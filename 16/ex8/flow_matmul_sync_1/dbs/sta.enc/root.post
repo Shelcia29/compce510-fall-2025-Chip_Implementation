@@ -1,0 +1,11 @@
+::db::check_and_set_root_attr delaycal_accurate_receiver_out_load true
+::db::check_and_set_root_attr delaycal_advanced_pin_cap_mode true
+::db::check_and_set_root_attr delaycal_enable_quiet_receivers_for_hold true
+::db::check_and_set_root_attr delaycal_eng_skipdefaultarc true
+::db::check_and_set_root_attr delaycal_eng_taskcompressionmode 2
+::db::check_and_set_root_attr delaycal_equivalent_waveform_model propagation
+::db::check_and_set_root_attr delaycal_ewm_type simulation
+::db::check_and_set_root_attr extract_rc_coupling_cap_threshold 0.1
+::db::check_and_set_root_attr extract_rc_relative_cap_threshold 1.0
+::db::check_and_set_root_attr extract_rc_total_cap_threshold 0.0
+::db::check_and_set_root_attr write_def_stream_check_uncolored false

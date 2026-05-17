@@ -1,0 +1,2 @@
+global init_ignore_lef_abstract
+set init_ignore_lef_abstract ""

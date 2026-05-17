@@ -1,0 +1,1 @@
+catch { if { [getMultiCpuUsage -localCpu] == 1 } { setMultiCpuUsage -localCpu 8 } }

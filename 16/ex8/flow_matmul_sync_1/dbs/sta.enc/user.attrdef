@@ -1,0 +1,207 @@
+define_attribute do_not_show_joules_log_on_error -data_type bool -obj_type root -category joules -help_string {Do not show child joules process log upon error.} -default_value {false} -hidden -quiet
+define_attribute enable_silicon_drift_flow -data_type bool -obj_type root -category timing_library -help_string {Enable silicon drift flow.} -default_value {false} -hidden -quiet
+define_attribute exp_stylus_db_silicon_drift -data_type string -obj_type root -category ifca -help_string {Internal attribute to control the behavior of the tool.} -hidden -quiet
+define_attribute flow_feature_add_1500 -data_type bool -obj_type root -category flow -help_string {add 1500 wrapper logic} -default_value {false} -quiet
+define_attribute flow_feature_add_bscan -data_type bool -obj_type root -category flow -help_string {add boundary scan chains} -default_value {false} -quiet
+define_attribute flow_feature_add_mbist -data_type bool -obj_type root -category flow -help_string {add mbist logic} -default_value {false} -quiet
+define_attribute flow_feature_add_opcg -data_type bool -obj_type root -category flow -help_string {add opcg logic} -default_value {false} -quiet
+define_attribute flow_feature_add_pegasus_beol_fill -data_type string -obj_type root -category flow -help_string {Insert metal fill using PEGASUS} -default_value {0} -hidden -quiet
+define_attribute flow_feature_add_pegasus_feol_fill -data_type string -obj_type root -category flow -help_string {Insert FEOL fill using PEGASUS} -default_value {0} -hidden -quiet
+define_attribute flow_feature_add_pvs_feol_fill -data_type string -obj_type root -category flow -help_string {Insert FEOL fill using PVS} -default_value {0} -hidden -quiet
+define_attribute flow_feature_add_pvs_fill -data_type string -obj_type root -category flow -help_string {Insert metal fill using PVS} -default_value {0} -hidden -quiet
+define_attribute flow_feature_add_scan -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_feature_check_drc_pegasus -data_type bool -obj_type root -category flow -help_string {Check DRC using Pegasus} -default_value {false} -quiet
+define_attribute flow_feature_check_drc_pvs -data_type bool -obj_type root -category flow -help_string {Check DRC using PVS} -default_value {false} -quiet
+define_attribute flow_feature_check_lvs_pegasus -data_type bool -obj_type root -category flow -help_string {Check LVS using PEGASUS} -default_value {false} -quiet
+define_attribute flow_feature_check_lvs_pvs -data_type bool -obj_type root -category flow -help_string {Check LVS using PVS} -default_value {false} -quiet
+define_attribute flow_feature_dft_compressor -data_type string -obj_type root -category flow -help_string {Add flow support for scan chains with compression insertion} -default_value {0} -hidden -quiet
+define_attribute flow_feature_dft_simple -data_type string -obj_type root -category flow -help_string {Add flow support for scan chain insertion} -default_value {0} -hidden -quiet
+define_attribute flow_feature_disable_naming_rules -data_type bool -obj_type root -category flow -help_string {No naming rules} -default_value {false} -quiet
+define_attribute flow_feature_dont_use_ulvt -data_type bool -obj_type root -category flow -help_string {Disable ULVT usage until opt_signoff} -default_value {false} -quiet
+define_attribute flow_feature_fix_route_drc -data_type bool -obj_type root -category flow -help_string {Check & fix regular route DRCs after route & postroute} -default_value {false} -quiet
+define_attribute flow_feature_flow_express -data_type string -obj_type root -category flow -help_string {Enable express synthesis and implementation flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_full_atpg -data_type bool -obj_type root -category flow -help_string {Create unlimited ATPG patterns} -default_value {false} -quiet
+define_attribute flow_feature_generate_models -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_feature_opt_eco -data_type string -obj_type root -category flow -help_string {Run opt_design during eco flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_opt_em -data_type string -obj_type root -category flow -help_string {Run EM (Electromigration) optimization during implementation flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_opt_postcts_hold_disable -data_type string -obj_type root -category flow -help_string {Disable postcts hold fixing} -default_value {0} -hidden -quiet
+define_attribute flow_feature_opt_postroute_split -data_type string -obj_type root -category flow -help_string {Run postroute opt_design for setup and hold as separate steps} -default_value {0} -hidden -quiet
+define_attribute flow_feature_opt_signoff -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_feature_pnr_db_handoff -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_feature_rail_analysis -data_type string -obj_type root -category flow -help_string {Run rail analysis in Voltus after flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_report_clp -data_type string -obj_type root -category flow -help_string {Add CLP dofile generation and checks to the flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_report_lec -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_feature_report_schedule -data_type string -obj_type root -category flow -help_string {Run report generation as a separate thread (note uses additional license) vs inline} -default_value {0} -hidden -quiet
+define_attribute flow_feature_route_secondary_nets -data_type string -obj_type root -category flow -help_string {Route secondary PG nets before route_design} -default_value {0} -hidden -quiet
+define_attribute flow_feature_run_atpg -data_type bool -obj_type root -category flow -help_string {Do ATPG in Modus} -default_value {false} -quiet
+define_attribute flow_feature_run_dft -data_type bool -obj_type root -category flow -help_string {Run DFT pattern generation and simulation after STA} -default_value {false} -quiet
+define_attribute flow_feature_run_joules_power -data_type bool -obj_type root -category flow -help_string {Generate TCF with Joules} -default_value {false} -quiet
+define_attribute flow_feature_sta_eco -data_type string -obj_type root -category flow -help_string {Run opt_signoff during signoff flow} -default_value {0} -hidden -quiet
+define_attribute flow_feature_synth_physical -data_type string -obj_type root -category flow -help_string {Physically aware synthesis flow with full phgysical final optimization} -default_value {0} -hidden -quiet
+define_attribute flow_feature_synth_spatial -data_type string -obj_type root -category flow -help_string {Flow feature enabled on command line.} -default_value {0} -hidden -quiet
+define_attribute flow_include_files -data_type string -obj_type root -category flow -help_string {Files to use in flow customization} -quiet
+define_attribute flow_report_name -data_type string -obj_type root -category flow -help_string {Name to use during report generation} -quiet
+define_attribute flow_report_prefix -data_type string -obj_type root -category flow -help_string {File prefix to use during report generation} -quiet
+define_attribute flow_source_directory -data_type string -obj_type root -category flow -help_string {Flow script source location} -quiet
+define_attribute flow_vars_bist_signals -data_type string -obj_type root -category user_flow -help_string {Generated verilog file which specifies bist signal connectivity} -quiet
+define_attribute flow_vars_constraint_modes -data_type string -obj_type root -category user_flow -help_string {Define the list of constraint modes} -quiet
+define_attribute flow_vars_data_directory -data_type string -obj_type root -category user_flow -help_string {Path to the input data} -quiet
+define_attribute flow_vars_design_name -data_type string -obj_type root -category user_flow -help_string {Top level design name} -quiet
+define_attribute flow_vars_design_top -data_type string -obj_type root -category user_flow -help_string {Top entity name to be elaborated} -quiet
+define_attribute flow_vars_dft_data_directory -data_type string -obj_type root -category user_flow -help_string {Path to the DFT input data} -quiet
+define_attribute flow_vars_dft_library -data_type string -obj_type root -category user_flow -help_string {Path to the DFT std cell library} -quiet
+define_attribute flow_vars_dft_ncsim_library -data_type string -obj_type root -category user_flow -help_string {Path to the DFT include library} -quiet
+define_attribute flow_vars_dont_use_list -data_type string -obj_type root -category user_flow -help_string {dont_use cell list definition} -quiet
+define_attribute flow_vars_elaboration_parameters -data_type string -obj_type root -category user_flow -help_string {Design toplevel parameters} -quiet
+define_attribute flow_vars_floorplan_def -data_type string -obj_type root -category user_flow -help_string {Path to the floorplan def file} -quiet
+define_attribute flow_vars_gdsin_stream_map_file -data_type string -obj_type root -category user_flow -help_string {Path to stream in map file} -quiet
+define_attribute flow_vars_gdsout_layer_map_table -data_type string -obj_type root -category user_flow -help_string {Path to stream out map file} -quiet
+define_attribute flow_vars_gdsout_stream_map_file -data_type string -obj_type root -category user_flow -help_string {Path to stream out map file} -quiet
+define_attribute flow_vars_hold_pnr_active_views -data_type string -obj_type root -category user_flow -help_string {Define the list of hold active analysis views for P&R} -quiet
+define_attribute flow_vars_hold_sta_active_views -data_type string -obj_type root -category user_flow -help_string {Define the list of hold active analysis views for STA} -quiet
+define_attribute flow_vars_hold_views -data_type string -obj_type root -category user_flow -help_string {Define the list of hold analysis views} -quiet
+define_attribute flow_vars_ict_em_models -data_type string -obj_type root -category user_flow -help_string {Path to ict em models} -quiet
+define_attribute flow_vars_io_gds_list -data_type string -obj_type root -category user_flow -help_string {IO GDS file list definition} -quiet
+define_attribute flow_vars_io_spi_list -data_type string -obj_type root -category user_flow -help_string {IO SPICE file list definition} -quiet
+define_attribute flow_vars_lef_list -data_type string -obj_type root -category user_flow -help_string {Lef file list definition} -quiet
+define_attribute flow_vars_lef_tech_file -data_type string -obj_type root -category user_flow -help_string {Path to lef technology file} -quiet
+define_attribute flow_vars_macro_gds_list -data_type string -obj_type root -category user_flow -help_string {Macro GDS file list definition} -quiet
+define_attribute flow_vars_macro_spi_list -data_type string -obj_type root -category user_flow -help_string {Macro SPICE file list definition} -quiet
+define_attribute flow_vars_memory_gds_list -data_type string -obj_type root -category user_flow -help_string {Memory GDS file list definition} -quiet
+define_attribute flow_vars_memory_path -data_type string -obj_type root -category user_flow -help_string {Path to memory libs} -quiet
+define_attribute flow_vars_memory_spi_list -data_type string -obj_type root -category user_flow -help_string {Memory SPICE file list definition} -quiet
+define_attribute flow_vars_mmmc_vt_flavor_list -data_type string -obj_type root -category user_flow -help_string {Define the the list of different VTs that should be loaded in the tool} -quiet
+define_attribute flow_vars_pegasus_antenna_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to Pegasus antenna rule file} -quiet
+define_attribute flow_vars_pegasus_drc_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to Pegasus DRC rule file} -quiet
+define_attribute flow_vars_pegasus_feol_fill_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PEGASUS FEOL fill rule file} -quiet
+define_attribute flow_vars_pegasus_lvs_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PEGASUS LVS rule file} -quiet
+define_attribute flow_vars_pegasus_metal_fill_gdsout_stream_map_file -data_type string -obj_type root -category user_flow -help_string {Path to PEGASUS metal fill stream out map file} -quiet
+define_attribute flow_vars_pegasus_metal_fill_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PEGASUS metal fill rule file} -quiet
+define_attribute flow_vars_power_intent -data_type string -obj_type root -category user_flow -help_string {Path to the power intent file} -quiet
+define_attribute flow_vars_power_view -data_type string -obj_type root -category user_flow -help_string {Define the power analysis view} -quiet
+define_attribute flow_vars_pvs_antenna_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PVS antenna rule file} -quiet
+define_attribute flow_vars_pvs_drc_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PVS DRC rule file} -quiet
+define_attribute flow_vars_pvs_feol_fill_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PVS FEOL fill rule file} -quiet
+define_attribute flow_vars_pvs_lvs_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PVS LVS rule file} -quiet
+define_attribute flow_vars_pvs_metal_fill_rule_file -data_type string -obj_type root -category user_flow -help_string {Path to PVS metal fill rule file} -quiet
+define_attribute flow_vars_qrc_tech_directory -data_type string -obj_type root -category user_flow -help_string {Path to qrc technology directory} -quiet
+define_attribute flow_vars_rtl_root_dir -data_type string -obj_type root -category user_flow -help_string {Design RTL root directory} -quiet
+define_attribute flow_vars_scan_abstracts -data_type string -obj_type root -category user_flow -help_string {Subblock scan abstract file paths} -quiet
+define_attribute flow_vars_sdf_list -data_type string -obj_type root -category user_flow -help_string {Macro SDF file list definition} -quiet
+define_attribute flow_vars_setup_pnr_active_views -data_type string -obj_type root -category user_flow -help_string {Define the list of setup active analysis views for P&R} -quiet
+define_attribute flow_vars_setup_sta_active_views -data_type string -obj_type root -category user_flow -help_string {Define the list of setup active analysis views for STA} -quiet
+define_attribute flow_vars_setup_synth_active_views -data_type string -obj_type root -category user_flow -help_string {Define the list of setup active analysis views for Synthesis} -quiet
+define_attribute flow_vars_stdcell_gds_list -data_type string -obj_type root -category user_flow -help_string {Stdcell GDS file list definition} -quiet
+define_attribute flow_vars_stdcell_path -data_type string -obj_type root -category user_flow -help_string {Path to stdcell libs} -quiet
+define_attribute flow_vars_stdcell_spi_list -data_type string -obj_type root -category user_flow -help_string {Stdcell SPICE file list definition} -quiet
+define_attribute flow_vars_tcf_file -data_type string -obj_type root -category user_flow -help_string {Path to the activity file generated by joules} -quiet
+define_attribute flow_vars_voltus_file_list -data_type string -obj_type root -category user_flow -help_string {Voltus file list definition} -quiet
+define_attribute joules_batch_eval_command -data_type string -obj_type root -category joules -help_string {The unix command to submit jobs to a server farm using eval of this command, when batch mode is chosen. It overrides joules_batch_script.} -hidden -quiet
+define_attribute joules_batch_script -data_type string -obj_type root -category joules -help_string {The unix command to submit jobs to a server farm.  Recommended settings are 'bsub -q <queuename> -o /dev/null -J <job_name>'.} -default_value {bsub} -hidden -quiet
+proc jls::ckattr_jls_exe {obj args} {
+
+  # assure that specified executable is ok
+  if {$args eq "default_search_order"} {
+    # default value - return ok
+    return 1
+  } elseif {[auto_execok $args] eq ""} {
+    jls::puts_send "Can not find specified executable: $args"
+    return 0
+  }
+  return 1
+}
+define_attribute joules_executable -data_type string -obj_type root -category joules -help_string {Joules executable to be used for encapsulated runs.} -check_function {jls::ckattr_jls_exe} -default_value {/opt/soc/eda/cadence/DDI231/bin/joules} -hidden -quiet
+define_attribute joules_extra_pin_mapping_rule -data_type string -obj_type root -category joules -help_string {Modify name while reading stimulus in replay.} -hidden -quiet
+define_attribute joules_launch_args -data_type string -obj_type root -category joules -help_string {The command line arguments that need to be passed to Joules while launching it.} -hidden -quiet
+define_attribute joules_launch_global_timeout -data_type int -obj_type root -category joules -help_string {Global launch timeout in s.} -default_value {2400} -hidden -quiet
+define_attribute joules_launch_initial_connection_timeout -data_type int -obj_type root -category joules -help_string {Launch timeout in s.} -default_value {1200} -hidden -quiet
+define_attribute joules_launch_license -data_type string -obj_type root -category joules -help_string {The first license to be used to start Joules.} -hidden -quiet
+define_attribute joules_launch_parallel_jobs -data_type bool -obj_type root -category joules -help_string {Launch parallel Joules jobs.} -default_value {true} -hidden -quiet
+define_attribute joules_launch_with_batch_command -data_type bool -obj_type root -category joules -help_string {Launch Joules with batch command.} -default_value {false} -hidden -quiet
+define_attribute joules_num_launch_attempts -data_type int -obj_type root -category joules -help_string {Number of launch attempts.} -default_value {5} -hidden -quiet
+proc jls::ckattr_jls_exe {obj args} {
+
+  # assure that specified executable is ok
+  if {$args eq "default_search_order"} {
+    # default value - return ok
+    return 1
+  } elseif {[auto_execok $args] eq ""} {
+    jls::puts_send "Can not find specified executable: $args"
+    return 0
+  }
+  return 1
+}
+define_attribute jstudio_executable -data_type string -obj_type root -category joules -help_string {Joules Studio executable to be used for encapsulated runs.} -check_function {jls::ckattr_jls_exe} -default_value {/opt/soc/eda/cadence/DDI231/bin/joules_studio} -hidden -quiet
+define_attribute jstudio_launch_args -data_type string -obj_type root -category joules -help_string {The command line arguments that need to be passed to Joules Studio while launching it.} -hidden -quiet
+define_attribute jstudio_launch_license -data_type string -obj_type root -category joules -help_string {The first license to be used to start Joules Studio.} -hidden -quiet
+proc jls::ckattr_lec_exe {obj args} {
+
+  # assure that specified executable is ok
+  if {[auto_execok $args] eq ""} {
+    jls::puts_send "Can not find specified executable: $args"
+    return 0
+  }
+  return 1
+}
+define_attribute lec_executable -data_type string -obj_type root -category joules -help_string {LEC executable to be used for xreplay runs.} -check_function {jls::ckattr_lec_exe} -default_value {/opt/soc/eda/cadence/CONFRML231/bin/lec} -hidden -quiet
+proc jls::ckattr_liberate_exe {obj args} {
+
+  # assure that specified executable is ok
+  if {[auto_execok $args] eq ""} {
+    jls::puts_send "Can not find specified executable: $args"
+    return 0
+  }
+  return 1
+}
+define_attribute liberate_executable -data_type string -obj_type root -category joules -help_string {Liberate executable to be used for xreplay runs.} -check_function {jls::ckattr_liberate_exe} -hidden -quiet
+define_attribute merge_activity_merge_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to merge_stimulus within merge_activity command.} -hidden -quiet
+define_attribute merge_activity_read_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to read_stimulus for merge_stimulus flow of merge_activity command.} -hidden -quiet
+define_attribute merge_activity_write_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to write_stimulus for merge_stimulus flow of merge_activity command.} -hidden -quiet
+define_attribute replay_merge_read_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to read_stimulus for merge_stimulus flow of xreplay_stimulus/replay_stimulus command.} -hidden -quiet
+define_attribute replay_merge_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to merge_stimulus within xreplay_stimulus/replay_stimulus command.} -hidden -quiet
+define_attribute replay_merge_write_stimulus_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to write_stimulus for merge_stimulus flow of xreplay_stimulus/replay_stimulus command.} -hidden -quiet
+define_attribute rpi_version -data_type string -obj_type root -category pi -help_string {UPF/CPF file version specified with read_power_intent command.} -hidden -quiet
+define_attribute show_joules_log_lines -data_type int -obj_type root -category joules -help_string {Dump Child Processes Joules logs in Innovus.} -default_value {0} -hidden -quiet
+define_attribute use_no_design_based_xreplay_merge_stim_flow -data_type bool -obj_type root -category joules -help_string {attribute will run xreplay merge stimulus flow in no design mode} -default_value {false} -hidden -quiet
+define_attribute use_parallel_read_stimulus_in_xreplay_merge_stim -data_type bool -obj_type root -category joules -help_string {attribute will run xreplay merge stimulus flow using parallel read stimulus} -default_value {false} -hidden -quiet
+define_attribute write_joules_standalone_flow_script -data_type bool -obj_type root -category joules -help_string {Attribute will dump xreplay_standalone_xreplay_stim.tcl for each stimulus.} -default_value {false} -hidden -quiet
+define_attribute xreplay_compare_sim_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to compare_sim command.} -hidden -quiet
+proc jls::sanity_check_for_xreplay_dump_annotation_info {obj args} {
+
+  # assure that specified value is ok
+  set args_str  {*}$args
+  set vals [split $args_str " "]
+  set pin_type {in out clock enable all}
+  set annotation_type {asserted unasserted unconnected non_toggle all}
+  set obj_type {port port_dft seq comb reg reg_dft mem mem_dft icgc latch bbox pad pm mux drivers rtl_drivers all}
+  #format for show_details option for report_sdb_annotation: <obj_type>[:<annotation_type>[:<pin_prop_type>]]
+  foreach val $vals {
+      set show_details_value [split $val ":"]
+      set length [llength $show_details_value]
+      if { $length > 0 && ( [llength [lsearch -all $obj_type [lindex $show_details_value 0] ] ] == 0) } {
+          puts "Error   : Invalid $val is given for attribute xreplay_dump_annotation_info." 
+          return 0
+      }
+      if { $length > 1 && ( [llength [lsearch -all $annotation_type [lindex $show_details_value 1] ] ] == 0) } {
+          puts "Error   : Invalid $val is given for attribute xreplay_dump_annotation_info." 
+          return 0
+      }
+      if { $length > 2 && ( [llength [lsearch -all $pin_type [lindex $show_details_value 2] ] ] == 0) } {
+          puts "Error   : Invalid $val is given for attribute xreplay_dump_annotation_info." 
+          return 0
+      }
+  }
+  return 1
+}
+define_attribute xreplay_dump_annotation_info -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to xreplay_stimulus command.} -check_function {jls::sanity_check_for_xreplay_dump_annotation_info} -hidden -quiet
+define_attribute xreplay_extra_options -data_type string -obj_type root -category joules -help_string {Attribute will pass arguments to xreplay command.} -hidden -quiet
+proc jls::ckattr_xrun_exe {obj args} {
+
+  # assure that specified executable is ok
+  if {[auto_execok $args] eq ""} {
+    jls::puts_send "Can not find specified executable: $args"
+    return 0
+  }
+  return 1
+}
+define_attribute xrun_executable -data_type string -obj_type root -category joules -help_string {Xrun executable to be used for xreplay runs.} -check_function {jls::ckattr_xrun_exe} -hidden -quiet
