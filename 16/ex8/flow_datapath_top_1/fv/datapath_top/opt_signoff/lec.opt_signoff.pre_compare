@@ -1,0 +1,4 @@
+add_pin_constraints 0 {scan_enable_datapath_top} -both
+add_primary_input {DFT_datapath_top_lockup_latch_neg_edge/D} -both
+add_ignored_inputs {DFT_datapath_top_lockup_latch_neg_edge/D} -both
+add_ignored_inputs {scan_in_matmul_sync_0} -module matmul_sync -both

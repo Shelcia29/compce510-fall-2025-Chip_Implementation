@@ -1,0 +1,3 @@
+
+{flow flow:lec tool lec tool_options {-nogui -lp -do fv/datapath_top/floorplan/lec.floorplan.do} status success steps_run {tool lec flow flow:lec canonical_path {} step {} features {} str {} child_of {flow:block flow:floorplan}} flow_schedule {} flow_starting_db {{} {} {} {}} flow_working_directory ./. branch floorplan caller_data {group 1 process_branch 1} next_step {} uuid {}}
+

@@ -1,0 +1,39 @@
+########################################################################################
+#                                                                                      #
+# Created by Genus(TM) Synthesis Solution 23.15-s099_1 on Fri Nov 14 15:34:41 EET 2025 #
+#                                                                                      #
+########################################################################################
+
+create_supply_port VDD \
+	 -direction in
+
+create_supply_net VDD
+
+connect_supply_net VDD \
+	 -ports VDD
+
+create_supply_port VSS \
+	 -direction in
+
+create_supply_net VSS
+
+connect_supply_net VSS \
+	 -ports VSS
+
+create_supply_set Set_VDD_VSS \
+	 -function { power VDD } \
+	 -function { ground VSS }
+
+create_power_domain pd_aon \
+	 -include_scope \
+	 -supply { primary Set_VDD_VSS }
+
+add_power_state Set_VDD_VSS -state on {  \
+	 -supply_expr { power == `{FULL_ON, 0.9} && ground == `{FULL_ON, 0.0} } }
+
+add_power_state pd_aon -state aon_state {  \
+	 -logic_expr { ((Set_VDD_VSS == on)) } }
+
+## BEGIN GENERATED connect_supply_net ##
+
+## END GENERATED connect_supply_net ##
