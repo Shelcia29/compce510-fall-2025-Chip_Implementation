@@ -1,0 +1,229 @@
+
+Cadence Innovus(TM) Implementation System.
+Copyright 2024 Cadence Design Systems, Inc. All rights reserved worldwide.
+
+Version:	v23.15-s106_1, built Wed Jul 16 17:15:29 PDT 2025
+Options:	-nowin -overwrite -log client_log/ASIC-vm_134034.client_1.log -init .nr_client.134034.1.tcl -noMultiCpuLicCheckout -DP -x 0001B027D7... 
+Date:		Fri Nov 14 16:57:17 2025
+Host:		ASIC-vm (x86_64 w/Linux 4.18.0-553.69.1.el8_10.x86_64) (8cores*8cpus*12th Gen Intel(R) Core(TM) i7-12700 25600KB)
+OS:		Rocky Linux 8.10 (Green Obsidian)
+
+License:
+		[16:57:27.329185] Configured Lic search path (23.02-s006): 5280@licl01.it.tuni.fi
+
+		Running innovus (-x) with Innovus_Impl_System capability.
+		Extra license Tempus_Timing_Signoff_XL
+		16 CPU jobs allowed with the current license(s). Use setMultiCpuUsage to set your required CPU count.
+The soft stacksize limit is either up to the hard limit or larger than 0.2% of RAM. No change is needed.
+Info: Process UID = 151040 / 28eec7b6-6180-48bd-97de-ec1e8abff4ee / roKDuobd87
+
+**INFO:  MMMC transition support version v31-84 
+
+<CMD> set_global _enable_mmmc_by_default_flow      $CTE::mmmc_default
+<CMD> suppressMessage ENCEXT-2799
+<CMD> getVersion
+[INFO] Loading Pegasus 24.13 fill procedures
+**WARN: Tk package not loaded. The Pegasus fill DRC monitor is disabled.
+Sourcing file ".nr_client.134034.1.tcl" ...
+source .nr_client.134034.1.tcl
+#Start client_route on Fri Nov 14 16:57:49 2025
+#
+#number of cpu = 16.
+#client index = 1763132489.
+#Connected to server ASIC-vm on port 33881. (16 threads)
+#WARNING (NRIF-80) When route_detail_post_route_swap_via is set to 'multiCut', the post route via swapping step will be performed on all nets, and to double cut vias. To swap to DFM vias based on via weight, please set the option to 'true'.
+#WARNING (NRIF-80) When route_detail_post_route_swap_via is set to 'multiCut', the post route via swapping step will be performed on all nets, and to double cut vias. To swap to DFM vias based on via weight, please set the option to 'true'.
+#WARNING (NRIF-90) Option setNanoRouteMode -route_bottom_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -bottomRoutingLayer instead.
+#WARNING (NRIF-90) Option setNanoRouteMode -route_bottom_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -bottomRoutingLayer instead.
+#WARNING (NRIF-91) Option setNanoRouteMode -route_top_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -topRoutingLayer instead.
+#WARNING (NRIF-91) Option setNanoRouteMode -route_top_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -topRoutingLayer instead.
+#Loading library ...
+#    loading LIBRARY_HEADER ...
+#    loading TECHNOLOGY ...
+#    loading 27 LAYERS ...
+#    loading 119 lib VIAS ...
+#    loading 16 VIA_RULES ...
+#    loading 6 RULES ...
+#    loading TIMING ...
+#    receiving 587 CELLS ...
+#setNanoRouteMode -drouteFixAntenna true
+#setNanoRouteMode -droutePostRouteSpreadWire "auto"
+#setNanoRouteMode -droutePostRouteSwapVia "multicut"
+#setNanoRouteMode -drouteUseMultiCutViaEffort "high"
+#setNanoRouteMode -routeAddAntennaInstPrefix "ANTENNA"
+#setNanoRouteMode -routeAntennaCellName "ANTENNA"
+#setNanoRouteMode -routeConcurrentMinimizeViaCountEffort "high"
+#setNanoRouteMode -routeInsertAntennaDiode true
+#setNanoRouteMode -routeWithEco true
+#setNanoRouteMode -routeWithLithoDriven true
+#setNanoRouteMode -routeWithViaInPin "1:1"
+#Loading design datapath_top init ...
+#    loading DESIGN_VIEW datapath_top,init ... 
+#    loading 185 CHILD CELL_VIEWS ...
+#    loading 21 design VIAS ...
+#    loading 307052 INSTANCES ...
+#    loading 2 SPECIAL_NETS ...
+#    loading 45961 NETS ...
+#setNanoRouteMode -drouteFixAntenna true
+#setNanoRouteMode -droutePostRouteSpreadWire "auto"
+#setNanoRouteMode -droutePostRouteSwapVia "multicut"
+#setNanoRouteMode -drouteUseMultiCutViaEffort "high"
+#setNanoRouteMode -routeAddAntennaInstPrefix "ANTENNA"
+#setNanoRouteMode -routeAntennaCellName "ANTENNA"
+#setNanoRouteMode -routeConcurrentMinimizeViaCountEffort "high"
+#setNanoRouteMode -routeInsertAntennaDiode true
+#setNanoRouteMode -routeWithEco true
+#setNanoRouteMode -routeWithLithoDriven true
+#setNanoRouteMode -routeWithViaInPin "1:1"
+**ERROR: (IMPESO-301):	The setSignoffOptMode command requires design data to be loaded.
+Type 'man IMPESO-301' for more detail.
+#cpu time = 00:00:01, elapsed time = 00:00:03, memory = 2075.15 (MB), peak = 2075.16 (MB)
+#Start routing data preparation on Fri Nov 14 16:58:09 2025
+#
+#Rebuild pin access data for design.
+#Restoring pin access data from file  ...
+#Done restoring pin access data
+#Initial pin access analysis.
+#Detail pin access analysis.
+#Done pin access analysis.
+# Metal1       H   Track-Pitch = 0.19000    Line-2-Via Pitch = 0.13000
+# Metal2       V   Track-Pitch = 0.20000    Line-2-Via Pitch = 0.15000
+# Metal3       H   Track-Pitch = 0.19000    Line-2-Via Pitch = 0.15000
+# Metal4       V   Track-Pitch = 0.20000    Line-2-Via Pitch = 0.15000
+# Metal5       H   Track-Pitch = 0.19000    Line-2-Via Pitch = 0.15000
+# Metal6       V   Track-Pitch = 0.20000    Line-2-Via Pitch = 0.15000
+# Metal7       H   Track-Pitch = 0.19000    Line-2-Via Pitch = 0.15000
+# Metal8       V   Track-Pitch = 0.20000    Line-2-Via Pitch = 0.15000
+# Metal9       H   Track-Pitch = 0.19000    Line-2-Via Pitch = 0.15000
+# Metal10      V   Track-Pitch = 0.50000    Line-2-Via Pitch = 0.42000
+# Metal11      H   Track-Pitch = 0.47500    Line-2-Via Pitch = 0.43000
+#Bottom routing layer index=2(Metal2), bottom routing layer for shielding=2(Metal2), bottom shield layer=2(Metal2) top shield layer=11(Metal11)
+#shield_bottom_stripe_layer=1(Metal1), shield_top_stripe_layer=11(Metal11)
+#pin_access_rlayer=2(Metal2) num_routing_layer=11 top_routing_layer=11 top_ripin_layer=11
+#shield_top_dpt_rlayer=-1 top_rlayer=11 top_trim_metal_rlayer=-1 rlayer_lowest=1 bottom_rlayer=2
+#enable_trim_layer_shield=F enable_dpt_layer_shield=F has_line_end_grid=F
+#WARNING (NRDB-103) Antenna cell FILL8 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL64 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL4 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL32 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL2 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL16 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell FILL1 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP9 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP8 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP7 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP6 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP5 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP4 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP3 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP2 does not have corresponding cell in innovus.
+#WARNING (NRDB-103) Antenna cell DECAP10 does not have corresponding cell in innovus.
+#Regenerating Ggrids automatically.
+#Auto generating G-grids with size=15 tracks, using layer Metal3's pitch = 0.19000.
+#Using automatically generated G-grids.
+#Done routing data preparation.
+#cpu time = 00:00:02, elapsed time = 00:00:02, memory = 2260.10 (MB), peak = 2260.10 (MB)
+#build: cpu time = 00:00:03, elapsed time = 00:00:03, memory = 2307.04 (MB), peak = 2307.04 (MB)
+#
+#Start client routing ...
+#start 4th optimization iteration ...
+#cpu time = 00:00:54, elapsed time = 00:00:09, memory = 2403.49 (MB), peak = 3206.76 (MB)
+#start 5th optimization iteration ...
+#cpu time = 00:03:35, elapsed time = 00:00:29, memory = 2425.95 (MB), peak = 3841.99 (MB)
+#start 6th optimization iteration ...
+#cpu time = 00:04:00, elapsed time = 00:00:32, memory = 2461.67 (MB), peak = 5084.86 (MB)
+#start 7th optimization iteration ...
+#cpu time = 00:01:19, elapsed time = 00:00:11, memory = 2464.20 (MB), peak = 5084.86 (MB)
+#start 8th optimization iteration ...
+#cpu time = 00:01:27, elapsed time = 00:00:12, memory = 2460.49 (MB), peak = 5084.86 (MB)
+#start 9th optimization iteration ...
+#cpu time = 00:01:43, elapsed time = 00:00:14, memory = 2463.89 (MB), peak = 5084.86 (MB)
+#start 10th optimization iteration ...
+#cpu time = 00:02:22, elapsed time = 00:00:19, memory = 2464.51 (MB), peak = 5084.86 (MB)
+#start 11th optimization iteration ...
+#cpu time = 00:03:01, elapsed time = 00:00:24, memory = 2461.51 (MB), peak = 5084.86 (MB)
+#start 12th optimization iteration ...
+#cpu time = 00:03:52, elapsed time = 00:00:31, memory = 2461.18 (MB), peak = 5085.20 (MB)
+#start 13th optimization iteration ...
+#cpu time = 00:01:16, elapsed time = 00:00:10, memory = 2464.43 (MB), peak = 5085.20 (MB)
+#start 14th optimization iteration ...
+#cpu time = 00:01:29, elapsed time = 00:00:12, memory = 2464.91 (MB), peak = 5085.20 (MB)
+#start 15th optimization iteration ...
+#cpu time = 00:02:01, elapsed time = 00:00:16, memory = 2463.92 (MB), peak = 5085.20 (MB)
+#start 16th optimization iteration ...
+#cpu time = 00:03:27, elapsed time = 00:00:28, memory = 2470.05 (MB), peak = 6329.90 (MB)
+#start 17th optimization iteration ...
+#cpu time = 00:03:29, elapsed time = 00:00:27, memory = 2459.09 (MB), peak = 6900.23 (MB)
+#start 18th optimization iteration ...
+#cpu time = 00:04:43, elapsed time = 00:00:38, memory = 2455.48 (MB), peak = 6900.23 (MB)
+#start 19th optimization iteration ...
+#cpu time = 00:01:31, elapsed time = 00:00:12, memory = 2453.17 (MB), peak = 6900.23 (MB)
+#start 20th optimization iteration ...
+#cpu time = 00:01:53, elapsed time = 00:00:15, memory = 2454.26 (MB), peak = 6900.23 (MB)
+#start 22th optimization iteration ...
+#cpu time = 00:02:39, elapsed time = 00:00:21, memory = 2454.68 (MB), peak = 6900.23 (MB)
+#start 41th optimization iteration ...
+#cpu time = 00:03:44, elapsed time = 00:00:30, memory = 2457.66 (MB), peak = 6900.23 (MB)
+#Cpu time = 00:48:28
+#Elapsed time = 00:06:32
+#Increased memory = 382.51 (MB)
+#Total memory = 2457.66 (MB)
+#Peak memory = 6900.23 (MB)
+#
+#WARNING (NRIF-80) When route_detail_post_route_swap_via is set to 'multiCut', the post route via swapping step will be performed on all nets, and to double cut vias. To swap to DFM vias based on via weight, please set the option to 'true'.
+#WARNING (NRIF-80) When route_detail_post_route_swap_via is set to 'multiCut', the post route via swapping step will be performed on all nets, and to double cut vias. To swap to DFM vias based on via weight, please set the option to 'true'.
+#WARNING (NRIF-90) Option setNanoRouteMode -route_bottom_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -bottomRoutingLayer instead.
+#WARNING (NRIF-90) Option setNanoRouteMode -route_bottom_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -bottomRoutingLayer instead.
+#WARNING (NRIF-91) Option setNanoRouteMode -route_top_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -topRoutingLayer instead.
+#WARNING (NRIF-91) Option setNanoRouteMode -route_top_routing_layer is obsolete. It will continue to work for the current release. To ensure compatibility with future releases, use option setDesignMode -topRoutingLayer instead.
+#build: cpu time = 00:00:00, elapsed time = 00:00:00, memory = 2460.27 (MB), peak = 6900.23 (MB)
+#
+#Start client routing ...
+#
+#start Post Route via swapping ...
+#cpu time = 00:00:29, elapsed time = 00:00:07, memory = 2458.88 (MB), peak = 6900.23 (MB)
+#
+#start DRC checking ...
+#cpu time = 00:00:26, elapsed time = 00:00:04, memory = 2454.61 (MB), peak = 6900.23 (MB)
+#Cpu time = 00:00:55
+#Elapsed time = 00:00:13
+#Increased memory = -3.05 (MB)
+#Total memory = 2454.61 (MB)
+#Peak memory = 6900.23 (MB)
+#
+#Cpu time = 00:49:24
+#Elapsed time = 00:07:13
+#Increased memory = 639.07 (MB)
+#Total memory = 2454.46 (MB)
+#Peak memory = 6900.23 (MB)
+#Finished client task on Fri Nov 14 17:05:02 2025
+#
+#
+#client_route statistics:
+#Cpu time = 00:49:24
+#Elapsed time = 00:07:13
+#Increased memory = 639.07 (MB)
+#Total memory = 2454.46 (MB)
+#Peak memory = 6900.23 (MB)
+#Number of warnings = 28
+#Total number of warnings = 28
+#Number of fails = 0
+#Total number of fails = 0
+#Complete client_route on Fri Nov 14 17:05:02 2025
+#
+#
+#  Scalability Statistics
+#
+#-------------------+---------+-------------+------------+
+#  client_route     | cpu time| elapsed time| scalability|
+#-------------------+---------+-------------+------------+
+#  Cell Pin Access  | 00:00:00|     00:00:00|         1.0|
+#  Data Preparation | 00:00:02|     00:00:02|         1.0|
+#  Entire Command   | 00:49:24|     00:07:13|         6.8|
+#-------------------+---------+-------------+------------+
+#
+*** Message Summary: 28 warning(s), 1 error(s)
+
+
+*** Memory Usage v#1 (Current mem = 7223.734M, initial mem = 894.402M) ***
+--- Ending "Innovus" (totcpu=0:49:39, real=0:07:45, mem=7223.7M) ---
