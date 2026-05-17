@@ -1,0 +1,37 @@
+  =================
+   Message Summary
+  =================
+---------------------------------------------------------------------------
+|   Id   |  Sev  |Count|                   Message Text                   |
+---------------------------------------------------------------------------
+|CDFG-818|Warning|    1|Using default parameter value for module          |
+|        |       |     | elaboration.                                     |
+|LBR-9   |Warning|   20|Library cell has no output pins defined.          |
+|        |       |     |Add the missing output pin(s)                     |
+|        |       |     | , then reload the library. Else the library cell |
+|        |       |     | will be marked as timing model i.e. unusable.    |
+|        |       |     | Timing_model means that the cell does not have   |
+|        |       |     | any defined function. If there is no output pin, |
+|        |       |     | Genus will mark library cell as unusable i.e. the|
+|        |       |     | attribute 'usable' will be marked to 'false' on  |
+|        |       |     | the libcell. Therefore, the cell is not used for |
+|        |       |     | mapping and it will not be picked up from the    |
+|        |       |     | library for synthesis. If you query the attribute|
+|        |       |     | 'unusable_reason' on the libcell; result will be:|
+|        |       |     | 'Library cell has no output pins.'Note: The      |
+|        |       |     | message LBR-9 is only for the logical pins and   |
+|        |       |     | not for the power_ground pins. Genus will depend |
+|        |       |     | upon the output function defined in the pin group|
+|        |       |     | (output pin)                                     |
+|        |       |     | of the cell, to use it for mapping. The pg_pin   |
+|        |       |     | will not have any function defined.              |
+|LBR-141 |Warning|   16|Clock function definition makes cell unusable.    |
+|        |       |     |The sequential cell cannot be inferred because its|
+|        |       |     | clock function is unknown.                       |
+|MESG-11 |Warning|    4|Maximum message print count reached.              |
+|PHYS-279|Warning|   20|Physical cell not defined in library.             |
+|        |       |     |Ensure that the proper library files are available|
+|        |       |     | and have been imported.                          |
+|TUI-32  |Warning|    1|This attribute will be obsolete in a next major   |
+|        |       |     | release.                                         |
+---------------------------------------------------------------------------

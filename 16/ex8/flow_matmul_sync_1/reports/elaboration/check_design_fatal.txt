@@ -1,0 +1,34 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'matmul_sync'
+
+No empty modules in design 'matmul_sync'
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'matmul_sync'
+
+No undriven sequential pin in 'matmul_sync'
+
+No undriven hierarchical pin in 'matmul_sync'
+
+No undriven port in 'matmul_sync'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'matmul_sync'
+
+No multidriven sequential pin in 'matmul_sync'
+
+No multidriven hierarchical pin in 'matmul_sync'
+
+No multidriven ports in 'matmul_sync'
+
+No multidriven unloaded nets in 'matmul_sync'
+
+  Done Checking the design.

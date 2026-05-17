@@ -1,0 +1,15 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'matmul_sync'
+
+No unloaded port in 'matmul_sync'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+No unloaded combinational element in 'matmul_sync'
+
+  Done Checking the design.
