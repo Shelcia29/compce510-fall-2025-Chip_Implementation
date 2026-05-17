@@ -1,0 +1,339 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'matmul_sync'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'matmul_sync'
+
+No empty modules in design 'matmul_sync'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'matmul_sync'
+
+design 'matmul_sync' has the following unloaded port(s)
+port:matmul_sync/scan_mode_matmul_sync
+port:matmul_sync/scan_enable_matmul_sync
+Total number of unloaded ports in design 'matmul_sync' : 2
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+No unloaded combinational element in 'matmul_sync'
+
+ Assigns
+ ------- 
+Total number of assign statements in design 'matmul_sync' : 0
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'matmul_sync'
+
+No undriven sequential pin in 'matmul_sync'
+
+No undriven hierarchical pin in 'matmul_sync'
+
+No undriven port in 'matmul_sync'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'matmul_sync'
+
+No multidriven sequential pin in 'matmul_sync'
+
+No multidriven hierarchical pin in 'matmul_sync'
+
+No multidriven ports in 'matmul_sync'
+
+No multidriven unloaded nets in 'matmul_sync'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'matmul_sync'
+
+design 'matmul_sync' has the following constant input sequential pin(s)
+pin:matmul_sync/operand_a_i_sr_reg_5/SN
+pin:matmul_sync/operand_a_i_sr_reg_5/SE
+pin:matmul_sync/operand_a_i_sr_reg_3/SN
+pin:matmul_sync/operand_a_i_sr_reg_3/SE
+pin:matmul_sync/operand_a_i_sr_reg_19/SN
+pin:matmul_sync/operand_a_i_sr_reg_19/SE
+pin:matmul_sync/operand_a_i_sr_reg_15/SN
+pin:matmul_sync/operand_a_i_sr_reg_15/SE
+pin:matmul_sync/operand_b_i_sr_reg_27/SN
+pin:matmul_sync/operand_b_i_sr_reg_27/SE
+pin:matmul_sync/operand_a_i_sr_reg_14/SN
+pin:matmul_sync/operand_a_i_sr_reg_14/SE
+pin:matmul_sync/operand_a_i_sr_reg_10/SN
+pin:matmul_sync/operand_a_i_sr_reg_10/SE
+pin:matmul_sync/operand_a_i_sr_reg_8/SN
+pin:matmul_sync/operand_a_i_sr_reg_8/SE
+pin:matmul_sync/operand_b_i_sr_reg_22/SN
+pin:matmul_sync/operand_b_i_sr_reg_22/SE
+pin:matmul_sync/operand_b_i_sr_reg_13/SN
+pin:matmul_sync/operand_b_i_sr_reg_13/SE
+pin:matmul_sync/operand_b_i_sr_reg_21/SN
+pin:matmul_sync/operand_b_i_sr_reg_21/SE
+pin:matmul_sync/operand_b_i_sr_reg_20/SN
+pin:matmul_sync/operand_b_i_sr_reg_20/SE
+pin:matmul_sync/operand_a_i_sr_reg_23/SN
+pin:matmul_sync/operand_a_i_sr_reg_23/SE
+pin:matmul_sync/operand_b_i_sr_reg_18/SN
+pin:matmul_sync/operand_b_i_sr_reg_18/SE
+pin:matmul_sync/operand_a_i_sr_reg_11/SN
+pin:matmul_sync/operand_a_i_sr_reg_11/SE
+pin:matmul_sync/operand_b_i_sr_reg_16/SN
+pin:matmul_sync/operand_b_i_sr_reg_16/SE
+pin:matmul_sync/operand_b_i_sr_reg_17/SN
+pin:matmul_sync/operand_b_i_sr_reg_17/SE
+pin:matmul_sync/operand_a_i_sr_reg_31/SN
+pin:matmul_sync/operand_a_i_sr_reg_31/SE
+pin:matmul_sync/operand_a_i_sr_reg_2/SN
+pin:matmul_sync/operand_a_i_sr_reg_2/SE
+pin:matmul_sync/operand_a_i_sr_reg_0/SN
+pin:matmul_sync/operand_a_i_sr_reg_0/SE
+pin:matmul_sync/operand_b_i_sr_reg_6/SN
+pin:matmul_sync/operand_b_i_sr_reg_6/SE
+pin:matmul_sync/operand_b_i_sr_reg_5/SN
+pin:matmul_sync/operand_b_i_sr_reg_5/SE
+pin:matmul_sync/operand_b_i_sr_reg_2/SN
+pin:matmul_sync/operand_b_i_sr_reg_2/SE
+pin:matmul_sync/operand_b_i_sr_reg_1/SN
+pin:matmul_sync/operand_b_i_sr_reg_1/SE
+pin:matmul_sync/operand_b_i_sr_reg_0/SN
+pin:matmul_sync/operand_b_i_sr_reg_0/SE
+pin:matmul_sync/operand_b_i_sr_reg_30/SN
+pin:matmul_sync/operand_b_i_sr_reg_30/SE
+pin:matmul_sync/operand_b_i_sr_reg_29/SN
+pin:matmul_sync/operand_b_i_sr_reg_29/SE
+pin:matmul_sync/operand_a_i_sr_reg_26/SN
+pin:matmul_sync/operand_a_i_sr_reg_26/SE
+pin:matmul_sync/operand_b_i_sr_reg_31/SN
+pin:matmul_sync/operand_b_i_sr_reg_31/SE
+pin:matmul_sync/operand_a_i_sr_reg_27/SN
+pin:matmul_sync/operand_a_i_sr_reg_27/SE
+pin:matmul_sync/operand_b_i_sr_reg_26/SN
+pin:matmul_sync/operand_b_i_sr_reg_26/SE
+pin:matmul_sync/operand_b_i_sr_reg_24/SN
+pin:matmul_sync/operand_b_i_sr_reg_24/SE
+pin:matmul_sync/operand_b_i_sr_reg_15/SE
+pin:matmul_sync/operand_b_i_sr_reg_14/SN
+pin:matmul_sync/operand_b_i_sr_reg_14/SE
+pin:matmul_sync/operand_b_i_sr_reg_10/SN
+pin:matmul_sync/operand_b_i_sr_reg_10/SE
+pin:matmul_sync/operand_b_i_sr_reg_8/SN
+pin:matmul_sync/operand_b_i_sr_reg_8/SE
+pin:matmul_sync/operand_a_i_sr_reg_30/SN
+pin:matmul_sync/operand_a_i_sr_reg_30/SE
+pin:matmul_sync/operand_b_i_sr_reg_28/SN
+pin:matmul_sync/operand_b_i_sr_reg_28/SE
+pin:matmul_sync/operand_a_i_sr_reg_13/SN
+pin:matmul_sync/operand_a_i_sr_reg_13/SE
+pin:matmul_sync/operand_b_i_sr_reg_25/SN
+pin:matmul_sync/operand_b_i_sr_reg_25/SE
+pin:matmul_sync/operand_a_i_sr_reg_18/SN
+pin:matmul_sync/operand_a_i_sr_reg_18/SE
+pin:matmul_sync/operand_a_i_sr_reg_16/SN
+pin:matmul_sync/operand_a_i_sr_reg_16/SE
+pin:matmul_sync/operand_a_i_sr_reg_29/SN
+pin:matmul_sync/operand_a_i_sr_reg_29/SE
+pin:matmul_sync/operand_a_i_sr_reg_21/SN
+pin:matmul_sync/operand_a_i_sr_reg_21/SE
+pin:matmul_sync/operand_b_i_sr_reg_9/SN
+pin:matmul_sync/operand_b_i_sr_reg_9/SE
+pin:matmul_sync/operand_b_i_sr_reg_23/SN
+pin:matmul_sync/operand_b_i_sr_reg_23/SE
+pin:matmul_sync/operand_b_i_sr_reg_19/SN
+pin:matmul_sync/operand_b_i_sr_reg_19/SE
+pin:matmul_sync/operand_a_i_sr_reg_7/SN
+pin:matmul_sync/operand_a_i_sr_reg_7/SE
+pin:matmul_sync/operand_a_i_sr_reg_24/SN
+pin:matmul_sync/operand_a_i_sr_reg_24/SE
+pin:matmul_sync/operand_a_i_sr_reg_1/SE
+pin:matmul_sync/operand_b_i_sr_reg_7/SE
+pin:matmul_sync/operand_a_i_sr_reg_17/SE
+pin:matmul_sync/operand_b_i_sr_reg_11/SN
+pin:matmul_sync/operand_b_i_sr_reg_11/SE
+pin:matmul_sync/operand_a_i_sr_reg_9/SN
+pin:matmul_sync/operand_a_i_sr_reg_9/SE
+pin:matmul_sync/operand_a_i_sr_reg_25/SN
+pin:matmul_sync/operand_a_i_sr_reg_25/SE
+pin:matmul_sync/operand_a_i_sr_reg_6/SN
+pin:matmul_sync/operand_a_i_sr_reg_6/SE
+pin:matmul_sync/operand_a_i_sr_reg_4/SN
+pin:matmul_sync/operand_a_i_sr_reg_4/SE
+pin:matmul_sync/operand_a_i_sr_reg_22/SN
+pin:matmul_sync/operand_a_i_sr_reg_22/SE
+pin:matmul_sync/operand_a_i_sr_reg_20/SN
+pin:matmul_sync/operand_a_i_sr_reg_20/SE
+pin:matmul_sync/operand_b_i_sr_reg_3/SN
+pin:matmul_sync/operand_b_i_sr_reg_3/SE
+pin:matmul_sync/operand_b_i_sr_reg_12/SN
+pin:matmul_sync/operand_b_i_sr_reg_12/SE
+pin:matmul_sync/operand_b_i_sr_reg_4/SN
+pin:matmul_sync/operand_b_i_sr_reg_4/SE
+pin:matmul_sync/operand_a_i_sr_reg_28/SN
+pin:matmul_sync/operand_a_i_sr_reg_28/SE
+pin:matmul_sync/operand_a_i_sr_reg_12/SN
+pin:matmul_sync/operand_a_i_sr_reg_12/SE
+Total number of constant sequential pins in design 'matmul_sync' : 124
+
+No constant hierarchical pin(s) in design 'matmul_sync'
+
+No constant connected ports in design 'matmul_sync'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'matmul_sync'
+No preserved sequential instance(s) in design 'matmul_sync'
+No preserved hierarchical instance(s) in design 'matmul_sync'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'matmul_sync'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'matmul_sync'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF2RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF2RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF2X1
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF2X2
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF4RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF4RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF4X1
+lib_cell:slow_0p9v_125c_ls/physical_cells/DFF4X2
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL1
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL16
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL2
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL32
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL4
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL64
+lib_cell:slow_0p9v_125c_ls/physical_cells/FILL8
+lib_cell:slow_0p9v_125c_ls/physical_cells/FSWNX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/FSWX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWDNX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWDX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWNX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOHLDX1_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOHLDX1_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOHX1_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOHX1_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOLX1_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISOLX1_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISONLX1_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/ISONLX1_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISOH_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISOH_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISOL_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISOL_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISONH_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISONH_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISONL_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHL_ISONL_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHLX1_FROM
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSHLX1_TO
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISOH_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISOH_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISOL_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISOL_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISONH_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISONH_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISONL_X1_FROM_OFF
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLH_ISONL_X1_TO_ON
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLHX1_FROM
+lib_cell:slow_0p9v_125c_ls/physical_cells/LSLHX1_TO
+lib_cell:slow_0p9v_125c_ls/physical_cells/PBUFX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/PINVX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNSQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNSRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNSRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNSX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFNX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFSQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFSRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFSRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFSX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RDFFX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RTLATRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RTLATSRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/RTLATX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SDFF2RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SDFF2RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/SDFF4RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SDFF4RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/SPDFF2RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SPDFF2RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/SPDFF4RX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SPDFF4RX2
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNSQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNSRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNSRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNSX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFNX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFSQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFSRQX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFSRX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFSX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/SRDFFX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWBX1
+lib_cell:slow_0p9v_125c_ls/physical_cells/HSWCX1
+Total number cell(s) with only physical (LEF) Info : 96
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             2
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)                0
+Assigns                                      0
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                       124
+Constant hierarchical Pin(s)                 0
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell        96
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.

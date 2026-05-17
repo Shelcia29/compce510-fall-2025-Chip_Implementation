@@ -1,0 +1,76 @@
+Reporting 1 scan chain (muxed_scan)
+ 
+Chain 1: scan_chain_matmul_sync_0 
+  scan_in:      scan_in_matmul_sync_0 
+  scan_out:     scan_out_matmul_sync_0   
+  shift_enable: scan_enable_matmul_sync (active high) 
+  clock_domain: scan_jtag (edge: rise)
+  power_domain: power_domain:matmul_sync/pd_aon
+  length: 64
+    bit 1 	operand_b_i_sr_reg_0  <clk_i (rise)>  
+    bit 2 	operand_b_i_sr_reg_1  <clk_i (rise)>  
+    bit 3 	operand_b_i_sr_reg_2  <clk_i (rise)>  
+    bit 4 	operand_b_i_sr_reg_3  <clk_i (rise)>  
+    bit 5 	operand_b_i_sr_reg_6  <clk_i (rise)>  
+    bit 6 	operand_b_i_sr_reg_7  <clk_i (rise)>  
+    bit 7 	operand_b_i_sr_reg_23  <clk_i (rise)>  
+    bit 8 	operand_b_i_sr_reg_20  <clk_i (rise)>  
+    bit 9 	operand_b_i_sr_reg_18  <clk_i (rise)>  
+    bit 10 	operand_b_i_sr_reg_19  <clk_i (rise)>  
+    bit 11 	operand_b_i_sr_reg_21  <clk_i (rise)>  
+    bit 12 	operand_b_i_sr_reg_22  <clk_i (rise)>  
+    bit 13 	operand_b_i_sr_reg_24  <clk_i (rise)>  
+    bit 14 	operand_b_i_sr_reg_25  <clk_i (rise)>  
+    bit 15 	operand_b_i_sr_reg_13  <clk_i (rise)>  
+    bit 16 	operand_b_i_sr_reg_14  <clk_i (rise)>  
+    bit 17 	operand_b_i_sr_reg_30  <clk_i (rise)>  
+    bit 18 	operand_b_i_sr_reg_29  <clk_i (rise)>  
+    bit 19 	operand_b_i_sr_reg_15  <clk_i (rise)>  
+    bit 20 	operand_a_i_sr_reg_10  <clk_i (rise)>  
+    bit 21 	operand_a_i_sr_reg_16  <clk_i (rise)>  
+    bit 22 	operand_a_i_sr_reg_17  <clk_i (rise)>  
+    bit 23 	operand_a_i_sr_reg_11  <clk_i (rise)>  
+    bit 24 	operand_a_i_sr_reg_12  <clk_i (rise)>  
+    bit 25 	operand_a_i_sr_reg_24  <clk_i (rise)>  
+    bit 26 	operand_b_i_sr_reg_31  <clk_i (rise)>  
+    bit 27 	operand_a_i_sr_reg_25  <clk_i (rise)>  
+    bit 28 	operand_a_i_sr_reg_15  <clk_i (rise)>  
+    bit 29 	operand_a_i_sr_reg_23  <clk_i (rise)>  
+    bit 30 	operand_a_i_sr_reg_29  <clk_i (rise)>  
+    bit 31 	operand_a_i_sr_reg_30  <clk_i (rise)>  
+    bit 32 	operand_a_i_sr_reg_28  <clk_i (rise)>  
+    bit 33 	operand_a_i_sr_reg_27  <clk_i (rise)>  
+    bit 34 	operand_a_i_sr_reg_31  <clk_i (rise)>  
+    bit 35 	operand_a_i_sr_reg_21  <clk_i (rise)>  
+    bit 36 	operand_a_i_sr_reg_22  <clk_i (rise)>  
+    bit 37 	operand_a_i_sr_reg_26  <clk_i (rise)>  
+    bit 38 	operand_a_i_sr_reg_20  <clk_i (rise)>  
+    bit 39 	operand_a_i_sr_reg_19  <clk_i (rise)>  
+    bit 40 	operand_a_i_sr_reg_14  <clk_i (rise)>  
+    bit 41 	operand_a_i_sr_reg_13  <clk_i (rise)>  
+    bit 42 	operand_a_i_sr_reg_6  <clk_i (rise)>  
+    bit 43 	operand_a_i_sr_reg_7  <clk_i (rise)>  
+    bit 44 	operand_a_i_sr_reg_18  <clk_i (rise)>  
+    bit 45 	operand_b_i_sr_reg_28  <clk_i (rise)>  
+    bit 46 	operand_a_i_sr_reg_5  <clk_i (rise)>  
+    bit 47 	operand_a_i_sr_reg_9  <clk_i (rise)>  
+    bit 48 	operand_a_i_sr_reg_8  <clk_i (rise)>  
+    bit 49 	operand_a_i_sr_reg_4  <clk_i (rise)>  
+    bit 50 	operand_b_i_sr_reg_26  <clk_i (rise)>  
+    bit 51 	operand_a_i_sr_reg_3  <clk_i (rise)>  
+    bit 52 	operand_a_i_sr_reg_2  <clk_i (rise)>  
+    bit 53 	operand_a_i_sr_reg_1  <clk_i (rise)>  
+    bit 54 	operand_b_i_sr_reg_27  <clk_i (rise)>  
+    bit 55 	operand_a_i_sr_reg_0  <clk_i (rise)>  
+    bit 56 	operand_b_i_sr_reg_12  <clk_i (rise)>  
+    bit 57 	operand_b_i_sr_reg_11  <clk_i (rise)>  
+    bit 58 	operand_b_i_sr_reg_10  <clk_i (rise)>  
+    bit 59 	operand_b_i_sr_reg_9  <clk_i (rise)>  
+    bit 60 	operand_b_i_sr_reg_8  <clk_i (rise)>  
+    bit 61 	operand_b_i_sr_reg_17  <clk_i (rise)>  
+    bit 62 	operand_b_i_sr_reg_16  <clk_i (rise)>  
+    bit 63 	operand_b_i_sr_reg_5  <clk_i (rise)>  
+    bit 64 	operand_b_i_sr_reg_4  <clk_i (rise)>  
+    llatch 64 	DFT_matmul_sync_lockup_latch_neg_edge <clk_i (low)>
+------------------------
+
