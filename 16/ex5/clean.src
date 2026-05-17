@@ -1,0 +1,2 @@
+rm -rf flow* logs/ fv/ dbs/ reports/ output* *~ atpg/ noneq.* hier_tmp* rtl_fv_map_db/
+
