@@ -1,0 +1,3548 @@
+create_flow_step -name activate_views {
+    set db [get_db flow_starting_db]
+    set flow [lindex [get_db flow_hier_path] end]
+    set setup_views [get_feature $flow -feature setup_views]
+    set hold_views [get_feature $flow -feature hold_views]
+    set leakage_view [get_feature $flow -feature leakage_view]
+    set dynamic_view [get_feature $flow -feature dynamic_view]
+    
+    if {($setup_views ne "") || ($hold_views ne "") || ($leakage_view ne "") || ($dynamic_view ne "")} {
+	#- use read_db args for DB types and set_analysis_views for TCL
+	if {([llength [get_db analysis_views]]) > 0 &&  ([lindex $db 0] eq {tcl} || [lindex $db 0] eq {enc} && [file isfile [lindex $db 1]])} {
+	    set cmd "set_analysis_view"
+	    if {$setup_views ne ""} {
+		append cmd " -setup [list $setup_views]"
+	    } else {
+		append cmd " -setup [list [get_db [get_db analysis_views -if .is_setup] .name]]"
+	    }
+	    if {$hold_views ne ""} {
+		append cmd " -hold [list $hold_views]"
+	    } else {
+		append cmd " -hold [list [get_db [get_db analysis_views -if .is_hold] .name]]"
+	    }
+	    if {$leakage_view ne ""} {
+		append cmd " -leakage [list $leakage_view]"
+	    } else {
+		if {[llength [get_db analysis_views -if .is_leakage]] > 0} {
+		    append cmd " -leakage [list [get_db [get_db analysis_views -if .is_leakage] .name]]"
+		}
+	    }
+	    if {$dynamic_view ne ""} {
+		append cmd " -dynamic [list $dynamic_view]"
+	    } else {
+		if {[llength [get_db analysis_views -if .is_dynamic]] > 0} {
+		    append cmd " -dynamic [list [get_db [get_db analysis_views -if .is_dynamic] .name]]"
+		}
+	    }
+	    eval $cmd
+	} elseif {[llength [get_db analysis_views]] == 0} {
+	    set_flowkit_read_db_args -setup_views "$setup_views" -hold_views "$hold_views" -leakage_view "$leakage_view" -dynamic_view "$dynamic_view"
+	} else {
+	}
+    }
+} -owner {cadence}
+set_db flow_step:activate_views .status not_run
+create_flow_step -name add_clock_spec {
+
+    if {[file exists scripts/clock_tree_spec.tcl]} {
+        puts "Info: Sourcing scripts/clock_tree_spec.tcl"
+        source scripts/clock_tree_spec.tcl
+    } else {
+        #- automatically create clock spec if one is not available
+        if {[llength [get_db clock_trees]] == 0} {
+            create_clock_tree_spec
+        } else {
+            puts "INFO: reusing existing clock tree spec"
+            puts "        to reload a new one use 'delete_clock_tree_spec' and 'read_ccopt_config"
+        }
+    }
+} -owner {cadence}
+set_db flow_step:add_clock_spec .status not_run
+create_flow_step -name add_clock_tree {
+    if {![get_db opt_enable_podv2_clock_opt_flow]} {
+        #- implement clock trees and propagated clock setup optimization
+        ccopt_design -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix ccopt_design
+    } else {
+        clock_opt_design -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix clock_opt_design
+    }
+} -owner {cadence}
+set_db flow_step:add_clock_tree .status not_run
+create_flow_step -name add_em_activity {
+    set_default_switching_activity -global_activity 0.2
+    
+    if {[file exists [get_db flow_vars_tcf_file]]} {
+	read_activity_file [get_db flow_vars_tcf_file]
+    } else {
+	puts "Error: TCF file not defined for EM activity"
+    }
+    
+    propagate_activity -set_net_freq true
+} -owner {design}
+set_db flow_step:add_em_activity .status not_run
+create_flow_step -name add_fillers {
+    #- insert filler cells before final routing
+    if {[get_db add_fillers_cells] ne "" } {
+	add_fillers
+    }
+} -owner {cadence}
+set_db flow_step:add_fillers .status not_run
+create_flow_step -name add_mbist_logic {
+    
+} -owner {design}
+set_db flow_step:add_mbist_logic .status not_run
+create_flow_step -name add_scan_logic {
+
+    #- Re-run DFT rule checks
+    check_dft_rules	     
+
+    if {0} {
+
+        add_core_wrapper_cell  -location [get_db ports {*src2dst* *dst2src*}]  -shared_through buffer  -no_mux_before_shared_cell  -wsen [get_db ports scan_enable*]
+
+        check_dft_rules
+
+        #report_core_wrapper_cell -report_flops
+
+        define_scan_chain -name 1500_chain  -sdi wchain_si_[get_db flow_vars_design_name]_0  -sdo wchain_so_[get_db flow_vars_design_name]_0  -create_ports
+
+        set num_chains [get_db current_design .dft_min_number_of_scan_chains]
+        reset_db current_design .dft_min_number_of_scan_chains
+        if {[get_db flow_feature_synth_physical] || [get_db flow_feature_synth_spatial]} {
+            place_dft_sequentials
+            
+            connect_scan_chains -chains 1500_chain  -elements [get_db scan_segments -if {.core_wrapper}]  -physical -incremental
+        } else {
+            connect_scan_chains -chains 1500_chain  -elements [get_db scan_segments -if {.core_wrapper}]  -incremental
+        }
+        set_db current_design .dft_min_number_of_scan_chains $num_chains
+    }
+
+    for {set i 0} {$i < [get_db [current_design] .dft_min_number_of_scan_chains]} {incr i} {
+        define_scan_chain  -sdi scan_in_[get_db flow_vars_design_name]_$i  -sdo scan_out_[get_db flow_vars_design_name]_$i  -create_ports  -name scan_chain_[get_db flow_vars_design_name]_$i  -terminal_lockup level_sensitive
+    }
+
+    #define_scan_chain -create_ports -sdi sdi -sdo sdo -terminal_lockup level_sensitive
+    if {[get_db flow_feature_synth_physical] || [get_db flow_feature_synth_spatial]} {
+	connect_scan_chains -chains scan_chain_*  -incremental  -physical -cluster_aggressively_high
+    } else {
+	connect_scan_chains -chains scan_chain_*  -incremental -zipper_stitch
+	
+    }
+
+    # connect shift enable signal to AICG TE-pins (can be done only after design is uniquified)
+    # go through all instantiated cgs
+    set_db ui_respects_preserve false
+    foreach icg_inst [get_db [get_db insts -if {.base_name==inst_TLATNTSCAX*}] .name] {
+	disconnect [get_db pins $icg_inst/TE]
+	connect [get_db ports scan_enable_[get_db flow_vars_design_name]] [get_db pins $icg_inst/TE] -prefix DFT_AICG_TE_scan_enable_[get_db flow_vars_design_name]_
+    }
+    set_db ui_respects_preserve true
+
+} -owner {design}
+set_db flow_step:add_scan_logic .status not_run
+create_flow_step -name add_switching_activity {
+    
+    foreach pd [get_db power_domains] {
+        
+        set_rail_analysis_domain  -domain_name [get_db $pd .name]  -power_nets [get_db [get_db $pd .primary_power_net] .name]  -ground_nets [get_db [get_db $pd .primary_ground_net] .name]  -threshold 0.10
+    }
+
+    set_default_switching_activity  -clock_gates_output 2.0  -global_activity 0.2  -input_activity 0.3
+
+    set_dynamic_power_simulation  -period 5ns  -resolution 50ps
+} -owner {tuni}
+set_db flow_step:add_switching_activity .status not_run
+create_flow_step -name add_tieoffs {
+    #- insert dedicated tieoff models
+    if {[get_db add_tieoffs_cells] ne "" } {
+	delete_tieoffs
+	#add_tieoffs -matching_power_domains true
+        puts "Warning: add_tiedoffs without matching_power_domains"
+	add_tieoffs
+    }
+} -owner {cadence}
+set_db flow_step:add_tieoffs .status not_run
+create_flow_step -name atpg_start {
+    set_db dft_verification_directory [get_db flow_vars_data_directory]/atpg
+    set_option modedef [dict get $allowed_testmodes [get_option testmode]]
+    set_option allowflushedmeasures yes
+    set_db workdir [get_db workdir]
+
+    if {[file exists [get_db dft_verification_directory]/scan_config.tcl]} {
+        source [get_db dft_verification_directory]/scan_config.tcl
+    }
+
+    if {[regexp COMPRESSION [get_option testmode]]} {
+        set_option experiment [get_db flow_vars_design_name]_compression
+    } else {
+        set_option experiment [get_db flow_vars_design_name]_atpg
+    }
+    
+    if {[file exists [get_db flow_vars_data_directory]/scripts/[get_db flow_vars_design_name].[get_option testmode].pinassign]} {
+        set_option assignfile [get_db flow_vars_data_directory]/scripts/[get_db flow_vars_design_name].[get_option testmode].pinassign
+    } else {
+        set scan_clk [dict get $dft_utils::port_alias jtag_tck]
+        dft_utils::read_pinassign [get_db dft_verification_directory]/[get_db flow_vars_design_name].[regsub COMPRESSION_DECOMP [get_option testmode] COMPRESSION].template.pinassign
+        # Scan clock sometimes incorrect
+        dft_utils::delete_test_function -pin $scan_clk -quiet
+        dft_utils::add_test_function -pin $scan_clk -function -EC
+        # Mask incorrect
+        if {[regexp COMPRESSION [get_option testmode]]} {
+            dft_utils::add_test_function -pin $scan_clk -function -CML
+            dft_utils::delete_test_function -pin [get_db [get_db ports mask_enable*] .name]
+            dft_utils::add_test_function -pin [get_db [get_db ports mask_enable*] .name] -function -CME
+        }
+        # OPCG load inputs incorrect, automatically assigned to all scan_ins
+        dft_utils::delete_all_by_function OLI
+        if {[regexp OPCG [get_option testmode]]} {
+            dft_utils::add_test_function -pin $scan_clk -function -OLC
+        }
+        # Scan in pads get incorrect ZTC
+        dft_utils::delete_all_by_function ZTC
+        dft_utils::write_pinassign [get_db dft_verification_directory]/[get_db flow_vars_design_name].[get_option testmode].pinassign
+        set_option assignfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].[get_option testmode].pinassign
+    }
+    
+    if {[file exists [get_db flow_vars_data_directory]/scripts/[get_db flow_vars_design_name].[get_option testmode].seqdef]} {
+        set_option seqdef [get_db flow_vars_data_directory]/scripts/[get_db flow_vars_design_name].[get_option testmode].seqdef
+    } elseif {[file exists [get_db dft_verification_directory]/[get_db flow_vars_design_name].[get_option testmode].seqdef]} {
+        set_option seqdef [get_db dft_verification_directory]/[get_db flow_vars_design_name].[get_option testmode].seqdef
+    } elseif {[file exists [get_db workdir]/testresults/TBDseqPatt.Set[get_option testmode]]} {
+        set_option seqdef [get_db workdir]/testresults/TBDseqPatt.Set[get_option testmode]
+        if {[regexp OPCG [get_option testmode]]} {
+            # build_testmode doesn't add scan_enable to sequence and will error
+            dft_utils::update_seqdef [get_option seqdef]
+            dft_utils::add_pi_event -pin [get_db [get_db ports *scan_enable*] .base_name] -value 1
+            dft_utils::finish_seqdef
+        }
+    } else {
+        set_option seqdef {}
+    }
+    
+    if {[info exists scan_mode_prop_cycles]} {
+        if {[get_option seqdef]!=""} {
+            dft_utils::update_seqdef [get_option seqdef]
+        } else {
+            set_option seqdef [get_db dft_verification_directory]/[get_db flow_vars_design_name].[get_option testmode].seqdef
+            dft_utils::init_seqdef [get_option seqdef] -name modeinit
+        }
+        dft_utils::add_prop_cycles $scan_mode_prop_cycles
+        dft_utils::finish_seqdef
+    }
+} -owner {cadence}
+set_db flow_step:atpg_start .status not_run
+create_flow_step -name block_finish {
+    #- Make sure flow_report_name is reset from any reports executed during the flow
+    set_db flow_report_name [get_db [lindex [get_db flow_hier_path] end] .name]
+    
+    if {[get_feature pnr_db_handoff] && [is_flow -quiet -inside flow:syn_opt]} {
+        set_db flow_write_db_common true
+    } else {
+        set_db flow_write_db_common false
+    }
+
+    #- Store non-default root attributes to metrics
+    catch {report_obj -tcl} flow_root_config
+    if {[dict exists $flow_root_config root:/]} {
+	set flow_root_config [dict get $flow_root_config root:/]
+    } elseif {[dict exists $flow_root_config root:]} {
+	set flow_root_config [dict get $flow_root_config root:]
+    } else {
+    }
+    foreach key [dict keys $flow_root_config] {
+	if {[string length [dict get $flow_root_config $key]] > 200} {
+	    dict set flow_root_config $key "\[long value truncated\]"
+	}
+    }
+    set_metric -name flow.root_config -value $flow_root_config
+} -write_db -owner {cadence} -categories {flow}
+set_db flow_step:block_finish .status success
+set_db flow_step:block_finish .run_count 1
+create_flow_step -name block_start {
+} -owner {cadence}
+set_db flow_step:block_start .status success
+set_db flow_step:block_start .run_count 1
+create_flow_step -name bscan_start {
+    set_db dft_verification_directory [get_db flow_vars_data_directory]/bscan_verification
+    set_option testmode 1149
+    set_option bsdlinput [get_db flow_vars_data_directory]/jtag/[get_db flow_vars_design_name].bsdl
+    set_option bsdlpkgpath [get_db flow_vars_data_directory]/jtag/
+    set_option allowflushedmeasures yes
+} -owner {cadence}
+set_db flow_step:bscan_start .status not_run
+create_flow_step -name build_core_migration_model {
+    build_core_migration_model  -modeltype complete  -modifynames yes
+} -owner {cadence}
+set_db flow_step:build_core_migration_model .status not_run
+create_flow_step -name build_faultmodel {
+    build_faultmodel  -includedynamic yes  -overwrite yes
+} -owner {cadence}
+set_db flow_step:build_faultmodel .status not_run
+create_flow_step -name build_model {
+    if {[file exists [get_db flow_vars_data_directory]/atpg/[get_db flow_vars_design_name].WIR_SCAN.pinassign]} {
+        set_option core yes
+    }
+
+    build_model
+
+    # For legacy reasons so this doesn't have to be in different configs
+    if {[llength [get_db ports jtag_tck*]]==1} {
+        dft_utils::set_port_names -jtag_tck [get_db [get_db ports jtag_tck*] .name]
+    }
+} -owner {cadence}
+set_db flow_step:build_model .status not_run
+create_flow_step -name build_testmode {
+    build_testmode
+} -owner {cadence}
+set_db flow_step:build_testmode .status not_run
+create_flow_step -name check_timing {
+    #- Reports that check design health
+    check_netlist -out_file        [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.netlist.rpt]
+    array unset cmode_done
+    foreach view_dpo [get_db analysis_views -if {.is_active && (.is_setup || .is_hold)}] {
+        set cmode [get_db $view_dpo .constraint_mode.name]
+        if {![info exists cmode_done($cmode)]} {
+            check_timing -view [get_db $view_dpo .name]               > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.timing.${cmode}.rpt]
+            set cmode_done($cmode) 1
+        } else {
+            continue
+        }
+    }
+
+    report_analysis_coverage     > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.coverage.rpt]
+    report_annotated_parasitics  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.annotation.rpt]
+    
+    #- Reports that describe constraints
+    report_clocks                > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]report.clocks.rpt]
+    report_case_analysis         > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]report.case_analysis.rpt]
+    #report_inactive_arcs         > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]report.inactive_arcs.rpt]
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:check_timing .status not_run
+create_flow_step -name check_tracks {
+    #- generate tracks after creating floorplan
+    if {[llength [get_db current_design .track_patterns]] == 0} {
+	puts "Fatal: Design floorplan does not contain track patterns. Redo floorplan"
+	exit(1)
+    }
+} -owner {cadence}
+set_db flow_step:check_tracks .status not_run
+create_flow_step -name commit_atpg {
+    commit_tests  -inexperiment [get_option experiment]
+} -owner {cadence}
+set_db flow_step:commit_atpg .status not_run
+create_flow_step -name create_cost_group {
+    #- Clear existing path_groups
+    get_db cost_groups -if {.name != default} -foreach {delete_obj $object}
+    
+    #- Add basic path_groups
+    set mems [get_cells -hierarchical -filter "@is_memory_cell"]
+    set icgs [filter_collection [all_registers] "@is_integrated_clock_gating_cell"]
+    set regs [remove_from_collection [all_registers -edge_triggered] $icgs]
+
+    foreach mode [get_db constraint_modes -if {.is_setup}] {
+        set_interactive_constraint_mode $mode
+        group_path -name in2out -from [all_inputs] -to [all_outputs]
+        if {[sizeof_collection [get_cells $regs]] > 0} {
+            group_path -name in2reg -from [all_inputs] -to $regs
+            group_path -name reg2out -from $regs -to [all_outputs]
+            group_path -name reg2reg -from $regs -to $regs
+        }
+        if {[sizeof_collection [get_cells $mems]] > 0} {
+            group_path -name mem2reg -from $mems -to $regs
+            group_path -name reg2mem -from $regs -to $mems
+            group_path -name mem2mem -from $mems -to $mems
+        }
+        if {[sizeof_collection [get_cells $icgs]] > 0} {
+            group_path -name reg2icg -from $regs -to $icgs
+        }
+    }
+} -owner {cadence}
+set_db flow_step:create_cost_group .status not_run
+create_flow_step -name create_embedded_test {
+    # Tpll calculated in create_mbist_interface_files
+
+    set_option interfacefiledir [get_db flow_vars_data_directory]/pmbist/testresults/testmode_data
+    set_option interfacefilelist [list [get_db flow_vars_design_name]_mbistchk_tdr_map.txt  [get_db flow_vars_design_name]_mbistsch_tdr_map.txt  [get_db flow_vars_design_name]_mbisttpn_tdr_map.txt  [get_db flow_vars_design_name]_${Tpll}_pattern_control.txt  [get_db flow_vars_design_name]_test_def.txt]
+
+    # Jtag mode assumed to be internal clock source, repair run only in mda if available
+    if {[get_option testmode]=="1149_patt"} {
+        # Modus gets confused without this
+        set_db workdir [get_db workdir]
+
+        set_option createpatterns jtag_production
+        set_option customtestplans  [dft_utils::get_mbist_testplans [get_option interfacefiledir]/[get_db flow_vars_design_name]_test_def.txt -pattern ptpn*]
+        set_option customexperiment MBIST_ATE_PROD_1_ICS
+        #set_option inexperiment [get_db [get_db testmodes 1149_patt] .experiments.name]
+    } elseif {[get_option testmode]=="mda"} {
+        set_option createpatterns pmda_production
+        
+        set_option customexperiment MBIST_ATE_DIRECTACCESS_1
+        #set_option inexperiment MBIST_ATE_DIRECTACCESS_1
+        if {"enable_bira_accum" in [dft_utils::get_mbist_testplans [get_option interfacefiledir]/[get_db flow_vars_design_name]_test_def.txt]} {
+            set_option customtestplans {enable_bira_accum ptpn_march_ssp px_move_bira_to_rru_disable_accum rerun_ptpn_march_ssp}
+        } else {
+            set_option customtestplans  [dft_utils::get_mbist_testplans [get_option interfacefiledir]/[get_db flow_vars_design_name]_test_def.txt -pattern ptpn*]
+        }
+    }
+        
+    create_embedded_test  -block [get_db flow_vars_design_name]  -buildtestmode no  -cleanstart yes  -prodschedule parallel_parallel
+
+} -owner {cadence}
+set_db flow_step:create_embedded_test .status not_run
+create_flow_step -name create_mbist_interface_files {
+    # Create interface files from templates based on mbist config
+    # TODO these should be separated, maybe run hier_test flow for jtag
+
+    set_db workdir [get_db workdir]
+
+    if {[get_option testmode]=="1149_patt"} {
+        # MBIST can be inserted without wir, in that case pll doesn't exists in block
+        set 1687_dir [get_db flow_vars_data_directory]/atpg
+            
+        if {[file exists $1687_dir/[get_db flow_vars_design_name].template.icl]} {
+            source [get_db dft_verification_directory]/mbist_config.tcl
+            
+            if {![info exists wir_bits]} {set wir_bits {}}
+            dft_utils::calculate_pll_config -r $R -n $N -m $M
+            dft_utils::create_mbist_pinassign [get_db workdir]/[get_db flow_vars_design_name].MBIST.pinassign
+            set Tpll $dft_utils::Tpll
+
+            dft_utils::create_pattern_control  -infile [get_db dft_verification_directory]/testresults/testmode_data/[get_db flow_vars_design_name]_template_pattern_control.txt
+
+            dft_utils::reset_wir_bits
+            dft_utils::add_wir_bits [concat $wir_bits scan_mode 0 mbist_mode 1]
+            
+            dft_utils::read_pdl $1687_dir/[get_db flow_vars_design_name].template.pdl -top [get_db flow_vars_design_name]
+            dft_utils::update_pll_pdl -mbist
+            dft_utils::write_pdl [get_db workdir]/[get_db flow_vars_design_name].MBIST.pdl
+            
+            dft_utils::read_icl $1687_dir/[get_db flow_vars_design_name].template.icl
+            dft_utils::fix_icl_opcg_macro -check_ports
+            dft_utils::fix_icl_jtag -mbist
+            dft_utils::write_icl [get_db workdir]/[get_db flow_vars_design_name].MBIST.icl
+            
+            set fp [open [get_db dft_verification_directory]/[get_db flow_vars_design_name].descfile w]
+            puts $fp "Algorithm SetMBIST_$Tpll;"
+            close $fp
+            
+            if {![llength [get_db testmodes WIR_SCAN]]} {
+                build_testmode  -name WIR_SCAN  -assignfile $1687_dir/[get_db flow_vars_design_name].WIR_SCAN.pinassign  -modedef FULLSCAN_BYPASS  -allowflushedmeasures yes
+            }
+
+            read_icl  -iclfile [get_db workdir]/[get_db flow_vars_design_name].MBIST.icl  -top [get_db flow_vars_design_name]  -testmode WIR_SCAN
+            
+            migrate_pdl_tests  -testmode WIR_SCAN  -experiment ijtag  -descfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].descfile  -pdlfile [get_db workdir]/[get_db flow_vars_design_name].MBIST.pdl  -generatemodeinit yes
+            
+            set_option assignfile [get_db workdir]/[get_db flow_vars_design_name].MBIST.pinassign
+            set_option seqdef [get_db workdir]/testresults/TBDseqPatt.SetMBIST_$Tpll
+        } else {
+            if {[file exists [get_db workdir]/testresults/testmode_data/[get_db flow_vars_design_name]_template_pattern_control.txt]} {
+                set dft_utils::Tpll 0
+                dft_utils::create_pattern_control  -infile [get_db workdir]/testresults/testmode_data/[get_db flow_vars_design_name]_template_pattern_control.txt
+            }
+            
+            set_option assignfile [get_db workdir]/[get_db flow_vars_design_name].MBIST.[get_option testmode].pinassign
+            dft_utils::create_mbist_pinassign -simple [get_option testmode]
+            if {[info exists mbist_port_ti]} {
+                dft_utils::read_pinassign [get_option assignfile]
+                foreach pair $mbist_port_ti {
+                    if {[lindex $pair 1]} {
+                        set function +TI
+                    } else {
+                        set function -TI
+                    }
+                    dft_utils::add_test_function -pin [lindex $pair 0] -function $function
+                }
+                dft_utils::write_pinassign [get_option assignfile]
+            }
+            set_option seqdef [get_db workdir]/[get_db flow_vars_design_name].[get_option testmode].seqdef
+            dft_utils::init_seqdef [get_option seqdef] -name modeinit
+            dft_utils::create_mbist_init
+            dft_utils::finish_seqdef
+        }
+        
+        if {[info exists mbist_mode_prop_cycles]} {
+            if {[get_option seqdef]!=""} {
+                dft_utils::update_seqdef [get_option seqdef]
+            } else {
+                set_option seqdef [get_db workdir]/[get_db flow_vars_design_name].[get_option testmode].seqdef
+                dft_utils::init_seqdef [get_option seqdef] -name modeinit
+            }
+            dft_utils::add_prop_cycles $mbist_mode_prop_cycles
+            dft_utils::finish_seqdef
+        }
+
+    } elseif {[get_option testmode]=="mda"} {
+        if {![info exists mda_ema]} {
+            set mda_ema 1111111111111111
+        }
+        if {![info exists mda_clk_ctrl]} {
+            set mda_clk_ctrl 00001000
+        }
+        
+        set seqdef [get_db workdir]/testresults/mda_modeinit.seqdef
+        dft_utils::init_seqdef $seqdef -name mda_init
+        if {[llength [get_db ports pll_ctrl_valid]]} {
+            dft_utils::create_mbist_pinassign -mda  -ema $mda_ema [get_db workdir]/[get_db flow_vars_design_name].MBIST.mda.pinassign  -clk_ctrl $mda_clk_ctrl
+            dft_utils::create_mda_init
+        } else {
+            # HPC cores don't have common clock interface
+            dft_utils::create_mbist_pinassign -mda  -ema $mda_ema [get_db workdir]/[get_db flow_vars_design_name].MBIST.mda.pinassign
+            if {[info exists mbist_port_ti]} {
+                dft_utils::read_pinassign [get_option assignfile]
+                foreach pair $mbist_port_ti {
+                    if {[lindex $pair 1]} {
+                        set function +TI
+                    } else {
+                        set function -TI
+                    }
+                    dft_utils::add_test_function [lindex $pair 0] -function $function
+                }
+                dft_utils::write_pinassign [get_option assignfile]
+            }
+            dft_utils::create_mda_init -simple
+        }
+        dft_utils::finish_seqdef
+        
+        set_option assignfile [get_db workdir]/[get_db flow_vars_design_name].MBIST.mda.pinassign
+        set_option seqdef $seqdef
+    }
+
+} -owner {cadence}
+set_db flow_step:create_mbist_interface_files .status not_run
+create_flow_step -name create_mda_headers {
+    set_db workdir [get_db workdir]
+    if {[llength [get_db ports mda_tdi]]} {
+        unset_option customtestplans ""
+        unset_option customexperiment
+        
+        create_embedded_test  -block [get_db flow_vars_design_name]  -buildtestmode no  -cleanstart yes  -prodschedule parallel_parallel
+        
+        # Subsystem can't really know this, probably has to be redone at top
+        if {![info exists index]} {
+            set index 0
+        }
+
+        dft_utils::create_mda_header_from_sequence  -in_file [glob -directory [get_db dft_verification_directory]/testresults/testmode_data/sources *.MBIST_ATE_DIRECTACCESS_1.gz]  -out_file [get_db workdir]/[get_db flow_vars_design_name]_mda.h -module [get_db flow_vars_design_name] -index $index  -pattern_control [get_option interfacefiledir]/[get_db flow_vars_design_name]_${Tpll}_pattern_control.txt
+    }
+        
+} -owner {cadence}
+set_db flow_step:create_mda_headers .status not_run
+create_flow_step -name create_path_groups {
+    #- Clear existing path_groups
+    reset_path_group -all
+
+    #- Add basic path_groups
+    set mems [get_cells -hierarchical -filter "@is_memory_cell"]
+    set icgs [filter_collection [all_registers] "@is_integrated_clock_gating_cell"]
+    set regs [remove_from_collection [all_registers -edge_triggered] $icgs]
+
+    foreach mode [get_db constraint_modes -if {.is_setup}] {
+        set_interactive_constraint_mode $mode
+        group_path -name in2out -from [all_inputs] -to [all_outputs]
+        if {[sizeof_collection [get_cells $regs]] > 0} {
+            group_path -name in2reg -from [all_inputs] -to $regs
+            group_path -name reg2out -from $regs -to [all_outputs]
+            group_path -name reg2reg -from $regs -to $regs
+        }
+        if {[sizeof_collection [get_cells $mems]] > 0} {
+            group_path -name mem2reg -from $mems -to $regs
+            group_path -name reg2mem -from $regs -to $mems
+            group_path -name mem2mem -from $mems -to $mems
+        }
+        if {[sizeof_collection [get_cells $icgs]] > 0} {
+            group_path -name reg2icg -from $regs -to $icgs
+        }
+    }
+} -owner {tuni}
+set_db flow_step:create_path_groups .status not_run
+create_flow_step -name define_timing_atpg {
+    # Protects from possible TSV-054 and TSV-059
+    read_sdc  -tsvconstraints
+
+    # Possible multicycles need to be read in
+    if {[file exists [get_db flow_vars_data_directory]/constraints/[get_db flow_vars_design_name].constraints.atpg_opcg.tcl]} {
+        read_sdc -sdc [get_db flow_vars_data_directory]/constraints/[get_db flow_vars_design_name].constraints.atpg_opcg.tcl
+    }
+} -owner {cadence}
+set_db flow_step:define_timing_atpg .status not_run
+create_flow_step -name dft_start {
+
+    file delete -force [get_db flow_vars_data_directory]/dft
+    
+    define_attribute dft_simulated_tests  -category user_flow  -data_type string  -default ""  -help_string "DFT simulated tests, list of dicts"  -obj_type root
+
+    define_attribute dft_unsimulated_tests  -category user_flow  -data_type string  -default ""  -help_string "DFT unsimulated tests, list of dicts"  -obj_type root
+
+    define_attribute dft_verification_directory  -category user_flow  -data_type string  -default ""  -help_string "Directory of DFT verification"  -obj_type root
+
+    define_attribute dft_running_simulations  -category user_flow  -data_type string  -default ""  -help_string "pids of simulations"  -obj_type root
+
+    source -quiet [get_db flow_source_directory]/../scripts_global/utilities/dft_utils.tcl
+    set_db workdir [get_db flow_vars_data_directory]/dft
+} -owner {cadence}
+set_db flow_step:dft_start .status not_run
+create_flow_step -name eco_finish {
+} -write_db -owner {cadence}
+set_db flow_step:eco_finish .status not_run
+create_flow_step -name eco_start {
+} -owner {cadence}
+set_db flow_step:eco_start .status not_run
+create_flow_step -name edit_model {
+    # There seems to be a bug in Modus causing undriven nets in model
+    
+    array unset nets
+    set fp [open [get_db workdir]/testresults/logs/log_build_model r]
+    while {[gets $fp line]>=0} {
+        if {[string match *TEI-143* $line]} {
+            regexp {.*'(.*)'.*'cell[[:space:]]+(.*)'.*'(.*)'.*} $line -> net cell file
+            lappend nets($cell) $net
+        }
+    }
+    close $fp
+
+    set fp [open [get_db workdir]/testresults/[get_db flow_vars_design_name].editfile w]
+
+    foreach {module net_l} [array get nets] {
+        foreach net $net_l {
+            set cell [get_db hinsts -if {.module.base_name==$module}]
+            set hnet [get_db $cell .local_hnets -if {.base_name==$net}]
+            if {[get_db $hnet .loads]==""} {
+                # Empty nets also reported
+                continue
+            }
+            set hport [get_db $hnet .loads -if {.obj_type==hport}]
+            if {[llength $hport]!=1} {
+                # !!! Might not always work
+                set hport [get_db $hport -expr {[llength $obj(.drivers)]==2}]
+            }
+            set nnet [get_db $hport .hnet]
+            set pins [get_db $hnet .loads -if {.obj_type==hpin||.obj_type==pin}]
+            foreach pin $pins {
+                puts $fp "move pin [get_db $pin .base_name] instance [get_db $pin .instance.base_name] to net [get_db $nnet .base_name] in cell [get_db $cell .module.name];"
+            }
+        }
+    }
+    close $fp
+
+    # TODO skipped, check if still causes issues
+    #edit_model -editfile [get_db workdir]/testresults/[get_db flow_vars_design_name].editfile
+
+} -owner {cadence}
+set_db flow_step:edit_model .status not_run
+create_flow_step -name edit_post_elaborate_netlist {
+    if {[file exists [get_db flow_vars_data_directory]/scripts/edit_post_elaborate_netlist.tcl]} {
+        source [get_db flow_vars_data_directory]/scripts/edit_post_elaborate_netlist.tcl
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:edit_post_elaborate_netlist .status not_run
+create_flow_step -name elaborate_design {
+    if {[get_db current_design] eq ""} {
+	#- setup library information
+	global mmmc_vars
+	if {[file exists scripts/mmmc_config.tcl]} {
+	    read_mmmc             scripts/mmmc_config.tcl
+	} else {
+	    read_mmmc             [get_db flow_source_directory]/mmmc_config.tcl
+	}
+	read_physical         -lef [get_db flow_vars_lef_list]
+	
+	#- read and elaborate design
+	#read_hdl
+	if {[file exists scripts/compile_[get_db flow_vars_design_name].tcl]} {
+	    puts "\nInfo: Sourcing scripts/compile_[get_db flow_vars_design_name].tcl"
+	    source scripts/compile_[get_db flow_vars_design_name].tcl
+	    puts "\n"
+	} else {
+	    puts "\nFatal: Compile-script not found! (scripts/compile_[get_db flow_vars_design_name].tcl)"
+	    puts "             Run make create_genustech\n"
+	    exit
+	}
+
+	# Check for non-default parameters for toplevel
+	set topname [get_db flow_vars_design_name]
+	if {[get_db flow_vars_design_top] != ""} {
+	    set topname [get_db flow_vars_design_top]
+	}
+	if {[get_db flow_vars_elaboration_parameters] != ""} {
+	    elaborate -parameters "[get_db flow_vars_elaboration_parameters]" ${topname}
+	} else {
+	    elaborate ${topname}
+	}
+	
+	# possible post-elaborate step
+	if {[file exists scripts/post_elaborate.tcl]} {
+	    puts "\nInfo: Sourcing scripts/post_elaborate.tcl"
+	    source scripts/post_elaborate.tcl
+	    puts "\n"
+	} elseif {[file exists [get_db flow_source_directory]/post_elaborate.tcl]} {
+	    puts "\nInfo: Sourcing [get_db flow_source_directory]/post_elaborate.tcl"
+	    source [get_db flow_source_directory]/post_elaborate.tcl
+	    puts "\n"
+	}
+	
+	# report macros after elaboration to see if linking is ok
+	puts "\nInfo: All macros in design:"
+	get_db insts -if {.is_macro==true} -foreach {puts [get_db $object .name]}
+	puts "\n"
+	
+	
+	# print memories into a text file (/reports folder)
+	set fp [open [get_db flow_report_directory]/[get_db flow_vars_design_name].memories.txt w]
+	if {[llength [get_db insts -if {.is_memory}]] > 0} {
+	    get_db insts -if {.is_memory} -foreach {puts $fp "[get_db $object .name] : [get_db $object .base_cell.name]"}
+	} else {
+	    puts $fp "no memories found"
+	}
+	
+	close $fp
+    }
+
+    if {![get_db flow_feature_disable_naming_rules]} {
+	write_db -to_file [get_db flow_database_directory]/syn_generic.elaborate_design.db
+    }
+
+    report_messages -warning > [get_db flow_report_directory]/elaboration/report_messages_warnings.txt
+    report_messages -error > [get_db flow_report_directory]/elaboration/report_messages_errors.txt
+    check_design -multiple_driver -unresolved -undriven > [get_db flow_report_directory]/elaboration/check_design_fatal.txt
+    check_design -unloaded -unloaded_comb > [get_db flow_report_directory]/elaboration/check_design_unloaded.txt
+    check_design -combo_loops > [get_db flow_report_directory]/elaboration/check_design_combo_loops.txt
+} -owner {design}
+set_db flow_step:elaborate_design .status not_run
+create_flow_step -name extract_rc {
+    if {([get_feature -feature add_pvs_fill] && [is_flow -quiet -after flow:opt_signoff.run_pvs_metal_fill]) ||
+    ([get_feature -feature add_pegasus_beol_fill] && [is_flow -quiet -after flow:opt_signoff.run_pegasus_metal_fill])} {
+	set_db extract_rc_pvs_fill true
+    }	
+    #set_multi_cpu_usage -local_cpu 4 -remote_host 1 -cpu_per_remote_host 4    
+    extract_rc
+    #set_multi_cpu_usage -local_cpu 8 -remote_host 1 -cpu_per_remote_host 8
+} -owner {cadence}
+set_db flow_step:extract_rc .status not_run
+create_flow_step -name fix_route_drc {
+    # check for possible routing DRCs and fix
+    # delete possible existing markers
+    delete_drc_markers
+    # check for routing drcs
+    check_drc -check_only regular
+    # if errors, fix
+    if {[llength [get_db markers -if {.type=="drc"}]]} {
+        route_eco -fix_drc
+    }
+} -owner {design}
+set_db flow_step:fix_route_drc .status not_run
+create_flow_step -name fix_via4_r4_m5_drc {
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+
+    if {![file exists scripts/pvsdrcctl_pr]} {
+        puts "Warning: file scripts/pvsdrcctl_pr does not exist"
+        puts "Creating file scripts/pvsdrcctl_pr"
+
+        set FH [open scripts/pvsdrcctl_pr w]
+        puts $FH "text_depth -primary;"
+        puts $FH "virtual_connect -colon no;"
+        puts $FH "virtual_connect -semicolon_as_colon yes;"
+        puts $FH "virtual_connect -noname;"
+        puts $FH "virtual_connect -report no;"
+        puts $FH "virtual_connect -depth -primary;"
+        puts $FH "report_summary -drc \"${design}.sum\" -replace;"
+        puts $FH "max_results -drc -all;"
+        puts $FH "max_vertex -drc 4096;"
+        puts $FH "results_db -drc \"${design}.drc_errors.ascii\" -ascii;"
+        puts $FH "keep_layers -none;"
+        puts $FH "abort_on_layout_error yes;"
+        puts $FH "layout_allow_duplicate_cell yes;"
+        puts $FH "select_check -drc VIA4.R.4:M5;"
+        puts $FH ""
+        close $FH
+
+ 
+    } else {
+        puts "Found existing file scripts/pvsdrcctl_pr"
+        puts "Using that in fix_via4_r4_m5_drc step"
+    }
+
+    write_stream  -die_area_as_boundary  -format stream  -map_file [get_db flow_vars_gdsout_stream_map_file]  -output_macros  -unit 1000  -mode ALL  $out_dir/$design.pr.gds.gz
+
+    exec pvs  -dp 32  -license_timeout 5  -run_dir PVS_DRC_PR  -log logs/PVS_DRC_PR.log  -ui_data  -control scripts/pvsdrcctl_pr  -gds $out_dir/$design.pr.gds.gz  -top_cell $design  -drc [get_db flow_vars_pvs_drc_rule_file]
+
+    read_markers -type pvs PVS_DRC_PR/$design.drc_errors.ascii
+    # Procedure to delete vias under DRC marker of specific type
+
+    foreach drc_marker [get_db markers -if ".user_type == VIA4.R.4:M5"] {
+        set vias_in_box [get_obj_in_area -areas [get_db $drc_marker .bbox] -obj_type special_via]
+        set_db selected $vias_in_box
+        puts "Deleting via $vias_in_box at location: [get_db $drc_marker .bbox]"
+        delete_routes -selected
+	puts "Creating via4 blockage on drc marker: [get_db $drc_marker .bbox]"
+	create_route_blockage -layers VIA4 -rects [get_db $drc_marker .bbox]
+    }
+
+    delete_markers
+    
+} -owner {flow}
+set_db flow_step:fix_via4_r4_m5_drc .status not_run
+create_flow_step -name generate_abstract {
+    if {![file exists models]} {file mkdir models}
+
+    # get top layer
+    set top_idx -42
+    set top_layer M1
+    get_db layers -foreach {
+        puts "r_idx: [get_db $object .route_index]"
+        if {[get_db $object .route_index] > $top_idx} {
+            set top_idx [get_db $object .route_index]
+            set top_layer [get_db $object .name]
+        }
+    }
+
+    # to add antenna information to LEF
+    check_process_antenna
+    write_lef_abstract -exclude_obs_layers $top_layer -stripe_pins -pg_pin_layers 10 [file join models [get_db flow_report_name] [get_db [current_design] .name].lef]
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:generate_abstract .status not_run
+create_flow_step -name generate_activity_file {
+    if {[get_db flow_feature_run_joules_power]} {
+	set ::rtls::use_joules_write_parsers 1
+	set_db lp_enable_jls_sdb_flow 1
+	set_default_activity -pin_types primary_input -duty 0 -freq 0
+	set_default_activity -pin_types seq_out -duty 0 -freq 0
+
+	read_stimulus  -file [lindex [get_db flow_vars_tcf_file] 0]  -dut_instance [lindex [get_db flow_vars_tcf_file] 1]  -frame 30  -start -end 25261ns  -scrub_prep -resim_cg_enables
+
+	propagate_activity -mode time_based
+	#compute_ideal_power -mode time_based
+	#compute_power -mode time_based
+
+	#write_tcf > [get_db flow_database_directory]/[get_db flow_vars_design_name].tcf
+	if {![file exists [get_db flow_report_directory]/joules]} {file mkdir [get_db flow_report_directory]/joules}
+	report_sdb_annotation > [get_db flow_report_directory]/joules/report_sdb_annotation.txt
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:generate_activity_file .status not_run
+create_flow_step -name genus_add_dft_constraints {
+
+    foreach constr_mode [get_db flow_vars_constraint_modes] {
+	set constr_files [list ]
+	foreach sdc [get_db [get_db constraint_modes -if {.base_name==${constr_mode}}] .sdc_files] {
+	    lappend constr_files $sdc
+	}
+	if {$constr_mode != "func"} {
+	} else {
+	    if {[is_flow -inside flow:syn_generic]} {
+		lappend constr_files [get_db flow_vars_data_directory]/constraints/[get_db flow_vars_design_name].constraints.hier_dft.tcl
+	    }
+	}
+	update_constraint_mode -name $constr_mode -sdc_files $constr_files
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_add_dft_constraints .status not_run
+create_flow_step -name genus_manage_derating {
+    # Enable native socv
+    #phys_enable_ocv -native_socv -design [current_design]
+    global mmmc_vars
+    foreach dc [get_db [get_db delay_corners -if {.is_setup}] .name] {
+	if {![info exists mmmc_vars(${dc},flat_data_cell_early)] ||
+	    ![info exists mmmc_vars(${dc},flat_data_cell_late)] ||
+	    ![info exists mmmc_vars(${dc},flat_clock_cell_early)] ||
+	    ![info exists mmmc_vars(${dc},flat_clock_cell_late)] ||
+	    ![info exists mmmc_vars(${dc},flat_data_net_early)] ||
+	    ![info exists mmmc_vars(${dc},flat_data_net_late)] ||
+	    ![info exists mmmc_vars(${dc},flat_clock_net_early)] ||
+	    ![info exists mmmc_vars(${dc},flat_clock_net_late)]} {
+	    puts "Fatal: mmmc_vars(${dc},flat_\[clock|data\]_\[cell|net\]_\[early|late\]) not defined! Check mmmc_setup.tcl!"
+	    exit 1
+	}
+	# Cell OCV
+	# Data
+	set_timing_derate -data  -cell_delay -early -delay_corner ${dc} $mmmc_vars(${dc},flat_data_cell_early)
+	set_timing_derate -data  -cell_delay -late  -delay_corner ${dc} $mmmc_vars(${dc},flat_data_cell_late)
+	# Clock
+	set_timing_derate -clock -cell_delay -early -delay_corner ${dc} $mmmc_vars(${dc},flat_clock_cell_early)
+	set_timing_derate -clock -cell_delay -late  -delay_corner ${dc} $mmmc_vars(${dc},flat_clock_cell_late)
+	
+	# Wire OCV
+	# Data
+	set_timing_derate -data  -net_delay  -early -delay_corner ${dc} $mmmc_vars(${dc},flat_data_net_early)
+	set_timing_derate -data  -net_delay  -late  -delay_corner ${dc} $mmmc_vars(${dc},flat_data_net_late)
+	# Clock
+	set_timing_derate -clock -net_delay  -early -delay_corner ${dc} $mmmc_vars(${dc},flat_clock_net_early)
+	set_timing_derate -clock -net_delay  -late  -delay_corner ${dc} $mmmc_vars(${dc},flat_clock_net_late)
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_manage_derating .status not_run
+create_flow_step -name genus_manage_preserve {
+    foreach dpo [get_db insts -if {.base_cell.class != block* && .base_cell.class != ""}] {
+	set_db $dpo .preserve true
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_manage_preserve .status not_run
+create_flow_step -name genus_manage_ungrouping {
+    foreach dpo [get_db insts -if {.base_cell.class != ""}] {
+	if {[get_db $dpo .parent.name] != [get_db flow_vars_design_name]} {
+	    set exit_loop false
+	} else {
+	    set exit_loop true
+	}
+	while {!$exit_loop} {
+	    set dpo [get_db $dpo .parent]
+	    set_db $dpo .ungroup_ok false
+	    if {[string first [string tolower [get_db flow_vars_design_name]] [string tolower [get_db $dpo .parent.name]]] == 0} {
+		set exit_loop true
+	    }
+	}
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_manage_ungrouping .status not_run
+create_flow_step -name genus_print_clock_tree_cells {
+} -owner {design}
+set_db flow_step:genus_print_clock_tree_cells .status not_run
+create_flow_step -name genus_read_activity_file {
+    if {[file exists [get_db flow_vars_tcf_file]]} {
+	read_tcf "[get_db flow_vars_tcf_file]"
+    } else {
+	puts "Error: TCF file not found [get_db flow_vars_tcf_file]! Skipping reading activity file"
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_read_activity_file .status not_run
+create_flow_step -name genus_to_clp {
+    #- create output location
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    file mkdir $out_dir
+    
+    #- write dofile for CLP
+    write_clp_script  -design $design  -files_1801 [get_db flow_vars_power_intent]  -netlist [file join $out_dir $design.v.gz]  -log_file [file join [get_db flow_log_directory] clp.[get_db flow_report_name].log]  -clp_out_report [file join [get_db flow_report_directory] [get_db flow_report_name] clp.rpt]  > [file join [get_db current_design .verification_directory]  clp.[get_db flow_report_name].do]
+    
+    #- schedule the CLP flow
+    #FlowtoolPredictHint ArgumentRandomise -branch
+    #schedule_flow  #	-flow clp  #	-branch [get_db flow_report_name]  #	-no_db  #	-no_sync  #	-tool_options "-nogui -lp -verify -do [file join [get_db current_design .verification_directory]  clp.[get_db flow_report_name].do]"
+
+} -owner {flow}
+set_db flow_step:genus_to_clp .status not_run
+create_flow_step -name genus_to_innovus {
+  #- Apply change_name rules
+  update_names  [get_db current_design]  -force  -verilog  -module  -append_log  -log [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]design.change_names.rpt]
+  
+  #- prevent SDCs from having set_timing_derate and group_path since these are ignored by innovus
+  set_db write_sdc_exclude {set_timing_derate group_path}
+  
+  #- write output files
+  if {![get_feature -feature pnr_db_handoff]} {
+      
+      # Old netlist handoff:
+      write_design  -innovus  -gzip_files  -basename [file normalize [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db current_design .name]]]
+      
+      set_db flow_post_db_overwrite [list tcl [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db current_design .name].invs_setup.tcl] [get_db flow_startup_directory] {}]
+  }  
+} -owner {cadence}
+set_db flow_step:genus_to_innovus .status not_run
+create_flow_step -name genus_to_lec {
+    #- create output location
+    set design  [get_db current_design .name]
+    if {[is_flow -quiet -inside flow:syn_opt] && [get_feature pnr_db_handoff]} {
+        set out_dir [lindex [get_db flow_starting_db] 1]/cmn
+    } else {
+        set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+        file mkdir $out_dir
+    }
+
+    #- write dofile for LEC
+    if {[is_flow -inside flow:syn_map]} {
+        if {[file exists scripts/lec.pre_compare.tcl]} {
+            write_do_lec  -top $design  -golden_design rtl  -revised_design fv_map  -pre_compare scripts/lec.pre_compare.tcl  -no_lp  -no_exit  -logfile [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  > [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do]
+        } else {
+            write_do_lec  -top $design  -golden_design rtl  -revised_design fv_map  -no_lp  -no_exit  -logfile [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  > [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do]
+        }
+	# Note, TL: From Benoit. Check if still needed!
+	#- Add "analyze_datapath -flowgraph" to dofile
+	file rename -force [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do] [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do.tmp]
+	set file_r [open [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do.tmp] r]
+	set file_w [open [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do] w]
+	
+	while {![eof $file_r]} {
+	    set line [gets $file_r]
+	    if {[regexp {analyze_datapath[ \t]+-verbose;} $line]} {
+		set line [regsub {(analyze_datapath[ \t]+-verbose;)} $line {analyze_datapath -flowgraph -verbose;}]
+	    } elseif {[regexp "read_library.+-lp all.+" $line]} {
+		set line [regsub -- "-lp all " $line ""]
+	    }
+
+	    puts $file_w $line
+	}
+	
+	close $file_r
+	close $file_w
+	# Note, TL. Check if needed end!
+
+    } else {
+        if {[file exists scripts/lec.pre_compare.syn_opt.tcl]} {
+            write_do_lec  -top $design  -golden_design fv_map  -revised_design [file join $out_dir $design.v.gz]  -pre_compare scripts/lec.pre_compare.syn_opt.tcl  -no_lp  -logfile [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  > [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do]
+        } else {
+            write_do_lec  -top $design  -golden_design fv_map  -revised_design [file join $out_dir $design.v.gz]  -no_lp  -logfile [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  > [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do]
+        }
+	#- Add "analyze_datapath -flowgraph" to dofile
+	file rename -force [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do] [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do.tmp]
+	set file_r [open [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do.tmp] r]
+	set file_w [open [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do] w]
+	
+	while {![eof $file_r]} {
+	    set line [gets $file_r]
+	    if {[regexp "read_library.+-lp all.+" $line]} {
+		set line [regsub -- "-lp all " $line ""]
+	    }
+
+	    puts $file_w $line
+	}
+	
+	close $file_r
+	close $file_w
+
+    }
+    
+    #- schedule the LEC flow
+    #FlowtoolPredictHint ArgumentRandomise -branch
+    #	schedule_flow  #	    -flow lec  #	    -branch [get_db flow_report_name]  #	    -no_db  #	    -no_sync  #	    -tool_options "-nogui -XL -do [file join [get_db current_design .verification_directory] lec.[get_db flow_report_name].do]"
+} -owner {flow}
+set_db flow_step:genus_to_lec .status not_run
+create_flow_step -name genus_to_modus {
+} -owner {flow}
+set_db flow_step:genus_to_modus .status not_run
+create_flow_step -name genus_uniquify_design {
+    set_db ui_respects_preserve false
+    uniquify [current_design] -verbose
+    set_db ui_respects_preserve true
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:genus_uniquify_design .status not_run
+create_flow_step -name genus_update_names {
+    #  update_names -suffix _front -module
+    update_names -prefix [get_db flow_vars_design_name]_ -module
+} -owner {tuni}
+set_db flow_step:genus_update_names .status not_run
+create_flow_step -name genus_write_tcf {
+
+    if {[get_db flow_feature_run_joules_power]} {
+	compute_ideal_power -mode time_based
+	compute_power -mode time_based
+	report_power -unit uW -format %.4f -by_leaf_instance > [get_db flow_report_directory]/joules/report_power_by_leaf_instance_[get_db flow_vars_design_name].rpt
+	report_power -unit uW -format %.4f -by_libcell > [get_db flow_report_directory]/joules/report_power_by_libcell_[get_db flow_vars_design_name].rpt
+    }
+
+    write_tcf >  [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].tcf]
+
+} -owner {tuni}
+set_db flow_step:genus_write_tcf .status not_run
+create_flow_step -name hier_test_1500_start {
+    # Empty
+} -owner {cadence}
+set_db flow_step:hier_test_1500_start .status not_run
+create_flow_step -name hier_test_1687_start {
+    # This step is for creating modeinits from 1687 files
+    set_db dft_verification_directory [get_db flow_vars_data_directory]/atpg
+    set_option testmode WIR_SCAN
+    set_option assignfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].WIR_SCAN.pinassign
+    set_option modedef FULLSCAN_BYPASS
+    set_option experiment ijtag
+    set_option allowflushedmeasures yes
+
+    set_option coremigrationdir [get_db workdir]/hier_migration
+
+    dft_utils::read_icl [get_db dft_verification_directory]/[get_db flow_vars_design_name].template.icl
+    dft_utils::read_pdl [get_db dft_verification_directory]/[get_db flow_vars_design_name].template.pdl  -top [get_db flow_vars_design_name]
+    
+    if {[regexp OPCG $testmodes]} {
+        source -quiet [get_db dft_verification_directory]/opcg_config.tcl
+        if {![info exists wir_bits]} {set wir_bits {}}
+        dft_utils::calculate_pll_config -r $R -n $N -m $M
+        dft_utils::add_wir_bits $wir_bits
+        
+        dft_utils::fix_icl_opcg_macro -check_ports
+        
+        dft_utils::update_pll_pdl
+        dft_utils::add_pdl_func_reset
+    }
+    
+    dft_utils::write_icl [get_db dft_verification_directory]/[get_db flow_vars_design_name].icl
+    dft_utils::write_pdl [get_db dft_verification_directory]/[get_db flow_vars_design_name].pdl
+} -owner {cadence}
+set_db flow_step:hier_test_1687_start .status not_run
+create_flow_step -name init_design {
+
+    #- optionally setup power intent from UPF/CPF/1801
+    if {[file exists [get_db flow_vars_power_intent]]} {
+	read_power_intent -1801 [get_db flow_vars_power_intent]
+    }
+
+    #- initialize library and design information
+    init_design
+
+    #- load floorplan (created by using "write_def <DEF FILE> -no_core_cells -no_special_net -no_std_cells")
+    if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+	set_db find_fuzzy_match true
+	read_def  [get_db flow_vars_floorplan_def]
+    }
+
+    #- add cells and commit power rules
+    if {[file exists [get_db flow_vars_power_intent]]} {
+	commit_power_intent
+    }
+
+    update_names -suffix _cn -name_collision -max_length 1000 [get_db current_design] 
+
+    #- load tool configs which require design information
+    if {[file exists scripts/[get_db program_short_name]_config.tcl]} {
+	uplevel #0 source -quiet scripts/[get_db program_short_name]_config.tcl
+    } else {
+	uplevel #0 source -quiet [file join [get_db flow_source_directory] [get_db program_short_name]_config.tcl]
+    }
+
+    if {[get_db flow_feature_disable_naming_rules]} {
+	write_db -to_file [get_db flow_database_directory]/syn_generic.init_design.disable_naming_rules.db
+    } else {
+	write_db -to_file [get_db flow_database_directory]/syn_generic.init_design.db
+    }
+} -owner {design}
+set_db flow_step:init_design .status not_run
+create_flow_step -name init_elaborate {
+
+    # Tool settings
+    set_db information_level 9
+    
+    # TL: Warns for each missing io port in def...
+    suppress_messages PHYS-156
+    # TL: Warns about multiple connections to power pins
+    suppress_messages PHYS-2381
+
+    # HDL attributes [get_db -category hdl]
+    #-------------------------------------------------------------------------------
+    if {![get_db flow_feature_disable_naming_rules]} {
+	puts "Info: Setting naming rules"
+	set_db hdl_array_naming_style %s_%d
+	set_db hdl_instance_array_naming_style %s_%d
+	set_db hdl_generate_index_style   %s_%d
+	set_db hdl_generate_separator _
+	set_db hdl_bus_wire_naming_style %s_%d
+	set_db hdl_record_naming_style %s_%s
+    }
+    if {[get_feature -feature flow_express]} {
+	# track RTL filename, row & column information for e.g. removed registers
+	set_db hdl_track_filename_row_col true
+    }
+    set_db hdl_max_loop_limit 32768
+    # Add, TL. new variable because of LTEMOD rtl, new in genus 18.73 (not official release)
+    #set_db hdl_array_read_mux_opto true
+    # Don't use scan ports for functional stuff
+    set_db use_scan_seqs_for_non_dft 		false
+    # Do not optimize away any logic which has floating nets in RTL
+    set_db hdl_unconnected_value none
+    # Do not set top name to a monstrous string with all non-default parameter values
+    set_db hdl_parameterize_module_name false
+    # no ungrouping to see hierarchy areas
+    #set_db auto_ungroup none
+
+    # Note, TL: temp fix for "interface signals using configurations bug"
+    set_db hdl_link_hier_inst_across_hdl_libraries true
+
+} -owner {flow}
+set_db flow_step:init_elaborate .status not_run
+create_flow_step -name init_floorplan {
+    if {[file exists floorplan_def/[get_db flow_vars_design_name].pso]} {
+        read_power_switches -in_file floorplan_def/[get_db flow_vars_design_name].pso
+    }
+    
+    if {![get_feature pnr_db_handoff]} {
+        if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+            read_def  dbs/syn_opt/[get_db flow_vars_design_name].def.gz
+        } else {
+            read_def  [get_db flow_vars_floorplan_def]
+        }
+    }
+    
+    if {![llength [get_db route_rules ndr_cts_2w25s_leaf]]} {
+        create_route_rule -name ndr_cts_2w25s_leaf -width {Metal1:Metal7 0.16} -spacing {Metal1:Metal7 0.15}
+    }
+    if {![llength [get_db route_rules ndr_cts_2w25s_trunk]]} {
+        create_route_rule -name ndr_cts_2w25s_trunk -width {Metal1:Metal7 0.16 Metal8:Metal9 0.32} -spacing {Metal1:Metal7 0.15 Metal8:Metal9 0.30}
+    }
+
+    create_route_type -name cts_route_type_top -preferred_routing_layer_effort medium -route_rule ndr_cts_2w25s_trunk -top_preferred_layer 9 -bottom_preferred_layer 8 -shield_net VSS
+    create_route_type -name cts_route_type_trunk -preferred_routing_layer_effort medium -route_rule ndr_cts_2w25s_trunk -top_preferred_layer 9 -bottom_preferred_layer 2 -shield_net VSS
+    create_route_type -name cts_route_type_leaf -preferred_routing_layer_effort medium -route_rule ndr_cts_2w25s_leaf -top_preferred_layer 7 -bottom_preferred_layer 2 -shield_net VSS
+
+    # VDDAON (secondary pg) NDR
+    if {![llength [get_db route_rules ndr_vddaon]]} {
+        create_route_rule -name ndr_vddaon -width {Metal1:Metal7 0.32 Metal8:Metal9 0.64}
+    }
+    create_route_type -name vddaon_ndr_route_type -stack_distance 0.001 -min_stack_layer 4 -preferred_routing_layer_effort high -route_rule ndr_vddaon -top_preferred_layer 6 -bottom_preferred_layer 5
+
+    if {![get_feature pnr_db_handoff]} {
+        # commit power intent only after reading in .def
+        commit_power_intent -verbose
+    }
+
+    if {[file exists scripts/post_init_floorplan.tcl]} {
+        source scripts/post_init_floorplan.tcl
+    }
+
+} -owner {design}
+set_db flow_step:init_floorplan .status not_run
+create_flow_step -name init_genus {
+
+    # Tool settings
+    set_db information_level 9
+
+    # Timing attributes  [get_db -category tim]
+    #-------------------------------------------------------------------------------
+    set_db ocv_mode                         true
+  
+    if {[get_feature -feature dft_simple] || [get_feature -feature dft_compressor]} {
+	# DFT attributes  [get_db -category dft]
+	#-------------------------------------------------------------------------------
+	set_db dft_wait_for_license true
+	
+    }
+    # automatic identification is a must to preserve synchronizer connections
+    set_db dft_auto_identify_shift_register true
+
+    # No identification for other test signals
+    set_db dft_identify_internal_test_clocks false
+    set_db dft_identify_test_signals false
+    set_db dft_identify_top_level_test_clocks false
+    set_db dft_include_controllable_pins_in_abstract_model allmodes
+
+
+    # Optimization attributes  [get_db -category netlist]
+    #-------------------------------------------------------------------------------
+    if {[get_feature -feature flow_express]} {
+	set_db syn_generic_effort express
+	set_db syn_map_effort     express
+	set_db syn_opt_effort     express
+    } else {
+	set_db syn_generic_effort medium
+	set_db syn_map_effort medium
+	set_db syn_opt_effort medium
+    }
+    set_db lp_insert_clock_gating true
+    set_db auto_ungroup both
+    
+    # Datapath attributes  [get_db -category dp]
+    #-------------------------------------------------------------------------------
+  
+    # Leakage Power attributes  [get_db -category lp_opt lib_ui]
+    #-------------------------------------------------------------------------------
+    set_db leakage_power_effort medium
+  
+    # Physical Synthesis attributes  [get_db -category phys]
+    #-------------------------------------------------------------------------------
+    set_db design_process_node              22
+    if {[get_feature -feature flow_express]} {
+	set_db design_flow_effort               express
+    }
+    if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+	# Physical Synthesis attributes  [get_db -category phys]
+	#-------------------------------------------------------------------------------
+	if {[array names env INNOVUSHOME] != ""} {
+	    set_db innovus_executable               $env(INNOVUSHOME)/tools/bin/innovus
+	} else {
+	    set_db innovus_executable               /opt/soc/eda/cadence/INNOVUS191/tools/bin/innovus
+	}
+	set_db phys_checkout_innovus_license    false
+
+	if {[file exists scripts/innovus_config.tcl]} {
+	    set_db invs_preload_script              scripts/innovus_config.tcl
+	    set_db invs_postload_script             ""
+	} else {
+	    set_db invs_preload_script              [get_db flow_source_directory]/innovus_config.tcl
+	    set_db invs_postload_script             ""
+	}
+	set_db invs_temp_dir $env(TMPDIR)/invs_temp_dir
+
+	set_db number_of_routing_layers 7
+
+	# # Clock gating setup
+	set_db base_cell:TLATNTSCAX4 .dont_use false
+	set_db current_design .lp_clock_gating_cell TLATNTSCAX4
+
+	set_db current_design .max_dynamic_power 0.06
+	set_db current_design .lp_power_optimization_weight 0.5
+
+	set_db lp_power_analysis_effort high
+	set_db lp_power_unit mW
+    }
+
+    # DFT helper procedures
+    source -quiet [get_db flow_source_directory]/dft_utils.tcl
+
+} -owner {flow}
+set_db flow_step:init_genus .status not_run
+create_flow_step -name init_innovus {
+
+    # Tool settings: NOTE: already set by flow_config.tcl
+    #set_multi_cpu_usage -local_cpu 8 -remote_host 1 -cpu_per_remote_host 8
+
+    if {[get_feature -feature report_lec]} {
+	# Init attributes  [get_db -category init]
+	#-------------------------------------------------------------------------------
+	set_db write_lec_directory_naming_style "fv/%s/[get_db flow_report_name]"
+	
+    }
+    set_db init_design_uniquify 1
+
+    # Design attributes  [get_db -category design]
+    #-------------------------------------------------------------------------------
+    set_db design_process_node            45
+    if {[get_feature -feature flow_express]} {
+	set_db design_flow_effort                   express
+    }
+    set_db design_early_clock_flow              true
+    
+    # Via naming
+    #-------------------------------------------------------------------------------
+    # Use design name as prefix for VIAs, as otherwise they will cause collision when merging designs on toplevel
+    set_db write_stream_via_names true
+
+    # Timing attributes  [get_db -category timing && delaycalc]
+    #-------------------------------------------------------------------------------
+    set_db timing_analysis_cppr           both
+    set_db timing_analysis_type           ocv
+    set_db timing_report_fields           {timing_point net cell fanout load transition delay incr_delay arrival edge user_derate power_domain}
+
+    #set_db timing_analysis_socv                               true                        ;# Enable socv analysis
+    #set_db timing_socv_rc_variation_mode                      true                        ;# Enable interconnect variation mode in SOCV mode
+    #set_db  timing_report_enable_verbose_ssta_mode true
+
+    # Add, TL: flow sets this to "no_async", async is default and should be used
+    set_db timing_analysis_async_checks async
+    # Add, TL: maybe a bit hazardous... disable default io delay for ports which are unconstrained!
+    # if true, will cause hold problems (since launching clock is the receiving clock (with same latency!))
+    set_db timing_apply_default_primary_input_assertion false
+
+    set_db delaycal_advanced_node_pin_cap_settings true
+    set_db delaycal_advanced_pin_cap_mode true
+
+    
+    # Extraction attributes  [get_db -category extract_rc]
+    #-------------------------------------------------------------------------------
+    if {[get_feature -feature add_pvs_fill] || [get_feature -feature add_pegasus_beol_fill]} {
+        set_db extract_rc_pvs_fill            true
+    }
+    if {[is_flow -after flow:opt_signoff] || [is_flow -inside flow:opt_signoff]} {
+	set_db extract_rc_effort_level signoff
+        set_db extract_rc_qrc_cmd_type partial
+        set_db extract_rc_qrc_cmd_file scripts/gpdk045_qrc.map
+    }
+	
+    if {[is_flow -after flow:route]} {
+	set_db delaycal_enable_si           true
+	set_db extract_rc_engine            post_route
+	# Note, TL: default is false, see effect of setting to true
+	#set_db si_delay_separate_on_data                  true
+    }    
+    if [is_flow -after_history flow:route] {
+	set_db delaycal_equivalent_waveform_model               propagation
+    } else {
+	set_db delaycal_equivalent_waveform_model               no_propagation
+    }           
+    set_db si_aggressor_alignment                             timing_aware_edge       
+
+    # Mod, TL: Too few licenses to extract all corners in parallel . Use the following to reduce number of used licenses :
+    #set_db extract_rc_qrc_run_mode sequential
+    
+    # Floorplan attributes  [get_db -category floorplan]
+    #-------------------------------------------------------------------------------
+    set_db finish_floorplan_active_objs   [list macro soft_blockage core]
+    # Constraints for even or odd site width/ row height
+    set_db floorplan_row_site_height                          even
+    set_db floorplan_row_site_width                           even
+    
+    # Placement attributes  [get_db -category place]
+    #-------------------------------------------------------------------------------
+    set_db place_detail_legalization_inst_gap                 1 
+    set_db place_detail_use_no_diffusion_one_site_filler      false                        ;# False to not leave 1-site gaps
+    set_db place_detail_filler_gap_min_gap                    0.2
+    set_db place_detail_filler_gap_effort                     high
+    
+    set_db place_global_uniform_density                       true                        ;# Enable even cell distribution for designs with less than 70% utilization
+
+    set_db place_global_place_io_pins               true
+    set_db place_detail_use_check_drc               true
+    #set_db place_detail_color_aware_legal           true
+    
+    # Tieoff attributes  [get_db -category add_tieoffs]
+    #-------------------------------------------------------------------------------
+    set_db add_tieoffs_cells                        [list TIEHI TIELO]
+    # tieoff max fanout not honored without this?
+    set_db add_tieoffs_max_fanout 32
+
+    # Optimization attributes  [get_db -category opt]
+    #-------------------------------------------------------------------------------
+    set_db opt_fix_hold_allow_setup_tns_degradation           true                        ;# When set to true, allows setup total negative slack to degrade during hold optimization.
+    set_db opt_fix_hold_verbose                               true                        ;# When set to true, display extra info in the log about remaining hold violations.
+    set_db opt_new_inst_prefix            "[get_db flow_report_name]_"
+    # Note, do not use DEL* -cells for hold fixing because of HUGE variation
+    set_db opt_fix_hold_lib_cells                   [list  ]
+    # enable data checks during gigaplace (false by default)
+    #set_db opt_enable_data_to_data_checks     true
+
+    # fix max_fanout / max_load violations, false by default
+    set_db opt_fix_fanout_load true
+
+    # Clock attributes  [get_db -category cts]
+    #-------------------------------------------------------------------------------
+    set_db cts_top_fanout_threshold                           2000                        ;# Minimum number of transitive fanout in the clock tree for a net to be routed as a top net
+    set_db cts_target_skew                          0.15
+    set_db cts_target_max_transition_time           0.10
+
+    set_db cts_buffer_cells                         [list CLKBUFX12 CLKBUFX16 CLKBUFX2 CLKBUFX20 CLKBUFX3 CLKBUFX4 CLKBUFX6 CLKBUFX8]
+    set_db cts_inverter_cells                       [list CLKINVX1 CLKINVX12 CLKINVX16 CLKINVX2 CLKINVX20 CLKINVX3 CLKINVX4 CLKINVX6 CLKINVX8]
+    set_db cts_clock_gating_cells                   [list TLATNCAX12 TLATNCAX16 TLATNCAX2 TLATNCAX20 TLATNCAX3 TLATNCAX4 TLATNCAX6 TLATNCAX8]
+    set_db cts_logic_cells                          [get_db [get_db base_cells CLK*] .name]
+
+    #- Route types definitions occur during the "init_floorplan" flow_step
+    if {[get_db route_types] ne ""} {
+	set_db cts_route_type_leaf                     cts_route_type_leaf
+	set_db cts_route_type_trunk                    cts_route_type_trunk
+	set_db cts_route_type_top                      cts_route_type_top
+    }
+    
+    # Only use inverters in clock tree, no buffers
+    set_db cts_use_inverters true
+
+    # Use max 32 fanout also in CTS
+    set_db cts_max_fanout 32
+
+    # power balance leakage / dynamic
+    #-------------------------------------------------------------------------------
+    # Optimize both leakage & dynamic with same weight
+    set_db opt_leakage_to_dynamic_ratio                 0.5
+
+    # Filler attributes  [get_db -category add_fillers]
+    #-------------------------------------------------------------------------------
+    #set_db add_fillers_avoid_abutment_patterns                "1:1 2:1"                   ;# Avoid 1:1 filler abutment
+    set_db add_fillers_cells                        [list  DECAP10 DECAP2 DECAP3 DECAP4 DECAP5 DECAP6 DECAP7 DECAP8 DECAP9  FILL1 FILL16 FILL2 FILL32 FILL4 FILL64 FILL8  ]
+    set_db add_fillers_no_single_site_gap true
+    # Insert fillers to toplevel hierarchy
+    set_db add_fillers_cell_name_style                      flat
+
+    # Routing attributes  [get_db -category route]
+    #-------------------------------------------------------------------------------
+    set_db route_early_global_bottom_routing_layer            [get_db [get_db layers Metal2] .route_index]
+    set_db route_early_global_top_routing_layer               [get_db [get_db layers Metal11] .route_index]
+    #set_db route_early_global_num_tracks_per_clock_wire     1
+    set_db route_early_global_num_tracks_per_clock_wire     5
+
+    # Note TL: use only up to M8 in routing
+    set_db route_design_bottom_routing_layer                  [get_db [get_db layers Metal2] .route_index]
+    set_db route_design_top_routing_layer                     [get_db [get_db layers Metal11] .route_index]
+
+    set_db route_design_detail_post_route_swap_via          none
+    set_db route_design_with_litho_driven                   true
+    set_db route_design_with_timing_driven                  true
+
+    # Antenna options
+    set_db route_design_antenna_pin_limit                   1000
+    set_db route_design_antenna_cell_name                   ANTENNA
+    set_db route_design_add_antenna_inst_prefix             "ANTENNA"
+    set_db route_design_antenna_diode_insertion             true
+    set_db route_design_detail_fix_antenna                  true
+
+    #set_db route_design_process_node                        45
+    set_db route_design_with_via_in_pin                     1:1 ; # enclose via inside stdcell pin shape on M1 accesses
+
+    # H240 trim grid definition
+    #set_db route_design_with_trim_metal "-layer 2  #-mask2 {-pitch 0.24 -core_offset 0.225 -width 0.03 }  #-mask2 {-pitch 0.24 -core_offset 0.095 -width 0.03 }  #-mask1 {-pitch 0.24 -core_offset 0.015 -width 0.03 }  #-mask1 {-pitch 0.24 -core_offset 0.145 -width 0.03 }"
+
+    set_db route_design_concurrent_minimize_via_count_effort  high                        ;# Reduce the via count while routing
+    set_db route_design_detail_use_multi_cut_via_effort       high                        ;# Turn on concurrent double/bar cut routing before CTS
+    #set_db route_design_with_via_only_for_block_cell_pin      2:2                         ;# Access M2 MACRO pin with VIA only
+
+    if [is_flow -after_history flow:route] {
+#	reset_db route_design_detail_use_multi_cut_via_effort                               ;# Turn off concurrent double/bar cut routing
+#	eval_legacy {setNanoRouteMode -drouteExpConcurrentMinimizeViaCountCost 64}          ;# Concurrently minimize via count adding via cost
+#	set_db route_design_antenna_diode_insertion             true                        ;# Allow diode insertion for Antenna fixing
+	set_db route_design_detail_post_route_swap_via          multicut                    ;# If postroute double cuts are desired..although the percentage of swap is low for N7
+#    }
+
+    eval_legacy {setNanoRouteMode  -routeExpShieldAddTappingVia true}                     ;# Add Tapping via for the specified distance for shielding
+
+    # Timing ECO attributes [get_db -category opt_signoff] 
+    #-------------------------------------------------------------------------------
+    set_db distributed_child_license_checkout_list          tpsxl
+
+    # techniques                                                                    
+    #set_db opt_signoff_resize_inst  true                                           
+    #set_db opt_signoff_add_inst true                                               
+    #set_db opt_signoff_swap_inst true                                              
+    #set_db opt_signoff_delete_inst true                                            
+    #set_db opt_signoff_allow_skewing false                                         
+    #set_db opt_signoff_optimize_sequential_cells false                             
+    set_db opt_signoff_optimize_core_only                   true                                    
+    #set_db opt_signoff_optimize_replicated_modules false                           
+
+    # target
+    #set_db opt_signoff_setup_target_slack 0.0
+    #set_db opt_signoff_hold_target_slack 0.0 
+
+        # Note TL: both false by default
+     set_db opt_signoff_fix_si_slew true
+     set_db opt_signoff_fix_xtalk   true
+     set_db opt_signoff_fix_glitch  true
+
+    # Hold fixing
+    set_db opt_signoff_fix_hold_allow_setup_optimization      true                        ;# When set to true, incremental Setup fixing is performed during Hold fixing in order to create more Setup margins on Hold violated nodes that could not be fixed earlier due to Setup timing conflict
+    set_db opt_signoff_fix_hold_allow_setup_tns_degrade       true                        ;# When  specified,  the  Setup Total Negative Slack can be degraded during Hold time violations fixing while still maintaining the Setup Worst Negative Slack in every Setup active views.
+
+    # PBA
+    set_db opt_signoff_retime                               path_slew_propagation
+    #set_db opt_signoff_check_type both                 
+    #set_db opt_signoff_max_paths -1                    
+    #set_db opt_signoff_nworst -1                       
+    #set_db opt_signoff_max_slack 0.0                   
+
+    # I/OS
+    #set_db opt_signoff_eco_file_prefix {}
+    #set_db opt_signoff_partition_list_file {}
+    #set_db opt_signoff_prefix ESO            
+    #set_db opt_signoff_read_eco_opt_db {}    
+    #set_db opt_signoff_write_eco_opt_db ecoTimingDB
+    #set_db opt_signoff_verbose false               
+    #set_db opt_signoff_pre_sta_tcl                
+
+} -owner {flow}
+set_db flow_step:init_innovus .status success
+set_db flow_step:init_innovus .run_count 1
+create_flow_step -name init_mcpu {
+    # Multi host/cpu attributes
+    #-----------------------------------------------------------------------------
+    # The FLOWTOOL_NUM_CPUS is an environment variable which should be exported by
+    # the specified dist script.  This connects the number of CPUs being reserved
+    # for batch jobs with the current flow scripts.  The LSB_MAX_NUM_PROCESSORS is
+    # a typical environment variable exported by distribution platforms and is
+    # useful for ensuring all interactive jobs are using the reserved amount of CPUs.
+    if {[info exists ::env(FLOWTOOL_NUM_CPUS)]} {
+	set max_cpus $::env(FLOWTOOL_NUM_CPUS)
+    } elseif {[info exists ::env(LSB_MAX_NUM_PROCESSORS)]} {
+	set max_cpus $::env(LSB_MAX_NUM_PROCESSORS)
+    } else {
+	set max_cpus 8
+    }
+
+    switch -glob [get_db program_short_name] {
+	joules*       -
+	genus*        {
+	    set_db max_cpus_per_server                $max_cpus
+	}
+	innovus*      -
+	tempus*       -
+	voltus*       {
+	    set_multi_cpu_usage -verbose -local_cpu   $max_cpus
+	    if {[get_feature -feature opt_signoff]} {
+		if {[is_flow -inside flow:opt_signoff]} {
+		    set_multi_cpu_usage -verbose -remote_host         1 -cpu_per_remote_host $max_cpus
+		    set_distributed_hosts                             -local
+		}
+	    }
+	    if {[get_feature -feature sta_eco]} {
+		if {[is_flow -inside flow:sta_eco]} {
+		    set_multi_cpu_usage -verbose -remote_host         1 -cpu_per_remote_host $max_cpus
+		    set_distributed_hosts                             -local
+		}
+	    }
+	}
+	default       {}
+    }
+} -owner {flow}
+set_db flow_step:init_mcpu .status not_run
+create_flow_step -name init_modus {
+  # General attributes
+  #-------------------------------------------------------------------------------
+  #set_db workdir                              dft
+  set_db stop_on_severity                     error
+  
+  #set_option outputdir                        [file join [get_db workdir] testresults]
+  set_option stdout                           summary
+  set_option log                              all
+  
+  # Design options
+  #-------------------------------------------------------------------------------
+
+  #set dft_synth_flow 1
+  set sim_no_delay 1
+
+  set_option cell [get_db flow_vars_design_name]
+  set_db current_design [get_db flow_vars_design_name]
+  
+  # Memory models found in atpg/memory_udp_models.v
+  set macro_models [list]
+  foreach verilog [get_db flow_vars_dft_library] {
+      if {![string match /opt/soc/work/mem/*_atpg.v $verilog] && ![regexp dft_lib $verilog]} {
+          lappend macro_models $verilog
+      }
+  }
+
+  if {[info exists dft_synth_flow]} {
+      set_option designsource [concat [get_db flow_vars_data_directory]/dbs/syn_opt/[get_db flow_vars_design_name].v.gz $macro_models]
+  } else {
+      set_option designsource [concat [get_db flow_vars_data_directory]/dbs/opt_signoff/[get_db flow_vars_design_name].v.gz $macro_models]
+  }
+  
+  set_option techlib [get_db flow_vars_dft_data_directory]/dft_lib_specify.v
+  if {[file exists [get_db flow_vars_data_directory]/atpg/memory_udp_models.v]} {
+      set_option techlib [concat [get_option techlib] [get_db flow_vars_data_directory]/atpg/memory_udp_models.v]
+  }
+  set_option allowmissingmodules              no
+  
+  #set_option sdc                              ""
+  #set_option clockconstraints                 ""
+  
+  # Test mode building options
+  #-------------------------------------------------------------------------------
+  # If pinassign for these is found they are built with defined modedef
+  # Note order important, fullscan_intest_opcg could be added
+  set allowed_testmodes {}
+  dict append allowed_testmodes COMPRESSION_DECOMP_INTEST      COMPRESSION_INTEST
+  dict append allowed_testmodes FULLSCAN_INTEST                FULLSCAN_INTEST
+  dict append allowed_testmodes COMPRESSION_DECOMP_INTEST_OPCG COMPRESSION_INTEST
+  dict append allowed_testmodes COMPRESSION_DECOMP_EXTEST      COMPRESSION_EXTEST
+  dict append allowed_testmodes FULLSCAN_EXTEST                FULLSCAN_EXTEST
+
+  # For non-1500 cores
+  dict append allowed_testmodes FULLSCAN                       FULLSCAN_INTERNAL
+  dict append allowed_testmodes FULLSCAN_OPCG                  FULLSCAN_INTERNAL
+  
+  
+  # Test mode reporting options
+  #-------------------------------------------------------------------------------
+  set_option reportscanchain                  all
+  
+  set_option reportchannelio                  yes
+  set_option reportchannelmaskchain           yes
+  set_option reportchannelmaskstate           yes
+  
+  set_option reportopcgregisters              yes
+  
+  # Test vector options
+  #-------------------------------------------------------------------------------
+  if {[get_feature -feature full_atpg]} {
+      set_option maxpatterns                  500
+  } else {
+      set_option maxpatterns                  5
+  }
+  set_option maxglobalcoveragestatic          99.00
+  set_option maxglobalcoveragedynamic         80.00
+  
+  set_option language                         stil
+  set_option combinesections                  no
+  set_option includemodeinit                  yes
+
+} -owner {flow}
+set_db flow_step:init_modus .status not_run
+create_flow_step -name init_scan {
+
+    set_db dft_prefix 				DFT_[get_db flow_vars_design_name]_
+    set_db dft_identify_top_level_test_clocks 	false
+    set_db dft_identify_test_signals 		false
+    set_db dft_identify_internal_test_clocks 	false
+    #set_db use_scan_seqs_for_non_dft 		true
+    set_db use_scan_seqs_for_non_dft 		false
+    set_db dft_auto_identify_shift_register         true
+    set_db dft_identify_shared_wrapper_cells        false
+    #set_db dft_shared_wrapper_through	        combinational
+
+    #- DFT Attributes to control scan mapping and connectivity
+    #set_db designs .dft_mix_clock_edges_in_scan_chains true 
+    set_db [current_design] .dft_mix_clock_edges_in_scan_chains true 
+    set_db [current_design] .dft_lockup_element_type level_sensitive
+    set_db current_design .dft_clock_edge_for_head_of_scan_chains leading
+    set_db current_design .dft_clock_edge_for_tail_of_scan_chains trailing
+    # min number of chains used as max number of chains in connect_scan_chain -command
+    set_db [current_design] .dft_min_number_of_scan_chains 1
+    set_db [current_design] .dft_max_length_of_scan_chains 300
+
+    #- Define test clock
+    #define_test_clock			     -name foo
+    define_test_clock -name jtag_tck_[get_db flow_vars_design_name] -domain scan_jtag clk_i
+
+    #- Define test mode port
+    define_test_signal -function test_mode -lec_value 0 -name scan_mode_[get_db flow_vars_design_name] -create_port -active high scan_mode_[get_db flow_vars_design_name]
+    #- Define scan enable port
+    define_test_signal -function shift_enable -lec_value 0 -name scan_enable_[get_db flow_vars_design_name] -create_port -active high scan_enable_[get_db flow_vars_design_name]
+    # Add, TL: pipeline shift enable
+    #define_test_signal -name pipe_sen -function pipe_sen -create_port -active low pipe_sen
+
+    #- Specify ICG bypass signal for DFT
+    set_db current_design .lp_clock_gating_test_signal [get_db test_signals scan_enable_[get_db flow_vars_design_name] ]
+    
+    #- Define test reset port
+    define_test_signal -function async_set_reset -name scan_reset_[get_db flow_vars_design_name] -active high rst_ni
+
+    if {0} {
+        define_test_signal -function wint -name WINT_[get_db flow_vars_design_name] -create_port WINT
+        define_test_signal -function wext -name WEXT_[get_db flow_vars_design_name] -create_port WEXT
+    }
+    
+    #- Control cg clocks
+    # go through all instantiated cgs
+    foreach icg_inst [get_db [get_db insts -if {.base_name==inst_TLATNTSCAX*}] .name] {
+	puts "Info: ICG: $icg_inst ([get_db [get_db insts $icg_inst] .base_cell.base_name])"
+	set_db [get_db pins $icg_inst/Z] .dft_controllable "[get_db pins $icg_inst/CP] non_inverting"
+
+	# prevent Genus from adding RC_CG_INST* hierarchy to instantiated clock gates
+	# Note, TE has to be connected manually to shift enable later on!
+	set_db [get_db insts $icg_inst] .lp_clock_gating_exclude true
+    }
+
+    #####################################################################
+    # ADD MUXES 
+    #####################################################################
+    # Note, Block specific
+    #- Add scan clock muxes
+    
+    if {[file exists scripts/add_mux.tcl]} {
+	source scripts/add_mux.tcl
+    }
+
+    # Set all previously instantiated muxes as preserve size_ok
+    if {[llength [get_db insts *scan_???_mux_*]] == 0} {
+	puts "Error: No instantiated clk nor rst muxes found. Check insertion script!"
+    }
+    set_db [get_db insts *scan_???_mux_*] .preserve size_ok
+    set_db [get_db insts *scan_???_inv_*] .preserve size_ok
+    
+    check_dft_rules
+
+    # For AICGs define shift enable connection inside 
+    set_compatible_test_clocks [get_db test_clocks *scan_jtag*]
+
+    #- Disable internal clock auto identification
+    set_db dft_identify_internal_test_clocks false
+
+    #- Check DFT rules
+    check_dft_rules
+} -owner {design}
+set_db flow_step:init_scan .status not_run
+create_flow_step -name init_tempus {
+  # Design attributes  [get_db -category design]
+  #-------------------------------------------------------------------------------
+  set_db design_process_node                        22
+
+  # Timing attributes  [get_db -category timing]
+  #-------------------------------------------------------------------------------
+  set_db timing_report_fields                               {timing_point net edge cell user_derate transition load delay arrival annotation}
+
+  set_db si_aggressor_alignment                             timing_aware_edge       
+  
+  # do not split report_constraint lines to enable scripting
+  set_table_style -no_frame_fix_width -nosplit
+
+  # Delaycal attributes  [get_db -category delaycal]
+  #-------------------------------------------------------------------------------
+
+  # set_delay_cal_mode -siAware true
+  set_db delaycal_enable_si                         true
+  # set_delay_cal_mode -ewm_type simulation -equivalent_waveform_model propagation
+  set_db delaycal_ewm_type simulation
+  set_db delaycal_equivalent_waveform_model propagation
+
+  # Note TL, true is more conservative
+  set_db delaycal_enable_quiet_receivers_for_hold true
+  # Note TL, true is more accurate
+  set_db delaycal_advanced_pin_cap_mode true 
+  # Note TL, true is more accurate
+  set_db delaycal_accurate_receiver_out_load true
+
+  set_db timing_analysis_socv                       false
+  set_db timing_analysis_cppr                       both
+  set_db timing_analysis_type                       ocv
+
+  set_db timing_socv_rc_variation_mode                      false
+
+  # set_global timing_disable_retime_clock_path_slew_propagation false
+  set_db timing_disable_retime_clock_path_slew_propagation false
+
+  if {[get_feature -feature sta_eco]} {
+    
+    # Opt Signoff attributes  [get_db -category opt_signoff]
+    #-------------------------------------------------------------------------------
+    set_db opt_signoff_allow_multiple_incremental     true
+    if {[file exists [file join [get_db flow_report_directory] [get_db flow_report_name]]]} {
+      set_db opt_signoff_write_eco_opt_db             [get_db flow_report_directory]/[get_db flow_report_name]/sta_eco_timing_db
+    }
+    if {[file exists [file join [get_db flow_report_directory] [get_db flow_report_name] sta_eco_timing_db]]} {
+      set_db opt_signoff_read_eco_opt_db              [get_db flow_report_directory]/[get_db flow_report_name]/sta_eco_timing_db
+    }
+  }
+} -owner {flow}
+set_db flow_step:init_tempus .status not_run
+create_flow_step -name innovus_activate_all_views {
+
+    # Enabled all views which are active in STA
+    set_analysis_view  -setup             [get_db flow_vars_setup_sta_active_views]   -hold              [get_db flow_vars_hold_sta_active_views]   -leakage           [get_db flow_vars_power_view]  -dynamic           [get_db flow_vars_power_view]
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:innovus_activate_all_views .status not_run
+create_flow_step -name innovus_activate_pnr_views {
+
+    # Enabled all views which are active in STA
+    set_analysis_view  -setup             [get_db flow_vars_setup_pnr_active_views]   -hold              [get_db flow_vars_hold_pnr_active_views]   -leakage           [get_db flow_vars_power_view]  -dynamic           [get_db flow_vars_power_view]
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:innovus_activate_pnr_views .status not_run
+create_flow_step -name innovus_export_design {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+
+    # Export GDSII, no leaf cell data whatsoever
+    write_stream  -die_area_as_boundary  -format stream  -map_file [get_db flow_vars_gdsout_stream_map_file]  -unit 1000  -mode ALL  -pvs_fill  $out_dir/$design.hierarchical.gds.gz
+
+    # Export GDSII with macros from LEF-data
+    write_stream  -die_area_as_boundary  -format stream  -map_file [get_db flow_vars_gdsout_stream_map_file]  -output_macros  -unit 1000  -mode ALL  -pvs_fill  $out_dir/$design.output_macros.gds.gz
+
+    write_stream  -die_area_as_boundary  -format stream  -map_file [get_db flow_vars_gdsout_stream_map_file]  -unit 1000  -mode ALL  -pvs_fill  -merge [concat [get_db flow_vars_macro_gds_list] [get_db flow_vars_stdcell_gds_list] [get_db flow_vars_memory_gds_list] [get_db flow_vars_io_gds_list]]  -uniquify_cell_names  $out_dir/$design.merged.gds.gz
+
+    # write out LVS netlist
+    write_netlist -exclude_leaf_cells -exclude_insts_of_cells "PAD73D6GU PAD73D6NU" -include_phys_inst -include_pg_ports $out_dir/$design.lvs.v.gz
+
+    # write out LEC script to check that LVS netlist matches "actual" signoff netlist
+    write_do_lec  -flat  -golden_design $out_dir/$design.v.gz  -revised_design $out_dir/$design.lvs.v.gz  -log_file logs/lec.lvs.opt_signoff.log  lec.lvs.opt_signoff.do
+
+    # Export DEF
+    set_db write_def_include_lef_vias true
+    write_def -routing $out_dir/$design.def.gz
+    set_db write_def_include_lef_vias false
+} -owner {flow}
+set_db flow_step:innovus_export_design .status not_run
+create_flow_step -name innovus_generate_etm {
+    if {![file exists models]} {file mkdir models}
+    if {![file exists models/[get_db flow_report_name]]} {file mkdir models/[get_db flow_report_name]}
+    set spef_dir  [file normalize [file join [get_db flow_working_directory] [get_db flow_db_directory] [file rootname [get_db flow_report_name]]]]
+    puts "Info: Using SPEF-dir: $spef_dir"
+    set active_setup_views [get_db [get_db analysis_views -if {.is_setup||.is_leakage||.is_dynamic}] .name]
+    set active_hold_views [get_db [get_db analysis_views -if {.is_hold}] .name]
+    #set_multi_cpu_usage -local_cpu 4 -remote_host 1 -cpu_per_remote_host 4
+    foreach view_dpo [get_db analysis_views -if {.is_setup||.is_hold||.is_leakage||.is_dynamic}] {
+	puts "Info: Writing timing model for analysis_view [get_db $view_dpo .name]"
+	set_analysis_view -setup [get_db $view_dpo .name] -hold [get_db $view_dpo .name]
+	# Note, TL. Parasitics are extracted only after route step
+	if {[is_flow -quiet -after flow:route]} {
+	    set corner_name [get_db $view_dpo .delay_corner.late_rc_corner.name]
+	    set spef_file [glob -nocomplain -directory ${spef_dir} *.${corner_name}.spef*]
+	    puts "Info: Reading SPEF-file ${spef_file} for corner $corner_name"
+	    read_spef -rc_corner ${corner_name} ${spef_file}
+	}
+	write_timing_model -include_power_ground [file join models [get_db flow_report_name] [get_db [current_design] .name].[get_db $view_dpo .name].lib] -view [get_db $view_dpo .name]
+    }
+    #set_multi_cpu_usage -local_cpu 8 -remote_host 1 -cpu_per_remote_host 8
+
+    set_analysis_view -setup $active_setup_views -hold $active_hold_views
+    
+    # merge .libs to one single multimode file
+    foreach corner_name [get_db -u [get_db analysis_views -if {.is_setup||.is_hold||.is_leakage||.is_dynamic}] .delay_corner.name] {
+
+	set constraint_modes [join [get_db -u analysis_views .constraint_mode.name] ","]
+	set files [glob models/[get_db flow_report_name]/[get_db [current_design] .name].${corner_name}_{${constraint_modes}}.lib]
+	if {![llength $files]} {
+	    puts "Error: No files corresponding to corner: ${corner_name} and constraint_modes: ${constraint_modes} in models/[get_db flow_report_name]/"
+	    continue
+	}
+	set mode_list [list ]
+	set mode_group ""
+	foreach ff $files {
+	    set mode ""
+	    set cmodes [regsub -all "," $constraint_modes "|"]
+	    if {![regexp "_(${cmodes})\.lib" $ff -> mode]} {
+		puts "Error: Bad filename $ff"
+		continue
+	    }
+	    lappend mode_list $mode
+	    if {$mode_group == ""} {
+		set mode_group $mode
+	    } else {
+		set mode_group ${mode_group}_${mode}
+	    }
+	}
+
+	merge_model_timing -input_library_file $files  -mode_group $mode_group  -modes $mode_list  -merged_library_file models/[get_db flow_report_name]/[get_db [current_design] .name].${corner_name}.lib
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:innovus_generate_etm .status not_run
+create_flow_step -name innovus_manage_derating {
+
+    # socv not implemented yet
+    if {0} {
+    foreach active_av [get_db [get_db analysis_views -if {.is_setup || .is_hold}] .name] {
+	# SOCV RC variation
+	set_socv_rc_variation_factor -view ${active_av} -late  0.100000
+	set_socv_rc_variation_factor -view ${active_av} -early 0.100000
+    }
+    }
+
+    global mmmc_vars
+    foreach setup_dc [get_db [get_db delay_corners -if {.is_setup || .is_hold}] .name] {
+	# Cell OCV
+	# Data
+	set_timing_derate -data  -cell_delay -early -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_data_cell_early)
+	set_timing_derate -data  -cell_delay -late  -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_data_cell_late)
+	# Clock
+	set_timing_derate -clock -cell_delay -early -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_clock_cell_early)
+	set_timing_derate -clock -cell_delay -late  -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_clock_cell_late)
+	
+	# Wire OCV
+	# Data
+	set_timing_derate -data  -net_delay  -early -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_data_net_early)
+	set_timing_derate -data  -net_delay  -late  -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_data_net_late)
+	# Clock
+	set_timing_derate -clock -net_delay  -early -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_clock_net_early)
+	set_timing_derate -clock -net_delay  -late  -delay_corner ${setup_dc} $mmmc_vars(${setup_dc},flat_clock_net_late)
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:innovus_manage_derating .status not_run
+create_flow_step -name innovus_save_latency_files {   
+    if {![file exists [get_db flow_database_directory]/latency_files]} {file mkdir [get_db flow_database_directory]/latency_files}
+    foreach dpo [get_db analysis_views] {
+	if {[get_db $dpo .latency_file] != ""} {
+	    file copy -force [get_db $dpo .latency_file] [file join [get_db flow_database_directory]/latency_files [get_db $dpo .name]_latency.sdc]
+	}
+    }
+} -owner {tuni}
+set_db flow_step:innovus_save_latency_files .status not_run
+create_flow_step -name innovus_to_clp {
+    
+    run_clp -setup_only
+    
+    #- schedule the clp flow
+    schedule_flow  -flow clp  -branch [get_db flow_report_name]  -no_db  -no_sync  -tool_options "-nogui -lp -1801 -verify -do clp_input/feclp.tcl"
+} -owner {flow}
+set_db flow_step:innovus_to_clp .status not_run
+create_flow_step -name innovus_to_lec {
+    #- write dofile for LEC
+    if {[is_flow -inside flow:floorplan]} {
+	write_do_lec  -flat  -log_file [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  lec.[get_db flow_report_name].do
+    } else {
+	write_do_lec  -flat  -pre_compare [file join [string map [list %s [get_db current_design .name]] [get_db write_lec_directory_naming_style]] lec.[get_db flow_report_name].pre_compare]  -log_file [file join [get_db flow_log_directory] lec.[get_db flow_report_name].log]  lec.[get_db flow_report_name].do
+    }
+    
+    #- schedule the LEC flow
+    #FlowtoolPredictHint ArgumentRandomise -branch
+    schedule_flow  -flow lec  -branch [get_db flow_report_name]  -no_db  -no_sync  -tool_options "-nogui -lp -do [file join [string map [list %s [get_db current_design .name]] [get_db write_lec_directory_naming_style]] lec.[get_db flow_report_name].do]"
+} -owner {flow}
+set_db flow_step:innovus_to_lec .status not_run
+create_flow_step -name innovus_to_quantus {
+    #- create output location
+    if {[get_db flow_branch] ne ""} {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_branch]_[get_db flow_report_name]]
+    } else {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    }
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+    
+    #- write extraction command file
+    #set_multi_cpu_usage -local_cpu 4 -remote_host 1 -cpu_per_remote_host 4
+    write_extraction_spec -out_dir $out_dir
+    #set_multi_cpu_usage -local_cpu 8 -remote_host 1 -cpu_per_remote_host 8
+    puts "Info: sleep until qrc.cmd -file is visible"
+    exec sleep 1
+    set count 0
+    while {![file exists qrc.cmd]} {
+	puts "Info: Sleeping..."
+	exec sleep 1
+	incr count
+	
+	if {$count >= 30} {
+	    puts "Fatal: qrc.cmd -file not populated into workspace"
+	    exit 0
+	}
+    }
+
+    puts "Info: renaming qrc.cmd to [file join $out_dir qrc.cmd]"
+    file rename -force qrc.cmd [file join $out_dir qrc.cmd]
+} -owner {cadence}
+set_db flow_step:innovus_to_quantus .status not_run
+create_flow_step -name innovus_to_tempus {
+    #- create output location
+    set design  [get_db [current_design] .name]
+
+    if {[get_db flow_branch] ne ""} {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_branch]_[get_db flow_report_name]]
+    } else {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    }
+
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+
+    #- write design and library information
+    write_netlist -top_module_first -top_module $design [file join $out_dir $design.v.gz]
+
+    #- write init_design sequence for STA flow
+    set FH [open $out_dir/init_sta.tcl w]
+    if {[file exists scripts/mmmc_config.tcl]} {
+	puts $FH "read_mmmc scripts/mmmc_config.tcl"
+    } else {
+	puts $FH "read_mmmc \[get_db flow_source_directory\]/mmmc_config.tcl"
+    }
+
+    puts $FH "set netlist_list \[list \\"
+    puts $FH "dbs/opt_signoff/[get_db flow_vars_design_name].v.gz \\"
+    puts $FH "\]"
+    puts $FH ""
+    puts $FH "# All subsystems need to be defined in local_macro_setup!"
+    puts $FH "foreach {blockname blockpath} \[array get local_macro_exportdir\] {"
+    puts $FH "    lappend netlist_list \${blockpath}/dbs/opt_signoff/\${blockname}.v.gz"
+    puts $FH "}"
+    puts $FH ""
+    puts $FH "read_netlist \"\${netlist_list}\""
+    puts $FH "set STA_SIGNOFF 1"
+    puts $FH "init_design"
+    puts $FH "read_power_intent -1801 [get_db flow_vars_power_intent]"
+    puts $FH "commit_power_intent -verbose"
+    puts $FH "set_db flow_report_name [get_db flow_report_name]"
+    puts $FH "read_activity_file -format TCF dbs/syn_opt/[get_db flow_vars_design_name].tcf"
+
+    get_db insts -if {.is_macro && !.is_memory} -foreach {puts $FH "set_spef_transform -inst [get_db $object .name] -orient [get_db $object .orient] -x_offset [get_db $object .location.x] -y_offset [get_db $object .location.y]"}
+
+    close $FH
+
+    set_db flow_post_db_overwrite $out_dir/init_sta.tcl
+} -owner {cadence}
+set_db flow_step:innovus_to_tempus .status not_run
+create_flow_step -name load_additional_procedures {
+    if {[file exists [get_db flow_vars_data_directory]/scripts/procedures.tcl]} {
+	puts "Info: Sourcing [get_db flow_vars_data_directory]/scripts/procedures.tcl"
+	source [get_db flow_vars_data_directory]/scripts/procedures.tcl
+
+	report_latches
+	report_clkgates
+	report_flip_flops_without_async_reset_or_set
+	SearchLargeRegBanks 512
+    }
+} -owner {tuni}
+set_db flow_step:load_additional_procedures .status not_run
+create_flow_step -name manage_uncertainty {
+    if {0} {
+    # only set functional mode clock uncertainties
+    set_interactive_constraint_modes [get_db constraint_modes -if {(.is_setup||.is_hold) && .name==*func*} -u]
+    set clock_names [get_db -u [get_db clocks -if {.base_name!=*_virtual}] .base_name]
+
+    global mmmc_vars
+    # Note TL: Fix these. Clock uncertainties are corner specific, not mode specific
+    if {[is_flow -quiet -after flow:opt_signoff] || [is_flow -quiet -inside flow:opt_signoff] ||
+	[is_flow -quiet -after flow:sta] || [is_flow -quiet -inside flow:sta]} {
+	set stp 0.085
+	set hld 0.050
+    } elseif {[is_flow -quiet -after flow:floorplan] || [is_flow -quiet -inside flow:floorplan]} {
+	set stp 0.105
+	set hld 0.065
+    } elseif {[is_flow -quiet -after flow:syn_generic] || [is_flow -quiet -inside flow:syn_generic]} {
+	set stp 0.105
+	set hld 0.065
+    } else {
+	puts "Error([info script]): flow step out of bounds (syn_generic <-> floorplan <-> sta)"
+    }
+
+    puts "Info([info script]): Setting setup uncertainty to $stp, hold uncertainty to $hld"
+    foreach clock_name $clock_names {
+	set_clock_uncertainty -setup $stp [get_clocks $clock_name]
+	set_clock_uncertainty -hold $hld [get_clocks $clock_name]
+
+	if {[llength [get_db clocks -if ".base_name==${clock_name}_virtual && .view_name==*func"]]} {
+	    set_clock_uncertainty -setup $stp [get_clocks ${clock_name}_virtual]
+	    set_clock_uncertainty -setup $stp -from [get_clocks ${clock_name}_virtual] -to   [get_clocks $clock_name]
+	    set_clock_uncertainty -setup $stp -to   [get_clocks ${clock_name}_virtual] -from [get_clocks $clock_name]
+	    set_clock_uncertainty -hold $hld [get_clocks ${clock_name}_virtual]
+	}
+    }
+    set_interactive_constraint_modes {}
+}
+} -owner {tuni}
+set_db flow_step:manage_uncertainty .status success
+set_db flow_step:manage_uncertainty .run_count 1
+create_flow_step -name mbist_start {
+    set_db dft_verification_directory [get_db flow_vars_data_directory]/pmbist
+    set_option modedef CORESCAN.mbist
+    set_option allowflushedmeasures yes
+} -owner {cadence}
+set_db flow_step:mbist_start .status not_run
+create_flow_step -name migrate_pdl_tests {
+    migrate_pdl_tests  -descfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].descfile  -pdlfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].pdl  -generatemodeinit yes
+} -owner {cadence}
+set_db flow_step:migrate_pdl_tests .status not_run
+create_flow_step -name post_sta {
+    if {[get_db flow_branch] ne ""} {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_branch]_[get_db flow_report_name]]
+    } else {
+	set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    }
+    close [open $out_dir/post_sta.tcl w]
+
+    set_db flow_post_db_overwrite $out_dir/post_sta.tcl
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:post_sta .status not_run
+create_flow_step -name pre_run_place_opt {
+    if {[file exists scripts/pre_run_place_opt.tcl]} {
+        puts "Info: Sourcing scripts/pre_run_place_opt.tcl"
+        source scripts/pre_run_place_opt.tcl
+    }
+} -owner {cadence}
+set_db flow_step:pre_run_place_opt .status not_run
+create_flow_step -name pre_syn_generic {
+    # If we're not doing scan insertion, exclude all instantiated clock gates from "clock gating".
+    # Otherwise Genus will add RC_CG_INST* hierarchy to instantiated clock gates
+    # which can then i.e. mess up STA constraints later on
+    if {![get_feature -feature add_scan]} {
+	# go through all instantiated cgs
+	foreach icg_inst [get_db [get_db insts -if {.base_name==inst_CKLNQD*}] .name] {
+	    puts "Info: ICG: $icg_inst ([get_db [get_db insts $icg_inst] .base_cell.base_name])"
+	    # prevent Genus from adding RC_CG_INST* hierarchy to instantiated clock gates
+	    # Note, TE has to be connected manually to shift enable later on!
+	    set_db [get_db insts $icg_inst] .lp_clock_gating_exclude true
+	}
+    }
+} -owner {tuni}
+set_db flow_step:pre_syn_generic .status not_run
+create_flow_step -name pre_syn_map {
+    clock_gating import -hierarchical -verbose
+    # If we're not doing scan insertion, set all clock gates as controllable.
+    # Otherwise check_dft_rules will mark flops driven by them with errors
+    # and they will not b replaced by scan flops. This will give optimistic
+    # area numbers when doing synthesis trials
+    if {![get_feature -feature add_scan]} {
+	# go through all instantiated cgs
+	foreach icg_inst [get_db [get_db insts -if {.base_name==inst_CKLNQD*}] .name] {
+	    puts "Info: ICG: $icg_inst ([get_db [get_db insts $icg_inst] .base_cell.base_name])"
+	    set_db [get_db pins $icg_inst/Q] .dft_controllable "[get_db pins $icg_inst/CP] non_inverting"
+
+	    # prevent Genus from adding RC_CG_INST* hierarchy to instantiated clock gates
+	    # Note, TE has to be connected manually to shift enable later on!
+	    set_db [get_db insts $icg_inst] .lp_clock_gating_exclude true
+	}
+	# go through all automatically inserted cgs
+	foreach aicg_inst [get_db [get_db insts *RC_CGIC_INST] .name] {
+	    if {[llength [get_db pins $aicg_inst/CP]]} {
+		set_db [get_db pins $aicg_inst/Q] .dft_controllable "[get_db pins $aicg_inst/CP] non_inverting"
+	    } elseif {[llength [get_db pins $aicg_inst/CPN]]} {
+		set_db [get_db pins $aicg_inst/Q] .dft_controllable "[get_db pins $aicg_inst/CPN] non_inverting"
+	    } else {
+		puts "Error: No CP nor CPN pin on inst: $aicg_inst. Cannot set cell output as dft_controllable"
+	    }
+	}
+    }
+    check_dft_rules
+} -owner {tuni}
+set_db flow_step:pre_syn_map .status not_run
+create_flow_step -name prepare_1500_bypass {
+    # Bypass is part of standard but possible to not implement
+    if {[file exists [get_db dft_verification_directory]/[get_db flow_vars_design_name].BYPASS.pinassign]} {
+        build_testmode  -testmode BYPASS  -assignfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].BYPASS.pinassign  -seqdef [get_db workdir]/testresults/TBDseqPatt.SetBYPASS  -modedef FULLSCAN_BYPASS  -allowflushedmeasures yes
+
+        # Note: testmode not verified but assumed fine
+
+        prepare_core_migration_info  -testmode BYPASS
+    }
+} -owner {cadence}
+set_db flow_step:prepare_1500_bypass .status not_run
+create_flow_step -name prepare_core_migration {
+    set_db workdir [get_db workdir]
+    puts "Migrating testmodes [get_db testmodes]"
+    foreach tm [get_db testmodes] {
+        if {[regexp INTEST $tm]} {
+            prepare_core_migration_data  -testmode [get_db $tm .name]
+        }
+    }
+} -owner {cadence}
+set_db flow_step:prepare_core_migration .status not_run
+create_flow_step -name prepare_opcg_test_sequences {
+    if {[regexp OPCG [get_option testmode]]} {
+        prepare_opcg_test_sequences  -read yes
+    }
+} -owner {cadence}
+set_db flow_step:prepare_opcg_test_sequences .status not_run
+create_flow_step -name read_icl {
+    read_icl  -iclfile [get_db dft_verification_directory]/[get_db flow_vars_design_name].icl  -top [get_db flow_vars_design_name]
+} -owner {cadence}
+set_db flow_step:read_icl .status not_run
+create_flow_step -name read_parasitics {
+    #- initialize annotations using spef
+    if {[is_flow -quiet -inside flow:ir_static] || [is_flow -quiet -inside flow:ir_dynamic] || [is_flow -quiet -inside flow:ir_rampup]} {
+	set views [get_db analysis_views [get_db power_view]]
+	set decoupled "-decoupled"
+    } else {
+	set views [get_db -u analysis_views -if {.is_setup || .is_hold || .is_leakage}]
+	set decoupled ""
+    }
+    set spef_dir  [file normalize [file join [get_db flow_working_directory] [get_db flow_db_directory] [file rootname [get_db flow_report_name]]]]
+    puts "Info: Using SPEF-dir: $spef_dir"
+    set corners [lsort -u [concat [get_db -u [get_db delay_corners -if {.is_setup || .is_hold}] .late_rc_corner]  [get_db -u [get_db delay_corners -if {.is_setup || .is_hold}] .early_rc_corner]]]
+    puts "Info: reading corners $corners"
+    
+    foreach corner $corners {
+        set rcc_name [get_db ${corner} .name]
+
+        set spef_list [list ${spef_dir}/[get_db flow_vars_design_name].${rcc_name}.spef.gz]
+        # subblock SPEFs
+        foreach {blockname blockpath} [array get local_macro_exportdir] {
+            puts "Info: Reading subblock SPEF ${blockpath}/dbs/opt_signoff/${blockname}.${rcc_name}.spef.gz"
+            lappend spef_list ${blockpath}/dbs/opt_signoff/${blockname}.${rcc_name}.spef.gz
+        }
+        puts "Info: read_spef \"${spef_list}\" -rc_corner $rcc_name"
+        read_spef "${spef_list}" -rc_corner $rcc_name
+    }
+} -owner {cadence}
+set_db flow_step:read_parasitics .status not_run
+create_flow_step -name release2pnr {
+
+    # WA : write scandef here because write_design doesn't generate scandef
+    if {[get_feature -feature dft_simple] || [get_feature -feature dft_compressor]} {
+        write_scandef > [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].scan.def.gz]
+    }
+    
+    set release_script "[file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].release2pnr.tcl]"
+    
+    set FH [open $release_script w]
+    puts $FH "# Design Import"
+    puts $FH "###########################################################"
+    if {[file exists scripts/mmmc_config.tcl]} {
+        puts $FH "read_mmmc scripts/mmmc_config.tcl"
+    } else {
+        puts $FH "read_mmmc \[get_db flow_source_directory\]/mmmc_config.tcl"
+    }
+    puts $FH ""
+    puts $FH "read_physical -lef \[get_db flow_vars_lef_list\]"
+    puts $FH ""
+    
+    #- read the netlist
+    puts $FH "read_netlist [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].v.gz]"
+    puts $FH ""
+    
+    #- read power intent from 1801
+    puts $FH "read_power_intent -1801 \[get_db flow_vars_power_intent\]"
+    puts $FH ""
+    
+    #- initialize library and design information
+    puts $FH "init_design"
+    puts $FH ""
+    
+    #- add cells and commint power rules
+    puts $FH "#commit_power_intent"
+    puts $FH ""
+    
+    #- Load Scan Chains
+    if {[get_feature -feature add_scan]} {
+        puts $FH "read_def [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].scan.def.gz]"
+        puts $FH ""
+    }
+    
+    ## Reading common preserve file for dont_touch and dont_use preserve settings
+    puts $FH ""
+    if {[get_feature -feature synth_spatial]} {
+        puts $FH "read_taf [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].preserve.taf.gz]"
+    } else {
+        puts $FH "source [file join [get_db flow_database_directory] [get_db flow_report_name] [get_db [current_design] .name].preserve.tcl]"
+    }
+    puts $FH ""
+    
+    close $FH
+    
+    set_db flow_post_db_overwrite $release_script
+
+} -owner {tuni}
+set_db flow_step:release2pnr .status not_run
+create_flow_step -name report_area_genus {
+  report_area -min_count 5000 > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]area.summary.rpt]
+  report_dp                   > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]area.datapath.rpt]
+} -exclude_time_metric -owner {cadence} -categories {design}
+set_db flow_step:report_area_genus .status not_run
+create_flow_step -name report_area_innovus {
+    report_summary -no_html -out_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]qor.rpt]
+    report_area  -min_count 1000 -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]area.summary.rpt]
+} -exclude_time_metric -owner {cadence} -categories {design}
+set_db flow_step:report_area_innovus .status not_run
+create_flow_step -name report_check_design {
+    if {[is_flow -inside flow:report_postroute]} {
+	check_design -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.design.tcl] -type {power_intent timing place opt cts route}
+    } elseif {[is_flow -inside flow:report_postcts]} {
+	check_design -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.design.tcl] -type {power_intent timing place opt cts}
+    } else {
+	check_design -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check.design.tcl] -type {power_intent timing place opt}
+    }
+} -exclude_time_metric -owner {cadence} -categories {design}
+set_db flow_step:report_check_design .status not_run
+create_flow_step -name report_clock_timing {
+    #- Reports that check clock implementation
+    report_clock_timing -type summary > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]clock.summary.rpt]
+    report_clock_timing -type latency > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]clock.latency.rpt]
+    report_clock_timing -type skew    > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]clock.skew.rpt]
+} -exclude_time_metric -owner {cadence} -categories {clock}
+set_db flow_step:report_clock_timing .status not_run
+create_flow_step -name report_congestion_genus {
+    report ple            > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]physical.ple.rpt]
+    report congestion     > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]physical.congestion.rpt]
+    gui_pv_snapshot -overwrite              [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]physical.placement.gif]
+    gui_pv_snapshot -overwrite -congestion  [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]physical.congestion.gif]
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:report_congestion_genus .status not_run
+create_flow_step -name report_design_genus {
+    report_sequential -deleted          > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]removed_registers.rpt]
+    # check timing intent for each mode (in active views) separately
+    array unset cmode_done
+    foreach view_dpo [get_db analysis_views -if {.is_active && (.is_setup || .is_hold)}] {
+        set cmode [get_db $view_dpo .constraint_mode.name]
+        if {![info exists cmode_done($cmode)]} {
+            check_timing_intent -view $view_dpo -verbose        > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check_timing_intent.${cmode}.rpt]
+            set cmode_done($cmode) 1
+        } else {
+            continue
+        }
+    }
+
+    check_design -all                   > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]check_design.rpt]
+    report_clocks                       > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]clocks.rpt]
+    report_case_analysis                > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]case_analysis.rpt]
+    report_area -detail                 > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]area_detail.rpt]
+    report_design_rules                 > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]report_design_rules.rpt]
+} -owner {tuni}
+set_db flow_step:report_design_genus .status not_run
+create_flow_step -name report_dft {
+    set i 0
+    set waiting {}
+    foreach test [get_db dft_simulated_tests] {
+        lappend waiting [dict get $test pid]
+    }
+    while {[llength $waiting]} {
+        set j 0
+        foreach pid $waiting {
+            if {![file exists /proc/$pid]} {
+                set waiting [lreplace $waiting $j $j]
+            } else {
+                incr j
+            }
+        }
+        if {$i==0} {
+            set i 5
+            puts "Waiting for [llength $waiting] simulations, pids $waiting"
+        }
+        # exec to reap zombie processes
+        exec sleep 60
+        incr i -1
+    }
+    
+    # Modus 19 and 21 report simulation differently
+    if {[lindex [split [get_db program_major_version] /] 0]>19} {
+        set re {Total\s+Failed\s+Tests.+([0-9]+)}
+    } else {
+        set re {TVE-203[^0-9]+([0-9]+)}
+    }
+    set failed [list]
+    foreach test [get_db dft_simulated_tests] {
+        if {[file exists [dict get $test log]]} {
+            set fp [open [dict get $test log] r]
+            set finished 0
+            while {![eof $fp]} {
+                gets $fp line
+                if {[regexp $re $line -> num]} {
+                    set finished 1
+                    if {![dict exists $test faults_expected] && $num > 0} {
+                        lappend failed $test
+                    } elseif {[dict exists $test faults_expected] && $num != [dict get $test faults_expected]} {
+                        lappend failed $test
+                    }
+                }
+            }            
+            if {$finished == "0"} {
+                lappend failed $test
+            }
+            close $fp
+        } else {
+            lappend failed $test
+        }
+        file delete -force [dict get $test temp_dir]
+    }
+
+    set fp [open [get_db workdir]/sim_logs/dft_simulations_summary.log w]
+    if {[llength $failed]} {
+        puts $fp "Failed tests:"
+        puts $fp ""
+        foreach test $failed {
+            dict for {opt value} $test {
+                puts $fp "${opt}: [join $value]"
+            }
+            puts $fp ""
+        }
+        puts ""
+        puts ""
+        puts "============================================================="
+        puts "  Warning: failed simulations"
+        puts "  See dft/sim_logs/dft_simulations_summary.log for details"
+        puts "============================================================="
+        puts ""
+        puts ""
+    } else {
+        puts $fp "No failed tests"
+    }
+    
+    puts $fp ""
+    puts $fp "Test details:"
+    puts $fp ""
+    foreach test [get_db dft_simulated_tests] {
+        dict for {opt value} $test {
+            if {$opt in {pid temp_dir}} {continue}
+            puts $fp "${opt}: [join $value]"
+        }
+        puts $fp ""
+    }
+    close $fp
+} -owner {cadence}
+set_db flow_step:report_dft .status not_run
+create_flow_step -name report_dft_genus {
+    report_scan_setup        > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]scan.setup.rpt]
+    
+    if {[is_flow -inside flow:syn_opt]} {
+	report_scan_chains       > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]scan.chains.rpt]
+	if {[llength [get_db actual_scan_chains]] > 0} {
+	    write_scandef            > [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db flow_report_prefix][get_db current_design .name].scan.def]
+            # By default compression chains are written to abstract. For hierarchical integration has to be fullscan
+            if {[get_feature -feature dft_compressor] && [get_db dft_add_test_compression_new_flow]} {
+                # spatial synthesis seems to delete scan clock in some cases, redefine it here
+                foreach name [list jtag_tck_[get_db flow_vars_design_name] jtag_tck] {
+                    set tck_port [get_db ports $name]
+                    if {[llength $tck_port]} {
+                        if {$tck_port ni [get_db [get_db test_clocks] .sources]} {
+                            define_test_clock -name jtag_tck_[get_db flow_vars_design_name] $tck_port
+                        }
+                        break
+                    }
+                }
+
+                define_dft_cfg_mode -name FULLSCAN -type scan  -mode_enable_low [get_db test_signals -if {.function==compression_enable || .function==spread_enable}]
+
+                check_dft_rules -dft_cfg_mode FULLSCAN
+
+                for {set i 0} {$i < [get_db dft_compression_num_scanin]} {incr i} {
+                    define_scan_chain -name FULLSCAN_$i  -sdi [get_db [get_db test_signals -if {.function==compress_sdi && .index==$i}] .pin]  -sdo [get_db [get_db test_signals -if {.function==compress_sdo && .index==$i}] .pin]  -dft_configuration_mode FULLSCAN  -multi_mode -analyze
+                }
+
+                write_dft_abstract_model -write_as_libcell -dft_cfg_mode FULLSCAN >  [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db flow_report_prefix][get_db current_design .name].scan.abstract]
+
+                # input->inout arcs aren't written to abstract
+                # TODO deleting self controllable definition would be good as now scan out
+                # controllables overwrite them but it requires the order to always be same
+                dft_utils::read_scan_abstract [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db flow_report_prefix][get_db current_design .name].scan.abstract]
+                foreach port [get_db ports -if {.is_user_scan_out}] {
+                    set controllable [report_dft_trace_back -continue $port]
+                    if {[get_db $controllable .obj_type]!="port"} {
+                        continue
+                    }
+                    dft_utils::add_dft_controllable -from [get_db $controllable .name] -to [get_db $port .name]
+                }
+                dft_utils::write_scan_abstract [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db flow_report_prefix][get_db current_design .name].scan.abstract]
+
+                delete_obj [get_db dft_configuration_modes FULLSCAN]
+                check_dft_rules
+
+                report_core_wrapper_cell -report_flops > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]core_wrapper.rpt]
+            } else {
+                write_dft_abstract_model -write_as_libcell > [file join [get_db flow_db_directory] [get_db flow_report_name] [get_db flow_report_prefix][get_db current_design .name].scan.abstract]
+            }
+	}
+    }
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:report_dft_genus .status not_run
+create_flow_step -name report_early_paths {
+    #- Reports that show detailed early timing with Graph Based Analysis (GBA)
+    report_timing -early -max_paths 5   -nworst 1 -path_type endpoint        > [get_db flow_report_directory]/[get_db flow_report_name]/hold.endpoint.rpt
+    report_timing -early -max_paths 1   -nworst 1 -path_type full_clock -net > [get_db flow_report_directory]/[get_db flow_report_name]/hold.worst.rpt
+    report_timing -early -max_paths 500 -nworst 1 -path_type full_clock      > [get_db flow_report_directory]/[get_db flow_report_name]/hold.gba.rpt
+    
+    #- Reports that show detailed timing with Path Based Analysis (PBA)
+    if {[is_flow -quiet -inside flow:sta]} {
+	report_timing -early -max_paths 50 -nworst 1 -path_type full_clock -retime path_slew_propagation  > [get_db flow_report_directory]/[get_db flow_report_name]/hold.pba.rpt
+    }
+} -exclude_time_metric -owner {flow}
+set_db flow_step:report_early_paths .status not_run
+create_flow_step -name report_finish {
+} -owner {cadence} -categories {flow}
+set_db flow_step:report_finish .status not_run
+create_flow_step -name report_late_paths {
+    #- Reports that show detailed timing with Graph Based Analysis (GBA)
+    report_timing -max_paths 5   -nworst 1 -path_type endpoint        > [get_db flow_report_directory]/[get_db flow_report_name]/setup.endpoint.rpt
+    report_timing -max_paths 1   -nworst 1 -path_type full_clock -net > [get_db flow_report_directory]/[get_db flow_report_name]/setup.worst.rpt
+    report_timing -max_paths 500 -nworst 1 -path_type full_clock      > [get_db flow_report_directory]/[get_db flow_report_name]/setup.gba.rpt
+    
+    #- Reports that show detailed timing with Path Based Analysis (PBA)
+    if {[is_flow -quiet -inside flow:sta]} {
+	report_timing -max_paths 50 -nworst 1 -path_type full_clock -retime path_slew_propagation > [get_db flow_report_directory]/[get_db flow_report_name]/setup.pba.rpt
+    }
+} -exclude_time_metric -owner {flow}
+set_db flow_step:report_late_paths .status not_run
+create_flow_step -name report_power {
+  report_power  -pg_pin  -out_dir [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name]]
+} -owner {cadence}
+set_db flow_step:report_power .status not_run
+create_flow_step -name report_power_genus {
+  report_gates -power   > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]power.all.rpt]
+  report_clock_gating   > [file join [get_db flow_report_directory]/[get_db flow_report_name] [get_db flow_report_prefix]power.clock_gating.rpt]
+  report_power -depth 0 > [file join [get_db flow_report_directory]/[get_db flow_report_name] [get_db flow_report_prefix]power.design.rpt]
+} -exclude_time_metric -owner {cadence} -categories {power}
+set_db flow_step:report_power_genus .status not_run
+create_flow_step -name report_power_innovus {
+    report_power -no_wrap -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]power.all.rpt]
+} -exclude_time_metric -owner {cadence} -categories {power}
+set_db flow_step:report_power_innovus .status not_run
+create_flow_step -name report_rail {
+  report_rail   -output_dir [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name] VOLTUS]  -type domain   ALL
+} -owner {cadence}
+set_db flow_step:report_rail .status not_run
+create_flow_step -name report_route_density {
+    check_metal_density -report [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.metal_density.rpt]
+    check_cut_density -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.cut_density.rpt]
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:report_route_density .status not_run
+create_flow_step -name report_route_drc {
+    #- Reports that check signal routing
+    if {[is_flow -inside flow:report_floorplan]} {
+	check_drc -check_only special -ignore_trial_route -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.drc.rpt]
+    } else {
+	check_drc -check_only special -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.special.drc.rpt]
+	check_drc -check_only regular -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.regular.drc.rpt]
+        check_connectivity -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.open.rpt]
+    }
+    set_metric -name check.drc.report_file -value [file join [get_db flow_report_name] [get_db flow_report_prefix]route.drc.rpt]
+} -exclude_time_metric -owner {cadence} -categories {route}
+set_db flow_step:report_route_drc .status not_run
+create_flow_step -name report_route_process {
+    #- Reports that process rules
+    check_process_antenna -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.antenna.rpt]
+    check_filler -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]route.filler.rpt]
+    set_metric -name check.drc.antenna.report_file -value [file join [get_db flow_report_name] [get_db flow_report_prefix]route.antenna.rpt]
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:report_route_process .status not_run
+create_flow_step -name report_start {
+} -owner {cadence}
+set_db flow_step:report_start .status not_run
+create_flow_step -name report_test_structures {
+    report_test_structures  -reportscanchain all
+    
+    verify_test_structures  -xclockanalysis yes
+} -owner {cadence}
+set_db flow_step:report_test_structures .status not_run
+create_flow_step -name report_timing_early {
+    #- Reports that describe early timing health
+    report_timing_summary -checks {hold drv} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.analysis_summary.rpt]
+    report_timing_summary -checks {hold drv} -expand_views > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.view_summary.rpt]
+    report_timing_summary -checks {hold drv} -expand_views -expand_clocks launch_capture  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.group_summary.rpt]
+    report_constraint -early -all_violators -drv_violation_type {min_capacitance min_transition min_fanout} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.all_violators.rpt]
+} -exclude_time_metric -owner {cadence} -categories {hold}
+set_db flow_step:report_timing_early .status not_run
+create_flow_step -name report_timing_early_innovus {
+    #- Update the timer for hold and write reports
+    time_design -expanded_views -hold -report_only -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix time_design_expanded_views_hold
+    
+    #- Reports that describe timing health
+    report_timing_summary -checks {hold drv} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.analysis_summary.rpt]
+    report_timing_summary -checks {hold drv} -expand_views > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.view_summary.rpt]
+    report_timing_summary -checks {hold drv} -expand_views -expand_clocks launch_capture  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.group_summary.rpt]
+    report_constraint -early -all_violators -drv_violation_type {min_capacitance min_transition min_fanout} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]hold.all_violators.rpt]
+} -exclude_time_metric -owner {cadence} -categories {hold}
+set_db flow_step:report_timing_early_innovus .status not_run
+create_flow_step -name report_timing_late {
+    #- Reports that describe timing health
+    report_timing_summary -checks {setup drv} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.analysis_summary.rpt]
+    report_timing_summary -checks {setup drv} -expand_views > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.view_summary.rpt]
+    report_timing_summary -checks {setup drv} -expand_views -expand_clocks launch_capture  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.group_summary.rpt]
+    report_constraint > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]report_constraint.summary.rpt]
+    report_constraint -late -all_violators -drv_violation_type {max_capacitance max_transition max_fanout} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.all_violators.rpt]
+    set_metric -name timing.drv.report_file -value [file join [get_db flow_report_name] [get_db flow_report_prefix]setup.all_violators.rpt]
+} -exclude_time_metric -owner {cadence} -categories {setup}
+set_db flow_step:report_timing_late .status not_run
+create_flow_step -name report_timing_late_innovus {
+    #- Update the timer for setup and write reports
+    time_design -expanded_views -report_only -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix time_design_expanded_views
+    
+    #- Reports that describe timing health
+    report_timing_summary -checks {setup drv} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.analysis_summary.rpt]
+    report_timing_summary -checks {setup drv} -expand_views > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.view_summary.rpt]
+    report_timing_summary -checks {setup drv} -expand_views -expand_clocks launch_capture  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.group_summary.rpt]
+    report_constraint -late -all_violators -drv_violation_type {max_capacitance max_transition max_fanout} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.all_violators.rpt]
+    set_metric -name timing.drv.report_file -value [file join [get_db flow_report_name] [get_db flow_report_prefix]setup.all_violators.rpt]
+} -exclude_time_metric -owner {cadence} -categories {setup}
+set_db flow_step:report_timing_late_innovus .status not_run
+create_flow_step -name report_timing_summary_late_genus {
+  report_timing_summary -checks {setup drv} > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.analysis_summary.rpt]
+  report_timing_summary -checks {setup drv} -expand_views > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.view_summary.rpt]
+  report_timing_summary -checks {setup drv} -expand_views -expand_clocks launch_capture  > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]setup.group_summary.rpt]
+  report_qor > [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db flow_report_prefix]qor.rpt]
+} -exclude_time_metric -owner {cadence} -categories {setup}
+set_db flow_step:report_timing_summary_late_genus .status not_run
+create_flow_step -name report_untested {
+    report_faults  -faultstatus {untestable aborted}  -includecollapsed yes
+} -owner {cadence}
+set_db flow_step:report_untested .status not_run
+create_flow_step -name run_atpg {
+
+    # Few faults can be found for extest so limit patterns
+    if {[regexp EXTEST $tm]} {
+        set max [get_option maxpatterns]
+        set_option maxpatterns 2
+    }
+    
+    if {[regexp OPCG [get_option testmode]]} {
+        create_logic_delay_tests  -latchsimulation pessimistic  -testsequence [get_db workdir]/testresults/TBDseqDef.[get_option testmode].dynamic.list
+    } else {
+        create_logic_tests  -latchsimulation pessimistic
+    }
+    
+    if {[regexp EXTEST $tm]} {
+        set_option maxpatterns $max
+    }
+    
+    write_toggle_gram
+
+} -owner {cadence}
+set_db flow_step:run_atpg .status not_run
+create_flow_step -name run_dynamic_rail_analysis {
+    
+    set_power_output_dir  [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name] VOLTUS]
+
+    set_db power_view [get_db [get_db analysis_views -if {.is_dynamic}] .name]
+    set_db power_write_db true
+    set_db power_db_name dynamic_vectorless_voltus_res.db
+    set_db power_write_static_currents true
+    set_db power_method dynamic_vectorless
+
+    report_power
+
+    set_dynamic_rail_simulation  -resolution 100ps
+
+    set pgs [list ]
+    foreach pg_port [get_db pg_ports .name] {
+        lappend pgs [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name] VOLTUS dynamic_${pg_port}.ptiavg]
+    }
+
+    set_power_data -reset
+    set_power_data  -format current  ${pgs}
+
+} -owner {tuni}
+set_db flow_step:run_dynamic_rail_analysis .status not_run
+create_flow_step -name run_em_analysis {
+    
+    check_ac_limits
+} -owner {tuni}
+set_db flow_step:run_em_analysis .status not_run
+create_flow_step -name run_fix_ac_limit {
+    #- report EM violations before fixing
+    check_ac_limits  -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] em.pre_fix_ac_limit.rpt]  -effort low
+    
+    #- fix reported EM violations
+    fix_ac_limit_violations  -use_report_file [file join [get_db flow_report_directory] [get_db flow_report_name] em.pre_fix_ac_limit.rpt]  -exclude_io true  -fix_nets_category data_only
+    
+    #- report EM violations after fixing
+    check_ac_limits  -out_file [file join [get_db flow_report_directory] [get_db flow_report_name] em.post_fix_ac_limit.rpt]  -effort low
+} -owner {design}
+set_db flow_step:run_fix_ac_limit .status not_run
+create_flow_step -name run_opt_eco {
+    opt_design -post_route -setup -hold -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_design_post_route_setup_hold
+} -owner {cadence}
+set_db flow_step:run_opt_eco .status not_run
+create_flow_step -name run_opt_postcts_hold {
+    #- perform postcts setup & hold optimization
+    opt_design -post_cts -hold -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_design_post_cts_hold
+} -owner {cadence}
+set_db flow_step:run_opt_postcts_hold .status not_run
+create_flow_step -name run_opt_postroute {
+    #- perform postroute and SI based setup optimization
+    opt_design -post_route -setup -hold -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_design_post_route_setup_hold
+} -owner {cadence}
+set_db flow_step:run_opt_postroute .status not_run
+create_flow_step -name run_opt_postroute_hold {
+    #- perform postroute and SI based hold optimization
+    opt_design -post_route -hold -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_design_post_route_hold
+} -owner {cadence}
+set_db flow_step:run_opt_postroute_hold .status not_run
+create_flow_step -name run_opt_postroute_setup {
+    #- perform postroute and SI based setup optimization
+    opt_design -post_route -setup -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_design_post_route_setup
+} -owner {cadence}
+set_db flow_step:run_opt_postroute_setup .status not_run
+create_flow_step -name run_opt_signoff {
+    #- perform signoff based optimization
+    push_snapshot_stack
+    opt_signoff -drv -no_eco_route -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_signoff_drv
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -drv" -auto min
+    
+    push_snapshot_stack
+    opt_signoff -setup -no_eco_route -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_signoff_setup
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -setup" -auto min
+    
+    push_snapshot_stack
+    opt_signoff -hold -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix opt_signoff_hold
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -hold" -auto min
+} -owner {cadence}
+set_db flow_step:run_opt_signoff .status success
+set_db flow_step:run_opt_signoff .run_count 1
+create_flow_step -name run_pegasus_feol_fill {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+        file mkdir $out_dir
+    }
+    
+    /opt/soc/tech/gf22/tech/FILLGEN/Pegasus/run_pegasus  -l $out_dir/$design.prefill.gds.gz  -ln $design  -tech [get_db flow_vars_pegasus_metal_fill_rule_file]  -output_filename fill.gds  -output_type gds  -setup scripts/feol_fill.setup  -boundary_layer_override OUTLINE  -tiles_gen_layer_override OPTION3_10M_2Mx_6Cx_2Ix_LB_SELECT  -ncpu 16
+
+    exec pegasus  -dp 16  -license_timeout 5  -drc  -run_dir ./PEGASUS_FEOL_FILL  -log logs/PEGASUS_FEOL_FILL.log  -gds $out_dir/$design.merged.gds.gz  -top_cell $design  $design.pegasus.tech
+        
+    # merge fill gds to top GDSs
+    exec -ignorestderr k2_viewer  -batch dbmerge scripts/k2_viewer_merge.feol.setup  $out_dir/$design.merged.full.gds.gz
+
+} -owner {flow}
+set_db flow_step:run_pegasus_feol_fill .status not_run
+create_flow_step -name run_pegasus_metal_fill {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+
+    /opt/soc/tech/gf22/tech/FILLGEN/Pegasus/run_pegasus  -l $out_dir/$design.prefill.gds.gz  -ln $design  -tech [get_db flow_vars_pegasus_metal_fill_rule_file]  -output_filename fill.gds  -output_type gds  -setup scripts/beol_fill.setup  -boundary_layer_override OUTLINE  -tiles_gen_layer_override OPTION3_10M_2Mx_6Cx_2Ix_LB_SELECT  -ncpu 16
+    
+    set_metal_fill_signoff_config  -output_macros  -layer_map_file scripts/gf22_gdsout_layer_map_file.map  -layer_map_table [get_db flow_vars_gdsout_layer_map_table]  -rule_file ${design}.pegasus.tech  -tmp_working_dir PEGASUS_BEOL_FILL  -distributed 16  -license_timeout 5
+
+    add_metal_fill_signoff  -fill
+} -owner {flow}
+set_db flow_step:run_pegasus_metal_fill .status not_run
+create_flow_step -name run_place_eco {
+    place_eco
+} -owner {cadence}
+set_db flow_step:run_place_eco .status not_run
+create_flow_step -name run_place_opt {
+    #- perform global placement and ideal clock setup optimization
+    if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+	place_opt_design -incremental -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix place_opt_design
+    } else {
+	place_opt_design -report_dir [file join [get_db flow_report_directory] [get_db flow_report_name]] -report_prefix place_opt_design
+    }
+} -owner {cadence}
+set_db flow_step:run_place_opt .status not_run
+create_flow_step -name run_pvs_feol_fill {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+    
+    exec pvs  -dp 16  -license_timeout 5  -run_dir PVS_FEOL_FILL  -log logs/PVS_FEOL_FILL.log  -ui_data  -gds $out_dir/$design.merged.gds.gz  -top_cell $design  -drc [get_db flow_vars_pvs_feol_fill_rule_file]
+
+    # merge feol fill to top GDSs
+    exec -ignorestderr k2_viewer  -batch dbmerge scripts/k2_viewer_merge.merged.setup  $out_dir/$design.merged.full.gds.gz
+
+    exec -ignorestderr k2_viewer  -batch dbmerge scripts/k2_viewer_merge.hierarchical.setup  $out_dir/$design.hierarchical.full.gds.gz
+
+} -owner {flow}
+set_db flow_step:run_pvs_feol_fill .status not_run
+create_flow_step -name run_pvs_metal_fill {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+    
+    run_pvs_metal_fill  -stream_file $out_dir/$design.prefill.gds.gz  -layer_map_file [get_db flow_vars_gdsout_stream_map_file]  -layer_map_table [get_db flow_vars_gdsout_layer_map_table]  -rule_file [get_db flow_vars_pvs_metal_fill_rule_file]  -cell $design  -working_dir PVS_FILL  -extra_pvs_options "-dp 16 -license_timeout 5"
+
+} -owner {flow}
+set_db flow_step:run_pvs_metal_fill .status not_run
+create_flow_step -name run_route {
+    #- perform detail routing and DRC cleanup
+    route_design
+} -owner {cadence}
+set_db flow_step:run_route .status not_run
+create_flow_step -name run_route_eco {
+    route_eco
+} -owner {cadence}
+set_db flow_step:run_route_eco .status not_run
+create_flow_step -name run_route_eco_secondary_nets {
+
+    # connect always-on cells added at postroute or opt_signoff -stage
+    set_route_attributes -nets VDDAON -skip_routing false -top_preferred_routing_layer M6 -bottom_preferred_routing_layer M5 -preferred_routing_layer_effort low -pattern trunk -stack_distance 0.001 -min_stack_layer 4 -route_rule ndr_vddaon
+    deselect_obj -all
+    select_obj [get_db nets VDDAON]
+    set_db route_design_with_eco true
+    set_db route_design_selected_net_only true
+    route_global_detail
+    set_route_attributes -nets VDDAON -skip_routing true
+    set_db route_design_with_eco false
+    set_db route_design_selected_net_only false
+} -owner {design}
+set_db flow_step:run_route_eco_secondary_nets .status not_run
+create_flow_step -name run_route_secondary_nets {
+
+    # set secondary PG pins to use signal router
+    foreach bc [get_db base_cells PT*] {
+        set_pg_pins_use_signal_route [get_db ${bc} .name]:TVDD
+    }
+    foreach bc [get_db base_cells LVLSRLHCRBD*BWP30P140LVT] {
+        set_pg_pins_use_signal_route [get_db ${bc} .name]:VDDS
+    }
+    foreach bc [get_db base_cells LVLLHD*BWP30P140LVT] {
+        set_pg_pins_use_signal_route [get_db ${bc} .name]:VDDL
+    }
+    foreach bc [get_db base_cells ISOSRLOD*BWP30P140LVT] {
+        set_pg_pins_use_signal_route [get_db ${bc} .name]:VDDS
+    }
+
+    #- route secondary PG nets to e.g. level shifters and isolation cells
+    set_route_attributes -nets VDDAON -skip_routing false
+    route_secondary_pg_pins -nets VDDAON  -pattern trunk  -max_pins_per_trunk 1  -non_default_rule ndr_vddaon
+    set_route_attributes -nets VDDAON -skip_routing true
+} -owner {design}
+set_db flow_step:run_route_secondary_nets .status not_run
+create_flow_step -name run_sta_opt_signoff {
+    #- perform signoff based DRV optimization
+    file mkdir [file join [get_db flow_report_directory] [get_db flow_report_name] eco.drv]
+    set_db opt_signoff_eco_file_prefix  [file join [get_db flow_report_directory] [get_db flow_report_name] eco.drv [get_db current_design .name]]
+    push_snapshot_stack
+    opt_signoff -drv
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -drv" -auto min
+    
+    #- perform signoff based setup optimization
+    file mkdir [file join [get_db flow_report_directory] [get_db flow_report_name] eco.setup]
+    set_db opt_signoff_eco_file_prefix  [file join [get_db flow_report_directory] [get_db flow_report_name] eco.setup [get_db current_design .name]]
+    push_snapshot_stack
+    opt_signoff -setup
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -setup" -auto min
+    
+    #- perform signoff based hold optimization
+    file mkdir [file join [get_db flow_report_directory] [get_db flow_report_name] eco.hold]
+    set_db opt_signoff_eco_file_prefix  [file join [get_db flow_report_directory] [get_db flow_report_name] eco.hold [get_db current_design .name]]
+    push_snapshot_stack
+    opt_signoff -hold
+    pop_snapshot_stack
+    create_snapshot -name "opt_signoff -hold" -auto min
+} -owner {cadence}
+set_db flow_step:run_sta_opt_signoff .status not_run
+create_flow_step -name run_static_rail_analysis {
+    
+    set_power_output_dir  [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name] VOLTUS]
+
+    set_db power_view [get_db [get_db analysis_views -if {.is_dynamic}] .name]
+    set_db power_write_db true
+    set_db power_db_name static_vectorless_voltus_res.db
+    set_db power_write_static_currents true
+    set_db power_method static
+
+    report_power
+
+    set_dynamic_rail_simulation  -resolution 50ps
+
+    set pgs [list ]
+    foreach pg_port [get_db pg_ports .name] {
+        lappend pgs [file join [get_db flow_report_directory] [get_db flow_report_name] [get_db [lindex [get_db flow_hier_path] end] .name] VOLTUS static_${pg_port}.ptiavg]
+    }
+
+    set_power_data -reset
+    set_power_data  -format current  ${pgs}
+
+} -owner {tuni}
+set_db flow_step:run_static_rail_analysis .status not_run
+create_flow_step -name run_syn_generic {
+  #- Synthesize to generic gates
+  if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+    syn_generic -physical
+  } else {
+    syn_generic
+  }
+} -owner {cadence}
+set_db flow_step:run_syn_generic .status not_run
+create_flow_step -name run_syn_map {
+  #- Synthesize to target library gates
+  if {[get_feature -feature synth_spatial] || [get_feature -feature synth_physical]} {
+    syn_map -physical
+  } else {
+    syn_map
+  }
+} -owner {cadence}
+set_db flow_step:run_syn_map .status not_run
+create_flow_step -name run_syn_opt {
+  #- Synthesize to optimized gates
+  if {[get_feature -feature synth_spatial]} {
+    syn_opt -spatial
+  } elseif {[get_feature -feature synth_physical]} {
+    syn_opt -physical
+  } else {
+    syn_opt
+  }
+} -owner {cadence}
+set_db flow_step:run_syn_opt .status not_run
+create_flow_step -name schedule_atpg {
+    if {[file exists [get_db flow_vars_data_directory]/atpg]} {
+        set testmodes [list]
+        foreach tm [dict keys $allowed_testmodes] {
+            # Genus 21 doesn't generate decompression mode pinassigns
+            if {[file exists [get_db flow_vars_data_directory]/atpg/[get_db flow_vars_design_name].[regsub COMPRESSION_DECOMP $tm COMPRESSION].template.pinassign]} {
+                lappend testmodes $tm
+            }
+        }
+        puts $testmodes
+
+        
+        if {[file exists [get_db flow_vars_data_directory]/atpg/[get_db flow_vars_design_name].WIR_SCAN.pinassign]} {
+            # Create 1500 mode modeinits
+            run_flow -flow hier_test_1687
+        } else {
+            set_option coremigrationdir ""
+        }
+        
+        foreach tm $testmodes {
+            set_option testmode $tm
+            run_flow -flow atpg -reset
+        }
+
+        if {[get_option coremigrationdir]!=""} {
+            # Migrate
+            run_flow -flow hier_test_1500
+        }
+    }
+} -owner {cadence}
+set_db flow_step:schedule_atpg .status not_run
+create_flow_step -name schedule_bscan {
+    if {[file exists [get_db flow_vars_data_directory]/bscan_verification]} {
+        run_flow -flow bscan
+    }
+} -owner {cadence}
+set_db flow_step:schedule_bscan .status not_run
+create_flow_step -name schedule_check_drc_pegasus {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+
+    # if feol fill was not done, copy gds to .full.gds.gz
+    if {![get_feature -feature add_pvs_feol_fill]} {
+        exec cp $out_dir/$design.merged.gds.gz  $out_dir/$design.merged.full.gds.gz
+        exec sleep 10
+    }
+
+    if {[file exist scripts/gf22_drc.run]} {
+        exec ./scripts/gf22_drc.run
+    } else {
+
+        exec pegasus  -dp 16  -license_timeout 5  -run_dir PEGASUS_ANT_DRC  -log logs/PEGASUS_ANT_DRC.log  -ui_data  -gds $out_dir/$design.merged.full.gds.gz  -top_cell $design  -drc [get_db flow_vars_pegasus_antenna_rule_file] &
+
+        # use control-file if it exists
+        if {[file exists scripts/pvsdrcctl_signoff]} {
+            puts "Info: Running PEGASUS DRC with control file: scripts/pvsdrcctl_signoff ->"
+            puts [read [open scripts/pvsdrcctl_signoff r]]
+            puts "Info: <- scripts/pvsdrcctl_signoff ends"
+            exec pegasus  -dp 16  -license_timeout 5  -run_dir PEGASUS_DRC  -log logs/PEGASUS_DRC.log  -ui_data  -control scripts/pvsdrcctl_signoff  -gds $out_dir/$design.merged.full.gds.gz  -top_cell $design  -drc [get_db flow_vars_pegasus_drc_rule_file] &
+        } else {
+            exec pegasus  -dp 16  -license_timeout 5  -run_dir PEGASUS_DRC  -log logs/PEGASUS_DRC.log  -ui_data  -gds $out_dir/$design.merged.full.gds.gz  -top_cell $design  -drc [get_db flow_vars_pegasus_drc_rule_file] &
+        }
+    }
+} -owner {flow}
+set_db flow_step:schedule_check_drc_pegasus .status not_run
+create_flow_step -name schedule_check_drc_pvs {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+
+    # if feol fill was not done, copy gds to .full.gds.gz
+    if {![get_feature -feature add_pvs_feol_fill]} {
+        exec cp $out_dir/$design.merged.gds.gz  $out_dir/$design.merged.full.gds.gz
+        exec sleep 10
+    }
+
+    exec pvs  -dp 16  -license_timeout 5  -run_dir PVS_ANT_DRC  -log logs/PVS_ANT_DRC.log  -ui_data  -gds $out_dir/$design.merged.full.gds.gz  -top_cell $design  -drc [get_db flow_vars_pvs_antenna_rule_file]
+
+
+    exec pvs  -dp 16  -license_timeout 5  -run_dir PVS_DRC  -log logs/PVS_DRC.log  -ui_data  -gds $out_dir/$design.merged.full.gds.gz  -top_cell $design  -drc [get_db flow_vars_pvs_drc_rule_file]
+
+} -owner {flow}
+set_db flow_step:schedule_check_drc_pvs .status not_run
+create_flow_step -name schedule_check_lvs_pegasus {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+
+    if {[file exist scripts/gf22_lvs.run]} {
+        exec ./scripts/gf22_lvs.run
+    } else {
+
+        set pvs_cmd "exec pegasus  -lvs  -dp 16  -license_timeout 5  -control scripts/pvslvsctrl  -run_dir PEGASUS_LVS  -log logs/PEGASUS_LVS.log  -gds $out_dir/$design.merged.full.gds.gz  -source_verilog $out_dir/$design.lvs.v.gz  -layout_top_cell $design  -source_top_cell $design  -ui_data  "
+        foreach add_spi [concat [get_db flow_vars_macro_spi_list] [get_db flow_vars_stdcell_spi_list] [get_db flow_vars_memory_spi_list] [get_db flow_vars_io_spi_list]] {
+            set pvs_cmd "$pvs_cmd    -source_cdl $add_spi  "
+        }
+        set pvs_cmd "$pvs_cmd    [get_db flow_vars_pegasus_lvs_rule_file]"
+
+        puts "Launching LVS: $pvs_cmd"
+        {*}$pvs_cmd
+    }
+} -owner {flow}
+set_db flow_step:schedule_check_lvs_pegasus .status not_run
+create_flow_step -name schedule_check_lvs_pvs {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+
+    set pvs_cmd "exec pvs  -lvs  -dp 16  -license_timeout 5  -control scripts/pvslvsctrl  -run_dir PVS_LVS  -log logs/PVS_LVS.log  -gds $out_dir/$design.merged.full.gds.gz  -source_verilog $out_dir/$design.lvs.v.gz  -layout_top_cell $design  -source_top_cell $design  -ui_data  "
+    foreach add_spi [concat [get_db flow_vars_macro_spi_list] [get_db flow_vars_stdcell_spi_list] [get_db flow_vars_memory_spi_list] [get_db flow_vars_io_spi_list]] {
+        set pvs_cmd "$pvs_cmd    -source_cdl $add_spi  "
+    }
+    set pvs_cmd "$pvs_cmd    [get_db flow_vars_pvs_lvs_rule_file]"
+
+    puts "Launching LVS: $pvs_cmd"
+    {*}$pvs_cmd
+} -owner {flow}
+set_db flow_step:schedule_check_lvs_pvs .status not_run
+create_flow_step -name schedule_mbist {
+    if {[file exists [get_db flow_vars_data_directory]/pmbist]} {
+        set_option testmode 1149_patt
+        run_flow -flow mbist
+
+        set_db workdir [get_db workdir]
+        if {[llength [get_db ports mda_tdi]]} {
+            set_option testmode mda
+            run_flow -flow mbist -reset
+        }
+    }
+} -owner {cadence}
+set_db flow_step:schedule_mbist .status not_run
+create_flow_step -name schedule_report_floorplan {
+    schedule_flow  -flow report_floorplan   -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_floorplan .status not_run
+create_flow_step -name schedule_report_generic {
+    schedule_flow  -flow report_synth  -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_generic .status not_run
+create_flow_step -name schedule_report_map {
+    schedule_flow  -flow report_synth  -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_map .status not_run
+create_flow_step -name schedule_report_postcts {
+    schedule_flow  -flow report_postcts   -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_postcts .status not_run
+create_flow_step -name schedule_report_postroute {
+    schedule_flow  -flow report_postroute   -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_postroute .status not_run
+create_flow_step -name schedule_report_prects {
+    schedule_flow  -flow report_prects   -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_prects .status not_run
+create_flow_step -name schedule_report_synth {
+    schedule_flow  -flow report_synth  -branch [get_db flow_branch]  -include_in_metrics
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_report_synth .status not_run
+create_flow_step -name schedule_signoff {
+    #FlowtoolPredictHint ArgumentRandomise -branch
+    if {([get_db flow_branch] ne "") && ([get_db flow_starting_db] eq "")} {
+	set branch_name [get_db flow_branch]
+    } elseif {([get_db flow_branch] ne "") && ([get_db flow_branch] ne [get_db flow_report_name])} {
+	set branch_name [get_db flow_branch]_[get_db flow_report_name]
+    } else {
+	set branch_name [get_db flow_report_name]
+    }
+ 
+    schedule_flow  -flow signoff  -branch $branch_name  -no_sync
+
+} -owner {cadence}
+set_db flow_step:schedule_signoff .status not_run
+create_flow_step -name schedule_signoff_subflows {
+    
+    #  schedule_flow  -flow extract  -branch [get_db flow_branch]  -tool_options "-log_file [file join [get_db flow_log_directory] extract.[get_db flow_report_name].log] -cmd [file join [get_db flow_db_directory] [get_db flow_report_name] qrc.cmd]"  -include_in_metrics  -sync
+
+    schedule_flow  -flow sta  -branch [get_db flow_branch]  -db [file join [get_db flow_db_directory] [get_db flow_branch] init_sta.tcl]  -include_in_metrics  -sync
+} -skip_metric -owner {cadence}
+set_db flow_step:schedule_signoff_subflows .status not_run
+create_flow_step -name schedule_simulation {
+
+    set env(WORKDIR) [get_db dft_verification_directory]
+
+    if {[info exists dft_synth_flow]} {
+        set netlist [get_db flow_vars_data_directory]/dbs/syn_opt/[get_db flow_vars_design_name].v.gz
+    } else {
+        set netlist [get_db flow_vars_data_directory]/dbs/opt_signoff/[get_db flow_vars_design_name].v.gz
+    }
+    set com_opts  [concat -define ARM_DISABLE_EMA_CHECK -define CLKPLL_NO_REFERENCE_CLOCK_MONITORING  -define ARM_FAULT_MODELING -define NTC -define RECREM  -sv [get_db flow_vars_dft_ncsim_library] $netlist -nowarn RECOME]
+    set elab_opts [list -negdelay -sdfstats unannotated_paths.rpt -ntc_level 3 -nowarn CSINFI  -nowarn CUVWSI -nowarn CUVWSP -nowarn NTCDMIN -nowarn SDFNCAP]
+    if {[file exists [get_db flow_vars_data_directory]/scripts/sdf.cmd]} {
+        lappend elab_opts [list -sdf_cmd_file [get_db flow_vars_data_directory]/scripts/sdf.cmd]
+    } else {
+        lappend elab_opts [list -sdf_cmd_file [get_db flow_vars_data_directory]/compiled_sdf/sdf.cmd]
+    }
+    if {[info exists dft_synth_flow]||[info exists sim_no_delay]} {
+        set elab_opts [list -seq_udp_delay 10ps -delay_mode zero ]
+    } else {
+        set elab_opts {}
+    }
+
+    set simulated [get_db dft_simulated_tests]
+    foreach test [get_db dft_unsimulated_tests] {
+        set name [dict get $test name]
+        set testfiles [dict get $test file_pattern]
+        set testbench [dict get $test testbench]
+        set env(TESTBENCH) $name
+        set env(MTM) [dict get $test MTM]
+        set log [dict get $test log]
+        if {"extra_opts" in [dict keys $test]} {
+            set extra_opts [dict get $test extra_opts]
+        } else {
+            set extra_opts ""
+        }
+
+        set sim_opts [list -exit +unknown_pin_off]
+        foreach tf [glob $testfiles] {
+            regexp {ts([0-9]+)} $tf -> file_num
+            lappend sim_opts "+TESTFILE${file_num}=$tf"
+        }
+
+        lappend com_opts $testbench
+
+        # To run multiple simulations at once
+        # TODO might be possible without this and could speed up compilation
+        set temp_dir xrun_temp_[expr int(rand()*1000000)]
+        while {[file exists $temp_dir]} {
+            set temp_dir xrun_temp_[expr int(rand()*1000000)]
+        }
+        file mkdir $temp_dir
+        lappend extra_opts -xmlibdirpath $temp_dir
+        
+        # Running exec xrun looks for modus executables
+        set xrun [exec which xrun]
+        set pid [exec {*}[concat $xrun -64bit -top $name $com_opts $elab_opts $sim_opts $extra_opts -l $log > /dev/null &]]
+        dict append test pid $pid
+        dict append test temp_dir $temp_dir
+        lappend simulated $test
+    }
+    
+    set_db dft_simulated_tests $simulated
+    set_db dft_unsimulated_tests [list]
+} -owner {cadence}
+set_db flow_step:schedule_simulation .status not_run
+create_flow_step -name schedule_sta {
+    #FlowtoolPredictHint ArgumentRandomise -branch
+    if {[get_db flow_branch] ne ""} {
+	set branch_name [get_db flow_branch]_[get_db flow_report_name]
+    } else {
+	set branch_name [get_db flow_report_name]
+    }
+    
+    schedule_flow  -flow sta  -branch $branch_name  -db [file join [get_db flow_db_directory] [get_db flow_report_name] init_sta.tcl]  -include_in_metrics  -no_sync
+} -owner {cadence}
+set_db flow_step:schedule_sta .status not_run
+create_flow_step -name schedule_sta_eco {
+    schedule_flow  -flow sta_eco  -branch [get_db flow_branch]  -db [get_db flow_starting_db]  -include_in_metrics  -no_sync
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:schedule_sta_eco .status not_run
+create_flow_step -name set_dont_touch {
+
+    # set default dont touch from project settings
+    if {[file exists [get_db flow_source_directory]/set_dont_touch.tcl]} {
+	puts "\nInfo: Sourcing [get_db flow_source_directory]/set_dont_touch.tcl"
+	source [get_db flow_source_directory]/set_dont_touch.tcl
+	puts "\n"
+    }
+
+    # override project dont touch settings and/or add own
+    if {[file exists scripts/set_dont_touch.tcl]} {
+	puts "\nInfo: Sourcing scripts/set_dont_touch.tcl"
+	source scripts/set_dont_touch.tcl
+	puts "\n"
+    }
+
+} -owner {cadence}
+set_db flow_step:set_dont_touch .status not_run
+create_flow_step -name set_dont_use {
+    # disable ULVT cells until postroute
+    if {[get_db flow_feature_dont_use_ulvt]} {
+	if {[is_flow -before flow:postroute]} {
+	    set_db [get_db base_cells -if {.lib_cells.library.name==*ulvt*}] .dont_use true
+	} else {
+	    set_db [get_db base_cells -if {.lib_cells.library.name==*ulvt*}] .dont_use false
+	}
+    }
+
+    foreach dont_use_expr [get_db flow_vars_dont_use_list] {
+        set_db [get_db base_cells -if {*}${dont_use_expr}] .dont_use true
+    }
+} -owner {cadence}
+set_db flow_step:set_dont_use .status not_run
+create_flow_step -name set_pg_nets {
+
+    # chk if design has bumps, then take top PG-IOs from them
+    if {[llength [get_db bumps]]} {
+        set top_layer [lindex [lsort -dict -dec [get_db [get_db layers -if {.type==routing}] .route_index]] 0]
+    } else {
+        set top_layer [lindex [lsort -dict -dec [get_db [get_db layers -if {.type==routing}] .route_index]] 1]
+    }
+    
+    foreach pg_port [get_db pg_ports .name] {
+        write_power_pads  -format xy  -auto_fetch  -layer [get_db [get_db layers -if {.route_index==${top_layer}}] .name]  -net ${pg_port}  -voltage_source_file ${pg_port}.pp
+    }
+
+    # Mod files, they have ports on all layers
+    foreach pg_port [get_db pg_ports .name] {
+        exec grep " [get_db [get_db layers -if {.route_index==${top_layer}}] .name]" ${pg_port}.pp > ${pg_port}_mod.pp
+    }
+
+
+    foreach pg_port [get_db pg_ports .name] {
+        set_power_pads  -format xy  -net ${pg_port}  -file ${pg_port}_mod.pp
+    }
+
+    
+    foreach pg_port [get_db pg_ports] {
+        if {[regexp {VDDPST} [get_db ${pg_port} .name]]} {
+            set max_voltage 1.98
+        } elseif {[regexp {VSS} [get_db ${pg_port} .name]]} {
+            set max_voltage 0.0
+        } else {
+            set max_voltage 0.99
+        }
+        if {$max_voltage > 0.001} {
+            set threshold [expr $max_voltage - ($max_voltage * 0.1)]
+        } else {
+            set threshold 0.09
+        }
+        set_pg_nets  -net [get_db ${pg_port} .name]  -voltage $max_voltage  -threshold ${threshold}
+    }
+} -owner {tuni}
+set_db flow_step:set_pg_nets .status not_run
+create_flow_step -name set_stdcell_opts {
+} -owner {cadence}
+set_db flow_step:set_stdcell_opts .status not_run
+create_flow_step -name signoff_finish {
+} -write_db -owner {cadence} -categories {flow}
+set_db flow_step:signoff_finish .status not_run
+create_flow_step -name signoff_start {
+} -owner {cadence}
+set_db flow_step:signoff_start .status not_run
+create_flow_step -name tempus_generate_etm {
+    if {![file exists models]} {file mkdir models}
+    if {![file exists models/[get_db flow_report_name]]} {file mkdir models/[get_db flow_report_name]}
+    set spef_dir  [file normalize [file join [get_db flow_working_directory] [get_db flow_db_directory] [file rootname [get_db flow_report_name]]]]
+    puts "Info: Using SPEF-dir: $spef_dir"
+    set active_setup_views [get_db [get_db analysis_views -if {.is_setup||.is_leakage||.is_dynamic}] .name]
+    set active_hold_views [get_db [get_db analysis_views -if {.is_hold}] .name]
+
+    # ETM model must be generated with the following setting
+    set_db timing_extract_model_slew_propagation_mode path_based_slew
+    # The following setting speeds up ETM generation
+    set_db timing_enable_timing_window_pessimism_removal false
+
+    # do ETM models only for PNR views
+    set pnr_aviews [get_db analysis_views  "[get_db  flow_vars_setup_pnr_active_views] [get_db flow_vars_hold_pnr_active_views]"]
+    set pnr_corners [get_db -u ${pnr_aviews} .delay_corner.late_rc_corner.name]
+    #set all_corners [get_db -u [get_db analysis_views -if {.is_setup||.is_hold||.is_leakage||.is_dynamic}] .delay_corner.late_rc_corner.name]
+    #set all_aviews [get_db analysis_views -if {(.is_setup||.is_hold||.is_leakage||.is_dynamic)}]
+    foreach corner_name $pnr_corners {
+
+	# rc_corner for which we read parasitics must be active, so we must first activate one before reading spef.
+	foreach view_dpo $pnr_aviews {
+	    if {[get_db $view_dpo .delay_corner.late_rc_corner.name] == $corner_name} {
+		puts "Info: Temp set_analysis_view in order to load parasitics"
+		set_analysis_view -setup [get_db $view_dpo .name] -hold [get_db $view_dpo .name]
+		break
+	    }
+	}
+	set spef_file [glob -nocomplain -directory ${spef_dir} *.${corner_name}.spef*]
+	puts "Info: Reading SPEF-file ${spef_file} for corner $corner_name"
+	read_spef -rc_corner ${corner_name} ${spef_file}
+
+	foreach view_dpo $pnr_aviews {
+	    if {[get_db $view_dpo .delay_corner.late_rc_corner.name] == $corner_name} {
+		puts "Info: Writing timing model for analysis_view [get_db $view_dpo .name]"
+		set_analysis_view -setup [get_db $view_dpo .name] -hold [get_db $view_dpo .name]
+		
+		write_timing_model -include_power_ground [file join models [get_db flow_report_name] [get_db [current_design] .name].[get_db $view_dpo .name].lib] -view [get_db $view_dpo .name]
+	    }
+	}
+    }
+    #set_multi_cpu_usage -local_cpu 8 -remote_host 1 -cpu_per_remote_host 8
+    
+    # merge .libs to one single multimode file
+    foreach corner_name [get_db -u [get_db analysis_views "[get_db  flow_vars_setup_pnr_active_views] [get_db flow_vars_hold_pnr_active_views]"] .delay_corner.name] {
+
+        set constraint_modes [join [get_db -u analysis_views .constraint_mode.name] ","]
+        set files [glob models/[get_db flow_report_name]/[get_db [current_design] .name].${corner_name}_{${constraint_modes}}.lib]
+	if {![llength $files]} {
+	    puts "Error: No files corresponding to corner: ${corner_name} and constraint_modes: ${constraint_modes} in models/[get_db flow_report_name]/"
+	    continue
+	}
+	set mode_list [list ]
+	set mode_group ""
+	foreach ff $files {
+	    set mode ""
+	    set cmodes [regsub -all "," $constraint_modes "|"]
+	    if {![regexp "_(${cmodes})\.lib" $ff -> mode]} {
+		puts "Error: Bad filename $ff"
+		continue
+	    }
+	    lappend mode_list $mode
+	    if {$mode_group == ""} {
+		set mode_group $mode
+	    } else {
+		set mode_group ${mode_group}_${mode}
+	    }
+	}
+
+        if {[llength $files] > 1} {
+            merge_model_timing -input_library_file $files  -mode_group $mode_group  -modes $mode_list  -merged_library_file models/[get_db flow_report_name]/[get_db [current_design] .name].${corner_name}.lib
+        } else {
+            # we only have one mode
+            exec cp [lindex $files 0] models/[get_db flow_report_name]/[get_db [current_design] .name].${corner_name}.lib
+        }
+    }
+
+    set_analysis_view -setup $active_setup_views -hold $active_hold_views
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:tempus_generate_etm .status not_run
+create_flow_step -name tempus_load_latency_files {   
+    foreach dpo [get_db analysis_views] {
+	set dpo_latency_file [file join [get_db flow_db_directory]/latency_files [get_db $dpo .name]_latency.sdc]
+	if {[file exists $dpo_latency_file]} {
+	    update_analysis_view -name [get_db $dpo .name] -latency_file $dpo_latency_file
+	} else {
+            puts "Warning: Could not find latency file for view: [get_db $dpo .name] in [get_db flow_db_directory]/latency_files"
+            puts "Note: Using different view for latency"
+            if {[regexp {^ss_0p81v.*worst_T_(\w+)$} [get_db $dpo .name] -> mode_name]} {
+                set new_dpo_name ss_0p81v_m40c_rcworst_T_${mode_name}
+                set dpo_latency_file [file join [get_db flow_db_directory]/latency_files ${new_dpo_name}_latency.sdc]
+            } elseif {[regexp {^ss_0p81v.*worst_(\w+)$} [get_db $dpo .name] -> mode_name]} {
+                set new_dpo_name ss_0p81v_m40c_rcworst_${mode_name}
+                set dpo_latency_file [file join [get_db flow_db_directory]/latency_files ${new_dpo_name}_latency.sdc]
+            } elseif {[regexp {^ff_0p99v.*best_(\w+)$} [get_db $dpo .name] -> mode_name]} {
+                set new_dpo_name ff_0p99v_125c_cbest_${mode_name}
+                set dpo_latency_file [file join [get_db flow_db_directory]/latency_files ${new_dpo_name}_latency.sdc]
+            } elseif {[regexp {^ff_0p99v.*worst_(\w+)$} [get_db $dpo .name] -> mode_name]} {
+                set new_dpo_name ff_0p99v_125c_cbest_${mode_name}
+                set dpo_latency_file [file join [get_db flow_db_directory]/latency_files ${new_dpo_name}_latency.sdc]
+            }
+                
+            if {[file exists $dpo_latency_file]} {
+                update_analysis_view -name [get_db $dpo .name] -latency_file $dpo_latency_file
+            } else {
+                puts "Error: Could not map [get_db $dpo .name] to latency file $dpo_latency_file"
+            }
+        }
+    }
+} -owner {tuni}
+set_db flow_step:tempus_load_latency_files .status not_run
+create_flow_step -name tempus_manage_derating {
+
+    global mmmc_vars
+    foreach active_av [get_db [get_db analysis_views -if {.is_setup || .is_hold}] .name] {
+	# SOCV RC variation
+	set_socv_rc_variation_factor -view ${active_av} -late  $mmmc_vars(late_rc_variation_factor)
+	set_socv_rc_variation_factor -view ${active_av} -early $mmmc_vars(early_rc_variation_factor)
+
+    }
+
+    set_socv_reporting_nsigma_multiplier -hold $mmmc_vars(timing_socv_analysis_nsigma_multiplier)  -setup $mmmc_vars(timing_socv_analysis_nsigma_multiplier) -views [get_db [get_db analysis_views -if {.is_setup || .is_hold}] .name]
+
+    foreach dc [get_db [get_db delay_corners] .name] {
+        regexp {([^_]+)_([^_]+)_([^_]+)_([\w]+)} $dc -> corn volt temp rc
+
+        # If rc-corner name ends in _T it is a setup corner
+        if {[regexp {_T$} $rc]} {
+            # For setup only derate capturing clock -> early
+            set_timing_derate -add -clock -cell_delay -early -delay_corner ${dc} $mmmc_vars(${dc},socv_clock_cell_early)
+        } else {
+            if {[regexp {ss} $corn]} {
+                # For hold in SS derate launching clock and data
+                set_timing_derate -add -data  -cell_delay -early -delay_corner ${dc} $mmmc_vars(${dc},socv_data_cell_early)
+                set_timing_derate -add -clock -cell_delay -early -delay_corner ${dc} $mmmc_vars(${dc},socv_clock_cell_early)
+            } else {
+                # For hold in FF only derate capturing clock -> late
+                set_timing_derate -add -clock -cell_delay -late  -delay_corner ${dc} $mmmc_vars(${dc},socv_clock_cell_late)
+            }
+        }
+    }
+} -exclude_time_metric -owner {tuni}
+set_db flow_step:tempus_manage_derating .status not_run
+create_flow_step -name tempus_set_propagated_clock {   
+    set_interactive_constraint_modes [all_constraint_modes -active]
+    set_propagated_clock [all_clocks]
+} -owner {tuni}
+set_db flow_step:tempus_set_propagated_clock .status not_run
+create_flow_step -name trim_metal_fill {
+    if {0} {
+	trim_metal_fill_near_net  -clock  -create_fill_blockage FILL
+    }
+} -owner {flow}
+set_db flow_step:trim_metal_fill .status not_run
+create_flow_step -name update_timing {
+    #- update timer for signoff timing reports
+    update_timing -full
+} -owner {cadence}
+set_db flow_step:update_timing .status not_run
+create_flow_step -name verify_11491_boundary {
+    verify_11491_boundary  -verify all
+    
+} -owner {cadence}
+set_db flow_step:verify_11491_boundary .status not_run
+create_flow_step -name write_eco {
+    write_eco -format innovus [file join [get_db flow_report_directory] [get_db flow_report_name] eco.innovus.tcl]
+    write_eco -format tempus [file join [get_db flow_report_directory] [get_db flow_report_name] eco.tempus.tcl]
+} -owner {cadence}
+set_db flow_step:write_eco .status not_run
+create_flow_step -name write_lec_constraints {
+    # Innovus scan lec constraints
+    file mkdir  [file join [string map [list %s [get_db current_design .name]] [get_db write_lec_directory_naming_style]]]
+    set FH [open [file join [string map [list %s [get_db current_design .name]] [get_db write_lec_directory_naming_style]] lec.[get_db flow_report_name].pre_compare] "w"]
+    
+    foreach pin [get_db [get_db ports {scan_enable* WRSTN* WEXT}] .name] {
+        puts $FH "add_pin_constraints 0 \{$pin\} -both"
+    }
+    foreach pin [get_db [get_db [get_db insts {*lockup_latch* *lockup_flop*}] .pins -if {.base_name==D}] .name] {
+        puts $FH "add_primary_input \{$pin\} -both"
+        puts $FH "add_ignored_inputs \{$pin\} -both"
+    }
+    foreach mc [get_db -u [get_db insts -if {.is_memory}] .base_cell] {
+        foreach msp [get_db $mc .base_pins.base_name *si*] {
+            puts $FH "add_ignored_inputs \{$msp\} -module [get_db $mc .base_name] -both"
+        }
+    }
+    foreach cb [get_db -u [get_db insts -if {.is_macro && !.is_memory}] .base_cell] {
+        foreach msp [get_db $cb .base_pins.base_name *scan_in*] {
+            puts $FH "add_ignored_inputs \{$msp\} -module [get_db $cb .base_name] -both"
+        }
+    }
+
+    close $FH
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:write_lec_constraints .status not_run
+create_flow_step -name write_parasitics {
+    set spef_dir  [file normalize [file join [get_db flow_working_directory] [get_db flow_db_directory] [file rootname [get_db flow_report_name]]]]
+    puts "Info: Using SPEF-dir: $spef_dir"
+
+    set corners [lsort -u [concat [get_db -u [get_db delay_corners -if {.is_setup || .is_hold}] .late_rc_corner]  [get_db -u [get_db delay_corners -if {.is_setup || .is_hold}] .early_rc_corner]]]
+    puts "Info: dumping corners $corners"
+    
+    foreach corner $corners {
+	set corner_name [get_db ${corner} .name]
+	puts "Info: Writing corner $corner_name to file [file join $spef_dir [get_db flow_vars_design_name].$corner_name.spef.gz]"
+	write_parasitics -rc_corner $corner_name -spef_file [file join $spef_dir [get_db flow_vars_design_name].$corner_name.spef.gz]
+    }
+} -owner {cadence}
+set_db flow_step:write_parasitics .status not_run
+create_flow_step -name write_sdf {
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+        file mkdir $out_dir
+    }
+
+    #write_sdf -recompute_parallel_arcs -delimiter "." -voltage 0.99:0.9:0.81 -temperature 125.0:25.0:-40.0 -process best:worst -target_application sta     -gate_level_sim_model ${out_dir}/[get_db current_design .name].gatesim.sta.sdf.gz
+    #write_sdf -recompute_parallel_arcs -delimiter "." -voltage 0.99:0.9:0.81 -temperature 125.0:25.0:-40.0 -process best:worst -target_application verilog -gate_level_sim_model ${out_dir}/[get_db current_design .name].gatesim.verilog.sdf.gz
+    #write_sdf -recompute_parallel_arcs -delimiter "." -voltage 0.99:0.9:0.81 -temperature 125.0:25.0:-40.0 -process best:worst -target_application sta     ${out_dir}/[get_db current_design .name].sta.sdf.gz
+    write_sdf -recompute_parallel_arcs -delimiter "." -voltage 1.1:1.0:0.9 -temperature 125.0:25.0:-0.0 -process best:worst -target_application verilog ${out_dir}/[get_db current_design .name].verilog.sdf.gz
+
+} -owner {tuni}
+set_db flow_step:write_sdf .status not_run
+create_flow_step -name write_stream_for_fill {
+
+    set design  [get_db current_design .name]
+    set out_dir [file join [get_db flow_db_directory] [get_db flow_report_name]]
+    if {![file exists $out_dir]} {
+	file mkdir $out_dir
+    }
+
+    write_stream  -die_area_as_boundary  -format stream  -map_file [get_db flow_vars_gdsout_stream_map_file]  -output_macros  -unit 1000  -mode ALL  $out_dir/$design.prefill.gds.gz
+} -owner {flow}
+set_db flow_step:write_stream_for_fill .status not_run
+create_flow_step -name write_tester_format {
+    write_vectors
+} -owner {cadence}
+set_db flow_step:write_tester_format .status not_run
+create_flow_step -name write_timing_db {
+    write_eco_opt_db
+} -exclude_time_metric -owner {cadence}
+set_db flow_step:write_timing_db .status not_run
+create_flow_step -name write_verilog_atpg {
+
+    write_vectors  -language verilog  -scanformat serial  -exportdir [get_db workdir]/testresults/verilog  -inexperiment [get_option experiment]  -xvalue 1
+
+    set tests [list]
+    if {[get_feature -feature full_atpg]} {
+        # Only run scan shift with serial
+        set patt [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option experiment].data.scan.ex1.ts*.verilog
+        # Also run with maximum delays
+        set delays {MINIMUM MAXIMUM}
+    } else {
+        set patt [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option experiment].data.logic.ex1.ts*.verilog
+        set delays MINIMUM
+    }
+    
+    foreach MTM $delays {
+        lappend tests [dict create name [file tail [get_db workdir]]_[get_option testmode]_[get_option experiment]  file_pattern $patt  testbench    [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option experiment].mainsim.v  log          [get_db workdir]/sim_logs/sim.[get_option testmode]_SDF_$MTM.log  MTM          $MTM  extra_opts   -gateloopwarn ]
+    }
+    set_db dft_unsimulated_tests [concat [get_db dft_unsimulated_tests] $tests]
+
+} -owner {cadence}
+set_db flow_step:write_verilog_atpg .status not_run
+create_flow_step -name write_verilog_bscan {
+
+    foreach tm {1149 TB_EXTEST_CAP_UPDT} {
+        write_vectors  -inexperiment 11491expt  -testmode $tm  -language verilog  -exportdir [get_db workdir]/testresults/verilog  -scanformat serial
+        
+        set tests [list]
+        foreach MTM {MAXIMUM MINIMUM} {
+            lappend tests [dict create name [file tail [get_db workdir]]_${tm}_11491expt  file_pattern [get_db workdir]/testresults/verilog/VER.$tm.11491expt.data.logic.ex1.ts*.verilog  testbench    [get_db workdir]/testresults/verilog/VER.$tm.11491expt.mainsim.v  log          [get_db workdir]/sim_logs/sim.${tm}_SDF_$MTM.log  MTM          $MTM ]
+        }
+    }
+    set_db dft_unsimulated_tests [concat [get_db dft_unsimulated_tests] $tests]
+} -owner {cadence}
+set_db flow_step:write_verilog_bscan .status not_run
+create_flow_step -name write_verilog_mbist {
+
+    # Default teststrobe is one clock cycle from falling edge, tdo driven on rising edge
+    set_option inexperiment [get_db [get_db testmodes [get_option testmode]] .experiments.name]
+    write_vectors  -language verilog  -keyeddata yes  -keyeddatakey PMBISTFailDataSync  -compresspatterns no  -exportdir [get_db workdir]/testresults/verilog
+
+    # Only some delays used here to reduce runtime
+    set tests [list]
+    foreach MTM {MAXIMUM} {
+        set tb [file tail [get_db workdir]]_[get_option testmode]_[get_option inexperiment]
+        lappend tests [dict create name $tb  file_pattern [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option inexperiment].data.logic.ex1.ts1.verilog  testbench    [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option inexperiment].mainsim.v  log          [get_db workdir]/sim_logs/sim.[get_option inexperiment]_SDF_$MTM.log  MTM          $MTM  extra_opts   -gateloopwarn
+                          ]
+    }
+    if {[file exists [get_db dft_verification_directory]/generate_mbist_faults.v]} {
+        dft_utils::add_tb_memory_faults -faults [get_db dft_verification_directory]/generate_mbist_faults.v  [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option inexperiment].mainsim.v
+        # This might take a long time when running full tests so skipped except when repair available
+        if {[get_option testmode]=="mda" && "enable_bira_accum" in [dft_utils::get_mbist_testplans [get_option interfacefiledir]/[get_db flow_vars_design_name]_test_def.txt]} {
+            set faults 2
+            foreach MTM {MINIMUM} {
+                lappend tests [dict create name [file tail [get_db workdir]]_[get_option testmode]_[get_option inexperiment]  file_pattern [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option inexperiment].data.logic.ex1.ts1.verilog  testbench    [get_db workdir]/testresults/verilog/VER.[get_option testmode].[get_option inexperiment].mainsim.v  log          [get_db workdir]/sim_logs/sim.[get_option inexperiment]_faults_SDF_$MTM.log  MTM          $MTM  extra_opts   [list -gateloopwarn -define MEMORY_FAULTS]  faults_expected $faults ]
+            }
+        }
+    }
+    set_db dft_unsimulated_tests [concat [get_db dft_unsimulated_tests] $tests]
+} -owner {cadence}
+set_db flow_step:write_verilog_mbist .status not_run
+create_flow_step -name write_verilog_parallel {
+
+    if {[get_feature -feature full_atpg]} {
+        write_vectors  -language verilog  -scanformat parallel  -exportdir [get_db workdir]/testresults/verilog_parallel  -inexperiment [get_option experiment]  -xvalue 1
+        
+        set tests [list]
+        foreach MTM {MAXIMUM MINIMUM} {
+            lappend tests [dict create name [file tail [get_db workdir]]_[get_option testmode]_[get_option experiment]  file_pattern [get_db workdir]/testresults/verilog_parallel/VER.[get_option testmode].[get_option experiment].data.logic.ex1.ts*.verilog  testbench    [get_db workdir]/testresults/verilog_parallel/VER.[get_option testmode].[get_option experiment].mainsim.v  log          [get_db workdir]/sim_logs/sim.[get_option testmode]_parallel_SDF_$MTM.log  MTM          $MTM  extra_opts   {-gateloopwarn -allowredefinition} ]
+        }
+        set_db dft_unsimulated_tests [concat [get_db dft_unsimulated_tests] $tests]
+    }
+    
+} -owner {cadence}
+set_db flow_step:write_verilog_parallel .status not_run

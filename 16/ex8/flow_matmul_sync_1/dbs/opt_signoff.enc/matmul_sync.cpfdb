@@ -1,0 +1,187 @@
+#IEEE1801 power intent data
+set 1801_ack_explicit_supply {1}
+set 1801_cln_reconnect {3.0}
+set 1801_default_applies_to {2.1}
+set 1801_domain_interface_definition {2.0}
+set 1801_ports_anon_supply {1}
+set 1801_support_wildcard {1}
+set allSNetVoltageSet {1}
+set all_inputfiles [list ${::IMEX::libVar}/cpf/matmul_sync.upf]
+set always_on_libcells ""
+set connectAOBLast {0}
+set current_apply_inst ""
+set current_model ""
+set current_scope {/}
+set debugFilterNoIsoShift {0}
+set debug_pst_powermode {0}
+set default_pd {pd_aon}
+set dontExpandPst {1}
+set downShifterNeeded(pd_aon,pd_aon) {0}
+set etsNoEco {0}
+set exe_version {23.15-s106_1}
+set feedthrough_ports ""
+set gvoltageRange(pd_aon,high) {0}
+set gvoltageRange(pd_aon,low) {0}
+set handlePowerStateAsPst {1}
+set handle_model_port_map {1}
+set has_upf_version {1}
+set hier_sepc {/}
+set ieee1801Committed {1}
+set ieee1801Loaded {1}
+set implicitUPFRules(num) {0}
+set internal_domains ""
+set internal_pgnet ""
+set is_analog_ports ""
+set is_isolated_ports ""
+set is_virtual_nets ""
+set is_virtual_ports ""
+set isoLSNeededInitialized {1}
+set isolationNeeded(pd_aon,pd_aon) {0}
+set keepGNC {0}
+set lib_lpcells(retention) ""
+set lib_lpcells(level_shifter) ""
+set lib_lpcells(always_on) ""
+set lib_lpcells(power_switch) ""
+set lib_lpcells(isolation) ""
+set lineno {42}
+set lint_error {0}
+set lint_scope {/}
+set noExpandPst {0}
+set normalizePstSupply {0}
+set num_always_on_cell {0}
+set num_apply_model {0}
+set num_associate_ss {0}
+set num_design_attr {0}
+set num_diode_clamp_cell {0}
+set num_eq_supply {0}
+set num_isolation_cell {0}
+set num_level_shifter_cell {0}
+set num_port_attr {0}
+set num_power_domain {1}
+set num_power_switch_cell {0}
+set num_related_supplynet {0}
+set num_related_supplypin {0}
+set num_retention_cell {0}
+set num_suppnet_conn {2}
+set num_suppset_conn {0}
+set pd_intnets(pd_aon,ground) {VSS}
+set pd_intnets(pd_aon,power) {VDD}
+set pd_list {pd_aon}
+set pd_pgconn(pd_aon,ground) { (VSS:VSS)}
+set pd_pgconn(pd_aon,power) { (VDD:VDD)}
+set pd_state(pd_aon,states) {aon_state}
+set pd_state(pd_aon,-line) {/home/student/16/ex8/flow_matmul_sync_1/dbs/syn_opt.cdb/cmn/matmul_sync.upf:42}
+set pd_state(pd_aon,aon_state,expr) { ((Set_VDD_VSS == on)) }
+set pd_techsite_list(pd_aon) {CoreSite}
+set pgvWithoutCSN {0}
+set port_state(VDD,-state) {{Set_VDD_VSS.on 0.9}}
+set port_state(VSS,-state) {{Set_VDD_VSS.on 0.0}}
+set power_domain(pd_aon,-primary_power_net) {VDD}
+set power_domain(pd_aon,all_libset) {fast_1p1v_0c_ls slow_0p9v_125c_ls}
+set power_domain(0) {pd_aon}
+set power_domain(pd_aon,-update) {-supply}
+set power_domain(pd_aon,domain_name) {pd_aon}
+set power_domain(pd_aon,-primary_ground_net) {VSS}
+set power_domain(pd_aon,default) {1}
+set power_domain(pd_aon,-line) {/home/student/16/ex8/flow_matmul_sync_1/dbs/syn_opt.cdb/cmn/matmul_sync.upf:11}
+set power_domain(pd_aon,-supply) {{primary Set_VDD_VSS}}
+set power_domain(pd_aon,-include_scope) ""
+set power_model_ignore_list {add_port_state add_pst_state create_pst set_design_top}
+set power_state(Set_VDD_VSS,-line) {/home/student/16/ex8/flow_matmul_sync_1/dbs/syn_opt.cdb/cmn/matmul_sync.upf:39}
+set power_state(pd_aon,-line) {/home/student/16/ex8/flow_matmul_sync_1/dbs/syn_opt.cdb/cmn/matmul_sync.upf:42}
+set power_state(Set_VDD_VSS,-state) {{on -supply_expr { power == `{FULL_ON, 0.9} && ground == `{FULL_ON, 0.0} }}}
+set power_state(pd_aon,-state) {{aon_state -logic_expr { ((Set_VDD_VSS == on)) }}}
+set ps_pst(pd_aon,states) {aon_state}
+set ps_pst(pd_aon,table_name) {pd_aon}
+set ps_pst(pd_aon,aon_state) {on}
+set ps_pst(pd_aon,-supplies) {Set_VDD_VSS}
+set related_supply_net_override {1}
+set resolved_pst_num_states {0}
+set scope_error {0}
+set scope_list { / }
+set singlePD {1}
+set skip_commit_iso_shifter {0}
+set sorted_iso_rules ""
+set sorted_ls_rules ""
+set sorted_ret_rules ""
+set source_quiet {0}
+set ss_deref(pd_aon.primary) {Set_VDD_VSS}
+set ss_domain(Set_VDD_VSS) {pd_aon}
+set ss_handle(pd_aon.primary) {Set_VDD_VSS}
+set ss_state(Set_VDD_VSS,on,ground) {0.0}
+set ss_state(Set_VDD_VSS,on,expr) { power == `{FULL_ON, 0.9} && ground == `{FULL_ON, 0.0} }
+set ss_state(Set_VDD_VSS,states) {on}
+set ss_state(Set_VDD_VSS,on,power) {0.9}
+set startCpuTime {17.550000}
+set startRealTime {34.000000}
+set supply_net(VSS,pg_type) {ground}
+set supply_net(VDD,net_name) {VDD}
+set supply_net(VDD,pg_type) {power}
+set supply_net(VSS,net_name) {VSS}
+set supply_port(VSS,pg_type) {ground}
+set supply_port(VSS,loConn) {VSS}
+set supply_port(VDD,hiConn) {VDD}
+set supply_port(VSS,port_name) {VSS}
+set supply_port(VDD,supply_net) {VDD}
+set supply_port(VSS,hiConn) {VSS}
+set supply_port(VDD,-direction) {in}
+set supply_port(VDD,pg_type) {power}
+set supply_port(VSS,supply_net) {VSS}
+set supply_port(VDD,loConn) {VDD}
+set supply_port(VSS,-direction) {in}
+set supply_port(VDD,port_name) {VDD}
+set supply_set(Set_VDD_VSS,-update) ""
+set supply_set(Set_VDD_VSS,set_name) {Set_VDD_VSS}
+set supply_set(Set_VDD_VSS,-function) {{power VDD} {ground VSS}}
+set supplynet_conn(1,net_name) {VSS}
+set supplynet_conn(0,-ports) {VDD}
+set supplynet_conn(1,-ports) {VSS}
+set supplynet_conn(0,net_name) {VDD}
+set supported_modelattrs {is_analog is_isolated unconnected feedthrough clamp_value}
+set supported_portattrs {related_power_port related_ground_port driver_supply receiver_supply attribute is_analog is_isolated feedthrough unconnected clamp_value}
+set unconnected_ports ""
+set upShifterNeeded(pd_aon,pd_aon) {0}
+set upfVersion {2.0}
+set upf_debug {0}
+set upf_file [list ${::IMEX::libVar}/cpf/matmul_sync.upf]
+set upf_inputfiles [list ${::IMEX::libVar}/cpf/matmul_sync.upf]
+set upf_lpcells(retention) ""
+set upf_lpcells(level_shifter) ""
+set upf_lpcells(diode_clamp) ""
+set upf_lpcells(always_on) ""
+set upf_lpcells(power_switch) ""
+set upf_lpcells(isolation) ""
+set upf_reinit {1}
+set useTriVoltValue {1}
+set user_pif_version ""
+set verifyUpfNoIsoShift {0}
+set verifyUpfThroughFeedthru {1}
+set voltageRange(pd_aon,high) {0.00}
+set voltageRange(pd_aon,low) {0.00}
+::MSV::setSNetVoltageForView VDD fast_1p1v_0c_cmin_func 1.1
+::MSV::setSNetVoltageForView VDD fast_1p1v_0c_cmin_scan_capture 1.1
+::MSV::setSNetVoltageForView VDD fast_1p1v_0c_cmin_scan_shift 1.1
+::MSV::setSNetVoltageForView VDD slow_0p9v_125c_cmax_func 0.9
+::MSV::setSNetVoltageForView VDD slow_0p9v_125c_cmax_scan_capture 0.9
+::MSV::setSNetVoltageForView VDD slow_0p9v_125c_cmax_scan_shift 0.9
+::MSV::setSNetVoltageForView VSS fast_1p1v_0c_cmin_func 0
+::MSV::setSNetVoltageForView VSS fast_1p1v_0c_cmin_scan_capture 0
+::MSV::setSNetVoltageForView VSS fast_1p1v_0c_cmin_scan_shift 0
+::MSV::setSNetVoltageForView VSS slow_0p9v_125c_cmax_func 0
+::MSV::setSNetVoltageForView VSS slow_0p9v_125c_cmax_scan_capture 0
+::MSV::setSNetVoltageForView VSS slow_0p9v_125c_cmax_scan_shift 0
+if {$::rdagVersionName >= 16.12 || ($::rdagVersionName >= 15.25 && $::rdagVersionName < 16.0)} {
+}
+set ::MSV_UPF::allSNetVoltageSet 1
+
+
+
+namespace eval ::pd_physical_data {
+set pd_data {
+POWERDOMAIN: NAME=pd_aon 
+	PRIM_POWER=VDD PRIM_GND=VSS LAYER=0 ISDEFAULT=1 EEQID=0 
+	ROWFLIP=3 SITE=CoreSite ROWSPACETYPE=2 ROWSPACING=0.0000 
+	MODULE=* POWER=(VDD:VDD) GND=(VSS:VSS) 
+END_PD
+}
+}
