@@ -1,0 +1,3 @@
+add_pin_constraints 0 {scan_enable_matmul_sync} -both
+add_primary_input {DFT_matmul_sync_lockup_latch_neg_edge/D} -both
+add_ignored_inputs {DFT_matmul_sync_lockup_latch_neg_edge/D} -both
