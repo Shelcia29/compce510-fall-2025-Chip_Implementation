@@ -1,0 +1,3 @@
+setenv REF_PATH $PWD/cadence_flow_scripts
+setenv FLOWTOOL_NUM_CPUS 16
+setenv MODULE_NAME matmul_sync
