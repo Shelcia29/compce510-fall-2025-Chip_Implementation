@@ -1,0 +1,13 @@
+Start checking Exercise 2
+Running: check_timing_intent -verbose
+Lint total: 0
+Check_timing OK
+Running: report_clocks
+Clock period OK
+Clock period OK
+Rise uncertainty OK
+Fall uncertainty OK
+Running: report_timing -path_type endpoint
+Timing slack OK
+########################################################
+Great success

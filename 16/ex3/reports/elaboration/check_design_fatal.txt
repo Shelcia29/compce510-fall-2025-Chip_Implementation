@@ -1,0 +1,34 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'datapath_top'
+
+No empty modules in design 'datapath_top'
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'datapath_top'
+
+No undriven sequential pin in 'datapath_top'
+
+No undriven hierarchical pin in 'datapath_top'
+
+No undriven port in 'datapath_top'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'datapath_top'
+
+No multidriven sequential pin in 'datapath_top'
+
+No multidriven hierarchical pin in 'datapath_top'
+
+No multidriven ports in 'datapath_top'
+
+No multidriven unloaded nets in 'datapath_top'
+
+  Done Checking the design.

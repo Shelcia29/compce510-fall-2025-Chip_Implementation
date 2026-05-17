@@ -1,0 +1,1 @@
+update_constraint_mode -name func -sdc_files [list ./constraints/matmul_sync.boundary_conditions.tcl ./constraints/matmul_sync.constraints.func.tcl ./constraints/matmul_sync.constraints.hier_dft.tcl ]
