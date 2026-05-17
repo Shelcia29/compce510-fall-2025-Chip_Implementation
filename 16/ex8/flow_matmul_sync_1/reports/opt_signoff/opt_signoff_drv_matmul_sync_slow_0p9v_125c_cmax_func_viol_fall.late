@@ -1,0 +1,6 @@
+
+reg2out       Pinsname:         result_o[31], Slack value :-0.0070, fromClk:     clk_i, toClk:clk_i_virtual
+
+==========================
+
+GroupType: reg2out, View:slow_0p9v_125c_cmax_func, Setup

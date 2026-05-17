@@ -1,0 +1,14 @@
+vhSlk       vlSlk       TermName                                NetName                                 vlPeak      vhPeak      
+#
+
++----------------+-------------+
+| Glitch report  |     all     |
++----------------+-------------+
+|         WGS (V)| 0.000       |
+|         TGS (V)| 0.000       |
+|         Nr Nets| 0           |
++----------------+-------------+
+View: slow_0p9v_125c_cmax_func
+  WGS (V): 0.000
+  TGS (V): 0.000
+  Nr Nets: 0
