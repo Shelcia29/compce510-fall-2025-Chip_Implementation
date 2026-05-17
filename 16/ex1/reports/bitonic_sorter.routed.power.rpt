@@ -1,0 +1,83 @@
+*----------------------------------------------------------------------------------------
+*	Innovus 23.15-s106_1 (64bit) 07/16/2025 17:15 (Linux 3.10.0-693.el7.x86_64)
+*	
+*
+* 	Date & Time:	2025-Sep-12 19:02:43 (2025-Sep-12 16:02:43 GMT)
+*
+*----------------------------------------------------------------------------------------
+*
+*	Design: bitonic_sorter
+*
+*	Liberty Libraries used: 
+*	        default_emulate_view: /opt/soc/tech/GPDK045/gsclib045/timing/slow_vdd1v0_basicCells.lib
+*
+*	Power Domain used: 
+*              Rail:        VDD      Voltage:        0.9 
+*
+*       Power View : default_emulate_view
+*
+*       User-Defined Activity : N.A.
+*
+*       Activity File: N.A.
+*
+*       Hierarchical Global Activity: N.A.
+*
+*       Global Activity: N.A.
+*
+*       Sequential Element Activity: 0.200000
+*
+*       Primary Input Activity: 0.200000
+*
+*       Default icg ratio: N.A.
+*
+*       Global Comb ClockGate Ratio: N.A.
+*
+*	Power Units = 1mW
+*
+*	Time Units = 1e-09 secs 
+*
+*       report_power -outfile ../reports/bitonic_sorter.routed.power.rpt
+*
+-----------------------------------------------------------------------------------------
+
+
+Total Power 
+-----------------------------------------------------------------------------------------
+Total Internal Power:        0.43250244 	   41.3714%
+Total Switching Power:       0.61253975 	   58.5931%
+Total Leakage Power:         0.00037145 	    0.0355%
+Total Power:                 1.04541364 
+-----------------------------------------------------------------------------------------
+
+
+Group                           Internal   Switching     Leakage       Total  Percentage 
+                                Power      Power         Power         Power  (%)        
+-----------------------------------------------------------------------------------------
+Sequential                       0.07382    0.007141   3.252e-05     0.08099       7.748 
+Macro                                  0           0           0           0           0 
+IO                                     0           0           0           0           0 
+Combinational                     0.3587      0.6054   0.0003389      0.9644       92.25 
+Clock (Combinational)                  0           0           0           0           0 
+Clock (Sequential)                     0           0           0           0           0 
+-----------------------------------------------------------------------------------------
+Total                             0.4325      0.6125   0.0003714       1.045         100 
+-----------------------------------------------------------------------------------------
+
+
+Rail                  Voltage   Internal   Switching     Leakage       Total  Percentage 
+                                Power      Power         Power         Power  (%)        
+-----------------------------------------------------------------------------------------
+VDD                       0.9     0.4325      0.6125   0.0003714       1.045         100 
+
+
+-----------------------------------------------------------------------------------------
+*	Power Distribution Summary: 
+*                Highest Average Power:              g73873__2346 (CLKMX2X4):          0.00163 
+*                Highest Leakage Power:     FE_PDC3553_data_in_47 (CLKBUFX20):        6.189e-07 
+*          Total Cap:      3.34086e-11 F
+*          Total instances in design:  6824
+*          Total instances in design with no power:     0
+*          Total instances in design with no activity:     0
+*          Total Fillers and Decap:     0
+-----------------------------------------------------------------------------------------
+
