@@ -1,0 +1,82 @@
+VERSION 5.5 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN matmul_sync ;
+
+SCANCHAINS 1 ;
+  - scan_chain_matmul_sync_0_seg1_jtag_tck_matmul_sync_rising 
+    + PARTITION p_jtag_tck_matmul_sync_rising_pd_aon_slow_0p9v_125c 
+      MAXBITS 64
+    + START PIN scan_in_matmul_sync_0
+    + FLOATING 
+       operand_b_i_sr_reg_0 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_1 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_2 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_3 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_6 ( IN SI ) ( OUT QN ) 
+       operand_b_i_sr_reg_7 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_23 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_20 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_18 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_19 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_21 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_22 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_24 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_25 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_13 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_14 ( IN SI ) ( OUT QN ) 
+       operand_b_i_sr_reg_30 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_29 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_15 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_10 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_16 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_17 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_11 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_12 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_24 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_31 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_25 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_15 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_23 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_29 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_30 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_28 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_27 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_31 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_21 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_22 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_26 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_20 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_19 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_14 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_13 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_6 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_7 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_18 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_28 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_5 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_9 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_8 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_4 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_26 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_3 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_2 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_1 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_27 ( IN SI ) ( OUT Q ) 
+       operand_a_i_sr_reg_0 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_12 ( IN SI ) ( OUT QN ) 
+       operand_b_i_sr_reg_11 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_10 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_9 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_8 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_17 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_16 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_5 ( IN SI ) ( OUT Q ) 
+       operand_b_i_sr_reg_4 ( IN SI ) ( OUT QN ) 
+    + STOP DFT_matmul_sync_lockup_latch_neg_edge D
+;
+
+END SCANCHAINS 
+END DESIGN 
+
