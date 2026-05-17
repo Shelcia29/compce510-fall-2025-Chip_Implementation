@@ -1,0 +1,27 @@
+1: List the problems you encountered. How usual do you think it is to encounter these kinds of problems (scale 1: very rare - 5: very common): 
+Unresolved reference to CLKINVX12: 4
+This kind of issue happens when the tool cannot find a required module or cell in the library. 
+
+Possible Missing Library or Tool Configuration Issue: 4
+Missing libraries or incorrectly configured paths are quite common when setting up design flows for custom modules or standard cells. 
+
+Inconsistent Naming / Cell Substitution: 3
+The difficulty is in understanding the specific library or cell being used.
+
+Verification of Correct Module Instantiation: 3
+Errors in module instantiation are common in large designs, especially when complex module hierarchies or generate statements are involved.
+
+2: How clearly did the Genus messages point to the root cause of each problem?
+The Genus messages were helpful clearly indicating the line to fix. For example, the message regarding the unresolved reference pointed directly to the missing CLKINVX12, which gave a clear indication of the problem. 
+
+3: How are you feeling? What was difficult / was something easier than you expected?
+It was neutral not too hard as well as not so easy. 
+The difficulties are:
+*Misconfigured cells/modules, which caused a lot of backtracking in the design process.
+*Needing to understand the specific tools and libraries involved to link the missing components properly.
+However, the easier than expected part was the fact that the Genus messages pointed out the exact reference to inconsistent naming and CLKINVX12, which made it easier to narrow down the problem.
+
+4: How much time did it take to finish this exercise?
+* Group member 1: <2>
+* Group member 2: <2>
+

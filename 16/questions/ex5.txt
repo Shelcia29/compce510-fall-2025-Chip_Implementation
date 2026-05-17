@@ -1,0 +1,8 @@
+1: How are you feeling? What was difficult / was something easier than you expected?
+At first, it was easy just running and following the instructions until we received the verification report. However, after that, identifying the exact issue within the scripts became difficult without the hint provided by Terro. Once the hint was given, we were able to identify the issue and fix it by looking at the schematics. After finding the issue, I realized it was much easier than I initially thought; I had assumed it was more complex.
+
+
+2: How much time did it take to finish this exercise?
+* Group member 1: <2,30>
+* Group member 2: <2,30>
+

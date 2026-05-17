@@ -1,0 +1,18 @@
+1: Questions in the constraints file comments:
+
+  #5. Why is the -add attribute needed?
+
+It allows multiple clocks to be defined on the same port without overwriting existing clocks. This is needed because we define both a real clock and a virtual clock on the same port.
+
+  #9 Why is it ok to add a multicycle path for reset? Can it be added to any signal which does not meet timing?
+
+Reset signal is not time critical. It's often used during chip startup.It can be used during the clock reset deactivation.
+
+2: How are you feeling? What was difficult / was something easier than you expected?
+
+Yes. It was difficult. Instructions were not pretty much clear like last week exercise.
+
+3: How much time did it take to finish this exercise?
+* Group member 1: <2>
+* Group member 2: <2>
+

@@ -1,0 +1,8 @@
+1: How are you feeling? What was difficult / was something easier than you expected?
+
+When we satrted it seems to be easy but once the dft rules are found we couldn't able to do it faster as expected. The most difficult part was interpreting the check_dft_rules output and figuring out exactly where to insert the muxes so that the internally generated clock and asynchronous reset become controllable in test mode.
+
+2: How much time did it take to finish this exercise?
+* Group member 1: <1,5h>
+* Group member 2: <1,5h>
+
