@@ -1,0 +1,6 @@
+ln -s $REF_PATH/scripts/genus_config-gpdk045.tcl scripts/genus_config.tcl
+ln -s $REF_PATH/scripts/innovus_config-gpdk045.tcl scripts/innovus_config.tcl
+ln -s $REF_PATH/scripts/library_setup-gpdk045.tcl scripts/library_setup.tcl
+ln -s $REF_PATH/scripts/mmmc_setup-gpdk045.tcl scripts/mmmc_setup.tcl
+ln -s $REF_PATH/scripts/tech_setup-gpdk045.tcl scripts/tech_setup.tcl
+ln -s $REF_PATH/scripts/tempus_config-gpdk045.tcl scripts/tempus_config.tcl

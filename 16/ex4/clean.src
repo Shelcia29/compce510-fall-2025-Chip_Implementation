@@ -1,0 +1,2 @@
+rm -rf flow* logs/ fv/ dbs/ reports/ output* *~ atpg/
+
