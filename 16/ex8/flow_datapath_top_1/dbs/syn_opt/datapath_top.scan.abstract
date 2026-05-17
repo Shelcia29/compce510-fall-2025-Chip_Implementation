@@ -1,0 +1,28 @@
+proc ::dft_hier_proc { inst } {
+    ::legacy::set_attribute dft_core_wir_bit_length 0 $inst
+}
+
+set_dft_functions_from_proc -libcell datapath_top -function dft_hier_proc
+
+set tbp [define_test_bus_port -name scan_mode_datapath_top -lib_cell datapath_top -active high -function test_mode -index 0 scan_mode_datapath_top]
+set_db -quiet $tbp .pipeline_depth 0
+set tbp [define_test_bus_port -name scan_enable_datapath_top -lib_cell datapath_top -active high -function shift_enable -default -index 0 scan_enable_datapath_top]
+set_db -quiet $tbp .pipeline_depth 0
+set tbp [define_test_bus_port -name scan_reset_datapath_top -lib_cell datapath_top -active high -function async_set_reset -index 0 rst_ni]
+set_db -quiet $tbp .pipeline_depth 0
+define_test_bus_port -name jtag_tck_datapath_top -lib_cell datapath_top -active high -function test_clock -index 0 clk_i
+ 
+# writing abstract model for 1 scan chain
+ 
+  define_scan_abstract_segment -lib_cell datapath_top \
+    -name datapath_top_scan_chain_datapath_top_0 \
+    -sdi scan_in_datapath_top_0 -sdo scan_out_datapath_top_0 \
+    -shift_enable_port scan_enable_datapath_top -active high \
+    -test_mode_port scan_mode_datapath_top -test_mode_active high \
+    -test_mode_port rst_ni -test_mode_active high \
+    -clock_port clk_i -rise \
+    -tail_clock_port clk_i -tail_edge_rise \
+    -skew_safe \
+    -skew_latch \
+    -length 3395 
+ 
