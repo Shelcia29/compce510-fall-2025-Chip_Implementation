@@ -1,0 +1,1466 @@
+-------------------------------------------------------------------------------
+Name     : Shielded net name
+Length   : Shielded net length
+Shield   : Total length of shielding wire
+Ratio    : Average shielding ratio
+-------------------------------------------------------------------------------
+Name          Length    Shield    Ratio   
+                                         Layer:      Length     Shield  Ratio
+-------------------------------------------------------------------------------
+i_clk_div_inv/CTS_2:   preferred: Metal7 - Metal8
+                 2.3       1.9    0.412
+                                         Metal2:        0.5        0.1  0.095
+                                         Metal3:        1.8        1.8  0.500
+CTS_3:   preferred: Metal7 - Metal8
+               217.5     234.4    0.539
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        0.4        0.8  1.000
+                                         Metal6:        0.6        1.0  0.868
+                                         Metal7:      173.4      146.6  0.423
+                                         Metal8:       42.9       85.9  1.000
+CTS_76:   preferred: Metal2 - Metal7
+               163.9     217.6    0.664
+                                         Metal2:        0.4        0.0  0.000
+                                         Metal3:        0.4        0.5  0.581
+                                         Metal5:        1.2        0.0  0.000
+                                         Metal6:      153.9      201.1  0.653
+                                         Metal7:        8.0       16.0  1.000
+CTS_2:   preferred: Metal2 - Metal7
+               148.2     209.3    0.706
+                                         Metal3:        0.6        1.2  1.000
+                                         Metal4:       47.3       93.7  0.991
+                                         Metal5:        1.6        0.5  0.166
+                                         Metal6:       95.0      106.5  0.561
+                                         Metal7:        3.0        5.9  0.975
+                                         Metal8:        0.8        1.5  1.000
+CTS_156:   preferred: Metal2 - Metal7
+               210.5     301.3    0.716
+                                         Metal3:       99.2      186.3  0.939
+                                         Metal4:      110.3      115.0  0.521
+                                         Metal5:        1.0        0.0  0.000
+i_clk_divider/n_1:   preferred: Metal7 - Metal8
+                 2.6       3.7    0.723
+                                         Metal2:        0.4        0.7  0.967
+                                         Metal3:        2.2        3.0  0.681
+CTS_131:   preferred: Metal7 - Metal8
+               190.7     277.5    0.728
+                                         Metal3:        0.6        1.0  0.829
+                                         Metal6:        1.0        1.9  1.000
+                                         Metal7:        5.6       10.9  0.973
+                                         Metal8:      183.5      263.7  0.718
+CTS_122:   preferred: Metal2 - Metal7
+                17.3      25.5    0.736
+                                         Metal2:        4.2        3.3  0.386
+                                         Metal3:        6.6       12.3  0.929
+                                         Metal4:        5.5        9.5  0.857
+                                         Metal5:        1.0        0.5  0.265
+CTS_138:   preferred: Metal2 - Metal7
+               217.2     328.9    0.757
+                                         Metal2:       38.7       60.7  0.785
+                                         Metal3:       25.4       46.9  0.922
+                                         Metal4:      152.6      221.3  0.725
+                                         Metal5:        0.6        0.0  0.000
+CTS_29:   preferred: Metal2 - Metal7
+                25.6      38.9    0.761
+                                         Metal2:       14.7       19.1  0.650
+                                         Metal3:       10.9       19.8  0.910
+CTS_43:   preferred: Metal7 - Metal8
+               147.3     225.9    0.767
+                                         Metal2:        0.8        0.0  0.000
+                                         Metal3:        2.0        0.0  0.000
+                                         Metal4:        0.4        0.6  0.836
+                                         Metal5:        0.6        1.2  1.000
+                                         Metal7:      116.2      169.3  0.729
+                                         Metal8:       27.4       54.7  1.000
+CTS_158:   preferred: Metal7 - Metal8
+               226.9     349.7    0.771
+                                         Metal3:        0.2        0.0  0.000
+                                         Metal5:        1.6        3.2  1.000
+                                         Metal7:        6.6       12.8  0.973
+                                         Metal8:      218.5      333.7  0.764
+CTS_177:   preferred: Metal2 - Metal7
+                 6.9      11.2    0.809
+                                         Metal2:        5.7        9.7  0.850
+                                         Metal3:        1.2        1.5  0.611
+CTS_41:   preferred: Metal2 - Metal7
+                42.7      69.4    0.811
+                                         Metal2:       19.2       26.0  0.678
+                                         Metal3:       23.6       43.4  0.920
+CTS_42:   preferred: Metal2 - Metal7
+               192.6     314.3    0.816
+                                         Metal2:       35.1       43.9  0.626
+                                         Metal3:       73.7      103.8  0.704
+                                         Metal4:       25.3       50.5  1.000
+                                         Metal5:       58.6      116.1  0.992
+CTS_181:   preferred: Metal7 - Metal8
+                 7.9      13.2    0.834
+                                         Metal2:        0.5        0.0  0.029
+                                         Metal3:        0.6        0.4  0.370
+                                         Metal5:        0.6        0.7  0.550
+                                         Metal6:        0.2        0.1  0.132
+                                         Metal7:        6.0       12.0  1.000
+CTS_73:   preferred: Metal2 - Metal7
+               271.2     455.1    0.839
+                                         Metal4:      145.1      288.4  0.994
+                                         Metal5:       42.3       82.1  0.971
+                                         Metal6:       83.8       84.6  0.505
+CTS_208:   preferred: Metal7 - Metal8
+                 1.5       2.5    0.842
+                                         Metal2:        0.1        0.0  0.000
+                                         Metal3:        1.4        2.5  0.875
+CTS_95:   preferred: Metal7 - Metal8
+               108.9     185.3    0.851
+                                         Metal2:        0.1        0.1  0.500
+                                         Metal3:        0.8        1.0  0.597
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal5:        2.6        0.0  0.000
+                                         Metal6:        0.2        0.0  0.000
+                                         Metal7:       86.4      147.0  0.851
+                                         Metal8:       18.6       37.2  1.000
+CTS_179:   preferred: Metal7 - Metal8
+                 4.2       7.2    0.854
+                                         Metal2:        2.0        2.9  0.738
+                                         Metal3:        2.2        4.2  0.958
+CTS_93:   preferred: Metal2 - Metal7
+                13.2      22.7    0.858
+                                         Metal2:        0.6        0.8  0.693
+                                         Metal3:        0.2        0.2  0.500
+                                         Metal4:        2.1        3.3  0.780
+                                         Metal5:       10.3       18.4  0.890
+clk_i:   preferred: Metal7 - Metal8
+                 8.0      13.9    0.863
+                                         Metal6:        1.9        3.8  1.000
+                                         Metal7:        6.1       10.1  0.821
+CTS_68:   preferred: Metal2 - Metal7
+               353.4     612.4    0.866
+                                         Metal2:        0.6        1.1  1.000
+                                         Metal3:       39.4       73.0  0.926
+                                         Metal4:      311.6      537.0  0.862
+                                         Metal5:        1.8        1.3  0.350
+CTS_19:   preferred: Metal2 - Metal7
+               142.4     248.0    0.871
+                                         Metal2:       34.7       54.8  0.789
+                                         Metal3:       38.3       58.5  0.763
+                                         Metal4:       58.3      115.8  0.992
+                                         Metal5:        1.2        1.2  0.500
+                                         Metal6:        9.5       17.8  0.939
+                                         Metal7:        0.4        0.0  0.000
+CTS_176:   preferred: Metal7 - Metal8
+                 8.2      14.4    0.874
+                                         Metal2:        7.0       12.2  0.866
+                                         Metal3:        1.2        2.2  0.925
+CTS_23:   preferred: Metal7 - Metal8
+                11.3      19.9    0.879
+                                         Metal2:        0.6        0.6  0.500
+                                         Metal3:        6.2       10.3  0.833
+                                         Metal4:        4.6        9.0  0.988
+CTS_11:   preferred: Metal2 - Metal7
+               101.9     181.1    0.889
+                                         Metal2:       44.4       76.3  0.858
+                                         Metal3:       51.0       91.9  0.901
+                                         Metal4:        6.5       12.9  1.000
+CTS_104:   preferred: Metal2 - Metal7
+               218.4     388.3    0.889
+                                         Metal2:       80.9      122.1  0.755
+                                         Metal3:        1.8        3.2  0.893
+                                         Metal5:        1.8        2.4  0.667
+                                         Metal6:       28.2       53.8  0.955
+                                         Metal7:      105.8      206.8  0.978
+CTS_192:   preferred: Metal7 - Metal8
+                 5.2       9.2    0.889
+                                         Metal2:        0.6        0.8  0.650
+                                         Metal3:        4.6        8.5  0.920
+CTS_194:   preferred: Metal7 - Metal8
+                 3.3       5.9    0.893
+                                         Metal2:        2.1        3.9  0.923
+                                         Metal3:        1.2        2.0  0.840
+CTS_81:   preferred: Metal7 - Metal8
+                 9.0      16.1    0.896
+                                         Metal2:        7.2       12.9  0.898
+                                         Metal3:        1.8        3.2  0.889
+CTS_119:   preferred: Metal7 - Metal8
+               230.6     413.6    0.897
+                                         Metal3:        0.6        1.0  0.854
+                                         Metal5:        0.2        0.4  1.000
+                                         Metal7:       47.0       47.0  0.500
+                                         Metal8:      182.8      365.1  0.999
+CTS_178:   preferred: Metal7 - Metal8
+                 8.1      14.5    0.901
+                                         Metal2:        0.7        0.3  0.248
+                                         Metal3:        7.4       14.2  0.959
+CTS_139:   preferred: Metal2 - Metal7
+               150.5     272.9    0.906
+                                         Metal2:       23.3       31.9  0.684
+                                         Metal3:       27.2       48.1  0.885
+                                         Metal4:        8.0       13.7  0.851
+                                         Metal5:       83.6      164.0  0.981
+                                         Metal6:        8.4       15.2  0.904
+CTS_195:   preferred: Metal7 - Metal8
+                 8.5      15.5    0.908
+                                         Metal2:        3.7        6.4  0.862
+                                         Metal3:        4.8        9.1  0.943
+CTS_151:   preferred: Metal2 - Metal7
+               155.5     284.5    0.915
+                                         Metal2:        2.2        1.7  0.383
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal4:      150.1      277.6  0.925
+                                         Metal5:        0.6        0.0  0.000
+CTS_125:   preferred: Metal2 - Metal7
+               186.3     341.9    0.918
+                                         Metal2:       26.3       40.1  0.762
+                                         Metal3:       29.6       56.1  0.947
+                                         Metal4:        6.3       12.1  0.966
+                                         Metal5:      121.6      229.8  0.945
+                                         Metal6:        2.1        3.8  0.908
+                                         Metal7:        0.4        0.0  0.000
+CTS_100:   preferred: Metal2 - Metal7
+               201.0     369.6    0.920
+                                         Metal2:       43.3       69.9  0.807
+                                         Metal3:       49.8       89.6  0.900
+                                         Metal4:       22.0       42.5  0.964
+                                         Metal5:       85.0      167.6  0.986
+                                         Metal6:        0.8        0.0  0.000
+CTS_38:   preferred: Metal2 - Metal7
+               118.3     217.8    0.921
+                                         Metal2:       17.8       29.3  0.824
+                                         Metal3:       14.0       25.0  0.892
+                                         Metal4:       85.7      163.6  0.955
+                                         Metal5:        0.8        0.0  0.000
+CTS_109:   preferred: Metal7 - Metal8
+                28.5      52.7    0.923
+                                         Metal2:        0.6        0.6  0.500
+                                         Metal3:        3.2        3.6  0.562
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:       20.2       40.1  0.993
+                                         Metal8:        4.2        8.0  0.962
+CTS_25:   preferred: Metal7 - Metal8
+                21.8      40.4    0.926
+                                         Metal3:        3.4        5.7  0.832
+                                         Metal6:        0.8        1.5  1.000
+                                         Metal7:       11.8       21.7  0.925
+                                         Metal8:        5.9       11.5  0.973
+CTS_166:   preferred: Metal7 - Metal8
+                22.5      41.8    0.927
+                                         Metal2:        0.4        0.7  0.967
+                                         Metal3:        4.0        7.6  0.950
+                                         Metal4:        1.3        1.6  0.582
+                                         Metal6:        0.6        0.2  0.167
+                                         Metal7:        1.8        3.1  0.850
+                                         Metal8:       14.4       28.6  0.991
+CTS_99:   preferred: Metal7 - Metal8
+                21.0      39.0    0.931
+                                         Metal2:        0.5        0.5  0.500
+                                         Metal3:        3.6        6.8  0.945
+                                         Metal6:        3.0        4.9  0.807
+                                         Metal7:       13.8       26.8  0.971
+CTS_121:   preferred: Metal7 - Metal8
+                17.3      32.3    0.932
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:       15.8       29.4  0.931
+                                         Metal4:        1.3        2.7  1.000
+CTS_44:   preferred: Metal2 - Metal7
+               352.2     660.4    0.938
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal4:        0.8        0.8  0.500
+                                         Metal5:        1.2        0.0  0.000
+                                         Metal6:      265.4      490.4  0.924
+                                         Metal7:       84.6      169.2  1.000
+CTS_1:   preferred: Metal2 - Metal7
+               284.4     534.9    0.940
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        3.6        5.7  0.787
+                                         Metal4:       21.7       21.7  0.500
+                                         Metal5:      221.3      434.0  0.980
+                                         Metal6:       37.6       73.6  0.979
+CTS_124:   preferred: Metal2 - Metal7
+               268.0     504.1    0.941
+                                         Metal2:       34.1       45.3  0.664
+                                         Metal3:       29.6       53.1  0.897
+                                         Metal4:      200.1      398.4  0.996
+                                         Metal5:        4.2        7.3  0.864
+CTS_50:   preferred: Metal2 - Metal7
+               255.0     480.4    0.942
+                                         Metal2:       29.9       39.8  0.665
+                                         Metal3:       32.3       58.4  0.904
+                                         Metal4:       82.1      163.7  0.997
+                                         Metal5:       11.0       21.1  0.957
+                                         Metal6:        0.8        1.5  0.968
+                                         Metal7:       98.9      196.0  0.991
+CTS_129:   preferred: Metal2 - Metal7
+               254.7     480.1    0.942
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        0.2        0.0  0.000
+                                         Metal5:        1.8        0.0  0.000
+                                         Metal6:       42.2       63.6  0.754
+                                         Metal7:      210.4      416.1  0.989
+CTS_57:   preferred: Metal2 - Metal7
+                27.3      51.6    0.945
+                                         Metal2:        1.6        1.6  0.500
+                                         Metal3:        5.4       10.8  1.000
+                                         Metal4:       17.5       34.7  0.994
+                                         Metal5:        2.8        4.5  0.796
+CTS_152:   preferred: Metal2 - Metal7
+               255.5     483.4    0.946
+                                         Metal2:        1.2        0.4  0.165
+                                         Metal3:      124.0      245.3  0.989
+                                         Metal4:       86.9      152.4  0.877
+                                         Metal5:       43.5       85.4  0.983
+CTS_182:   preferred: Metal7 - Metal8
+                21.9      41.5    0.946
+                                         Metal2:        1.1        1.1  0.536
+                                         Metal3:        0.2        0.2  0.500
+                                         Metal4:        0.4        0.0  0.000
+                                         Metal6:        1.0        1.5  0.803
+                                         Metal7:        2.2        4.4  0.999
+                                         Metal8:       17.1       34.2  1.000
+genblk3_12_i_mul_wrapper_c/CTS_1:   preferred: Metal2 - Metal7
+                56.5     107.6    0.952
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        0.2        0.4  0.870
+                                         Metal4:       54.2      107.0  0.987
+                                         Metal5:        1.9        0.0  0.000
+CTS_183:   preferred: Metal7 - Metal8
+                24.4      46.4    0.953
+                                         Metal2:        0.7        1.0  0.782
+                                         Metal3:        0.4        0.0  0.000
+                                         Metal5:        0.4        0.4  0.500
+                                         Metal6:        2.1        3.5  0.834
+                                         Metal7:        2.0        3.9  0.966
+                                         Metal8:       18.8       37.6  1.000
+CTS_97:   preferred: Metal7 - Metal8
+                27.4      52.3    0.953
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        2.4        3.0  0.637
+                                         Metal4:        6.7       12.8  0.964
+                                         Metal6:        6.7       13.3  1.000
+                                         Metal7:       11.6       23.2  1.000
+CTS_78:   preferred: Metal2 - Metal7
+               267.1     509.4    0.953
+                                         Metal3:        0.4        0.8  1.000
+                                         Metal4:       24.2       26.7  0.551
+                                         Metal5:      181.1      360.3  0.995
+                                         Metal6:       61.4      121.6  0.990
+CTS_130:   preferred: Metal2 - Metal7
+                33.9      64.7    0.955
+                                         Metal4:        4.2        8.4  1.000
+                                         Metal5:       29.7       56.4  0.949
+CTS_118:   preferred: Metal2 - Metal7
+               195.3     373.6    0.956
+                                         Metal2:       30.9       51.8  0.837
+                                         Metal3:       43.0       80.9  0.941
+                                         Metal5:        8.0       16.0  1.000
+                                         Metal6:        8.6       16.0  0.927
+                                         Metal7:      104.8      209.0  0.997
+CTS_175:   preferred: Metal7 - Metal8
+                 4.4       8.5    0.957
+                                         Metal2:        3.4        6.5  0.944
+                                         Metal3:        1.0        2.0  1.000
+i_clk_divider/CTS_2:   preferred: Metal7 - Metal8
+                 3.5       6.8    0.958
+                                         Metal2:        0.5        0.8  0.717
+                                         Metal3:        3.0        6.0  1.000
+CTS_10:   preferred: Metal2 - Metal7
+               226.1     433.2    0.958
+                                         Metal2:       15.1       17.5  0.576
+                                         Metal3:       32.3       59.6  0.922
+                                         Metal4:       95.2      190.4  1.000
+                                         Metal5:       83.4      165.8  0.994
+CTS_66:   preferred: Metal2 - Metal7
+               393.9     755.0    0.958
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal4:       29.1       29.4  0.506
+                                         Metal5:        4.6        7.7  0.840
+                                         Metal6:        1.6        2.1  0.679
+                                         Metal7:        2.4        3.5  0.743
+                                         Metal8:      356.1      712.1  1.000
+CTS_123:   preferred: Metal7 - Metal8
+               294.7     565.0    0.959
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        0.6        1.0  0.829
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal6:        1.5        2.5  0.812
+                                         Metal7:      292.2      561.3  0.961
+CTS_117:   preferred: Metal2 - Metal7
+               108.5     208.1    0.959
+                                         Metal2:        4.6        4.4  0.479
+                                         Metal3:        5.6        8.5  0.761
+                                         Metal4:        3.0        6.1  1.000
+                                         Metal5:       91.4      182.8  1.000
+                                         Metal6:        2.9        5.4  0.946
+                                         Metal7:        1.1        0.9  0.431
+CTS_197:   preferred: Metal7 - Metal8
+                27.6      52.8    0.959
+                                         Metal3:       10.4       18.7  0.898
+                                         Metal4:        3.2        6.5  1.000
+                                         Metal6:        1.5        2.9  0.951
+                                         Metal7:       12.4       24.8  1.000
+CTS_148:   preferred: Metal2 - Metal7
+               270.2     519.5    0.961
+                                         Metal2:        9.2       13.2  0.722
+                                         Metal3:      227.2      440.4  0.969
+                                         Metal5:       31.4       61.9  0.986
+                                         Metal6:        2.5        4.0  0.816
+CTS_53:   preferred: Metal2 - Metal7
+               227.2     437.5    0.963
+                                         Metal2:       10.3       14.9  0.728
+                                         Metal3:       10.1       17.4  0.860
+                                         Metal4:       72.0      144.0  1.000
+                                         Metal5:        9.4       18.8  1.000
+                                         Metal6:       11.7       22.0  0.946
+                                         Metal7:      113.8      220.3  0.968
+CTS_56:   preferred: Metal2 - Metal7
+                96.1     185.6    0.965
+                                         Metal2:        1.8        2.7  0.735
+                                         Metal3:        2.4        3.2  0.669
+                                         Metal4:       88.7      174.5  0.983
+                                         Metal5:        3.2        5.3  0.822
+CTS_206:   preferred: Metal7 - Metal8
+                 6.0      11.5    0.966
+                                         Metal2:        0.1        0.0  0.000
+                                         Metal3:        2.2        4.3  0.976
+                                         Metal4:        3.6        7.2  1.000
+CTS_51:   preferred: Metal2 - Metal7
+               224.1     433.4    0.967
+                                         Metal2:       10.2        9.7  0.474
+                                         Metal3:       39.3       75.6  0.961
+                                         Metal4:      151.1      302.1  1.000
+                                         Metal5:       23.6       46.1  0.976
+CTS_111:   preferred: Metal7 - Metal8
+                38.9      75.2    0.968
+                                         Metal3:        2.6        4.6  0.889
+                                         Metal6:        1.7        2.5  0.740
+                                         Metal7:        3.6        6.1  0.853
+                                         Metal8:       31.0       61.9  1.000
+CTS_46:   preferred: Metal7 - Metal8
+                66.6     129.2    0.969
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        3.6        5.3  0.733
+                                         Metal4:        9.1       17.1  0.936
+                                         Metal6:        0.6        1.1  0.925
+                                         Metal7:        6.8       13.6  1.000
+                                         Metal8:       46.2       91.8  0.994
+CTS_37:   preferred: Metal2 - Metal7
+               153.0     296.7    0.969
+                                         Metal2:       33.2       62.9  0.949
+                                         Metal3:        8.4       14.5  0.860
+                                         Metal5:      107.4      214.7  0.999
+                                         Metal6:        2.5        4.7  0.942
+                                         Metal7:        1.6        0.0  0.000
+CTS_47:   preferred: Metal7 - Metal8
+                64.2     124.8    0.972
+                                         Metal2:        3.6        7.2  1.000
+                                         Metal3:       12.0       21.1  0.879
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:       25.0       49.7  0.994
+                                         Metal8:       23.2       46.4  1.000
+CTS_15:   preferred: Metal2 - Metal7
+                36.8      71.6    0.973
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal4:        4.0        7.9  0.994
+                                         Metal5:        2.8        5.3  0.946
+                                         Metal6:       26.4       52.4  0.993
+                                         Metal7:        3.4        5.8  0.843
+CTS_115:   preferred: Metal2 - Metal7
+               127.0     248.0    0.976
+                                         Metal2:       65.8      127.6  0.969
+                                         Metal3:        8.5       16.3  0.959
+                                         Metal4:       29.6       59.3  1.000
+                                         Metal5:       23.0       44.9  0.975
+CTS_160:   preferred: Metal7 - Metal8
+                77.8     152.1    0.978
+                                         Metal2:        2.5        4.8  0.962
+                                         Metal3:        3.4        4.4  0.646
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal5:        4.8        9.6  1.000
+                                         Metal6:        1.3        2.6  0.981
+                                         Metal7:       65.2      129.6  0.994
+genblk3_11_i_mul_wrapper_c/CTS_1:   preferred: Metal2 - Metal7
+                44.8      87.7    0.978
+                                         Metal2:        0.1        0.0  0.000
+                                         Metal5:       23.2       45.2  0.974
+                                         Metal6:       21.5       42.5  0.989
+CTS_127:   preferred: Metal7 - Metal8
+                91.4     178.8    0.978
+                                         Metal2:        3.5        4.4  0.626
+                                         Metal3:        2.2        3.6  0.825
+                                         Metal4:        0.8        1.4  0.918
+                                         Metal5:        0.6        1.1  0.887
+                                         Metal6:        0.2        0.4  1.000
+                                         Metal7:       78.8      157.6  1.000
+                                         Metal8:        5.3       10.3  0.970
+CTS_26:   preferred: Metal7 - Metal8
+                11.2      21.9    0.978
+                                         Metal2:        0.1        0.0  0.000
+                                         Metal3:        0.6        1.0  0.846
+                                         Metal4:       10.5       20.9  1.000
+CTS_155:   preferred: Metal7 - Metal8
+                51.2     100.4    0.980
+                                         Metal2:        7.6       14.1  0.928
+                                         Metal3:        2.8        4.6  0.822
+                                         Metal7:        3.6        7.2  1.000
+                                         Metal8:       37.2       74.5  1.000
+CTS_168:   preferred: Metal7 - Metal8
+               205.8     403.2    0.980
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        4.6        7.2  0.782
+                                         Metal6:        2.9        5.5  0.972
+                                         Metal7:      193.4      380.8  0.984
+                                         Metal8:        4.8        9.5  1.000
+CTS_96:   preferred: Metal7 - Metal8
+               222.2     435.4    0.980
+                                         Metal3:        0.8        1.2  0.725
+                                         Metal6:        0.8        1.2  0.793
+                                         Metal7:      115.4      222.5  0.964
+                                         Metal8:      105.3      210.5  1.000
+CTS_147:   preferred: Metal2 - Metal7
+               272.5     534.7    0.981
+                                         Metal2:        0.5        0.1  0.098
+                                         Metal3:        7.1       12.7  0.896
+                                         Metal4:      160.0      319.1  0.997
+                                         Metal5:        4.0        8.0  1.000
+                                         Metal6:        0.6        0.0  0.000
+                                         Metal7:      100.3      194.8  0.971
+CTS_98:   preferred: Metal7 - Metal8
+               129.2     253.6    0.981
+                                         Metal3:        0.4        0.8  1.000
+                                         Metal6:        0.6        1.0  0.868
+                                         Metal7:      105.6      206.6  0.978
+                                         Metal8:       22.6       45.2  1.000
+CTS_32:   preferred: Metal7 - Metal8
+               194.2     381.3    0.982
+                                         Metal3:        2.6        5.2  0.999
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      191.4      375.9  0.982
+CTS_4:   preferred: Metal2 - Metal7
+               149.9     294.4    0.982
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        4.3        5.9  0.685
+                                         Metal4:      124.7      248.1  0.995
+                                         Metal5:       20.7       40.4  0.975
+CTS_150:   preferred: Metal7 - Metal8
+                77.3     151.8    0.983
+                                         Metal2:        1.5        2.1  0.701
+                                         Metal3:        3.6        5.4  0.753
+                                         Metal4:        0.8        1.5  1.000
+                                         Metal7:       71.4      142.8  1.000
+CTS_174:   preferred: Metal7 - Metal8
+               147.3     290.2    0.985
+                                         Metal2:        0.5        0.0  0.000
+                                         Metal3:        6.6       10.4  0.789
+                                         Metal4:       12.0       23.3  0.973
+                                         Metal6:        6.8       13.7  1.000
+                                         Metal7:      121.4      242.8  1.000
+CTS_180:   preferred: Metal7 - Metal8
+                19.2      37.8    0.985
+                                         Metal2:        0.7        0.9  0.677
+                                         Metal3:        0.4        0.7  0.833
+                                         Metal7:        9.2       18.4  1.000
+                                         Metal8:        8.9       17.9  1.000
+CTS_101:   preferred: Metal2 - Metal7
+               134.5     265.2    0.986
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        0.4        0.4  0.500
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal5:        2.4        3.7  0.762
+                                         Metal6:       30.6       60.8  0.995
+                                         Metal7:      100.6      199.8  0.993
+CTS_134:   preferred: Metal7 - Metal8
+                16.8      33.2    0.986
+                                         Metal2:        7.0       13.6  0.966
+                                         Metal3:        9.8       19.6  1.000
+CTS_20:   preferred: Metal7 - Metal8
+               182.4     359.6    0.986
+                                         Metal2:        0.6        1.1  1.000
+                                         Metal3:        0.6        0.6  0.500
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal5:        1.6        3.2  1.000
+                                         Metal6:        0.6        1.1  1.000
+                                         Metal7:      145.6      291.2  1.000
+                                         Metal8:       32.9       61.2  0.931
+CTS_149:   preferred: Metal7 - Metal8
+               267.2     526.9    0.986
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        2.0        0.0  0.000
+                                         Metal4:        0.4        0.0  0.000
+                                         Metal6:        0.4        0.2  0.250
+                                         Metal7:      162.0      322.2  0.995
+                                         Metal8:      102.2      204.4  1.000
+CTS_52:   preferred: Metal7 - Metal8
+                12.8      25.3    0.986
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        6.0       11.6  0.970
+                                         Metal4:        6.7       13.3  1.000
+CTS_13:   preferred: Metal7 - Metal8
+               164.1     324.0    0.987
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        0.6        1.0  0.829
+                                         Metal4:        0.6        0.4  0.362
+                                         Metal5:        0.4        0.3  0.331
+                                         Metal7:      142.2      281.7  0.990
+                                         Metal8:       20.1       40.3  1.000
+CTS_55:   preferred: Metal7 - Metal8
+                40.5      80.0    0.987
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        3.0        5.8  0.966
+                                         Metal6:        1.3        2.1  0.769
+                                         Metal7:        5.0       10.0  1.000
+                                         Metal8:       31.0       61.9  1.000
+CTS_80:   preferred: Metal7 - Metal8
+                29.2      57.7    0.988
+                                         Metal2:        0.4        0.4  0.553
+                                         Metal3:        4.2        8.0  0.954
+                                         Metal7:        2.8        5.6  1.000
+                                         Metal8:       21.9       43.7  1.000
+CTS_143:   preferred: Metal7 - Metal8
+               124.4     245.8    0.988
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        6.2       10.3  0.827
+                                         Metal4:        0.6        0.6  0.500
+                                         Metal7:       96.2      192.4  1.000
+                                         Metal8:       21.1       42.2  1.000
+CTS_27:   preferred: Metal7 - Metal8
+                43.8      86.5    0.988
+                                         Metal2:        0.6        1.1  0.978
+                                         Metal3:        4.6        8.9  0.964
+                                         Metal4:        2.1        4.2  1.000
+                                         Metal5:        0.4        0.8  1.000
+                                         Metal6:        0.4        0.2  0.244
+                                         Metal7:        0.6        1.1  0.887
+                                         Metal8:       35.1       70.3  1.000
+CTS_14:   preferred: Metal7 - Metal8
+               310.9     614.3    0.988
+                                         Metal2:        0.6        1.1  0.978
+                                         Metal3:        2.0        3.8  0.954
+                                         Metal4:        0.4        0.0  0.000
+                                         Metal6:        0.6        1.0  0.833
+                                         Metal7:      277.4      548.4  0.988
+                                         Metal8:       30.0       60.0  1.000
+genblk3_11_i_mul_wrapper_a/CTS_1:   preferred: Metal2 - Metal7
+               222.7     440.0    0.988
+                                         Metal3:        0.2        0.2  0.500
+                                         Metal5:        0.8        0.3  0.166
+                                         Metal6:       88.9      174.7  0.982
+                                         Metal7:      132.8      264.9  0.997
+CTS_189:   preferred: Metal7 - Metal8
+               231.5     457.5    0.988
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        2.2        0.0  0.000
+                                         Metal6:        1.3        1.9  0.714
+                                         Metal7:      216.0      432.0  1.000
+                                         Metal8:       11.6       23.2  1.000
+CTS_126:   preferred: Metal7 - Metal8
+               121.1     239.5    0.989
+                                         Metal2:        0.4        0.0  0.000
+                                         Metal3:        0.4        0.4  0.500
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal7:        1.0        1.6  0.828
+                                         Metal8:      119.1      237.4  0.996
+CTS_146:   preferred: Metal7 - Metal8
+               231.9     458.5    0.989
+                                         Metal3:        0.6        1.0  0.829
+                                         Metal7:      118.6      233.1  0.983
+                                         Metal8:      112.7      224.5  0.996
+genblk1_0_i_mem_a/CTS_1:   preferred: Metal2 - Metal7
+               210.3     415.9    0.989
+                                         Metal5:      206.6      410.0  0.992
+                                         Metal6:        3.2        6.0  0.920
+                                         Metal7:        0.5        0.0  0.000
+CTS_33:   preferred: Metal7 - Metal8
+               227.2     449.6    0.989
+                                         Metal2:        0.6        0.6  0.500
+                                         Metal3:       12.8       22.8  0.892
+                                         Metal4:        0.6        0.0  0.000
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       54.8      109.4  0.998
+                                         Metal8:      158.3      316.5  1.000
+CTS_105:   preferred: Metal2 - Metal7
+               326.7     646.4    0.989
+                                         Metal2:        0.4        0.7  0.967
+                                         Metal3:        0.8        1.5  0.916
+                                         Metal4:      206.2      410.6  0.996
+                                         Metal5:       13.6       24.8  0.912
+                                         Metal6:        0.8        0.0  0.000
+                                         Metal7:      105.0      208.8  0.994
+CTS_84:   preferred: Metal7 - Metal8
+                71.3     141.2    0.990
+                                         Metal2:        0.4        0.8  1.000
+                                         Metal3:        4.2        8.0  0.952
+                                         Metal5:        0.2        0.2  0.500
+                                         Metal6:        0.6        0.6  0.500
+                                         Metal7:        8.6       16.9  0.983
+                                         Metal8:       57.4      114.8  1.000
+i_clk_div_inv/CTS_3:   preferred: Metal7 - Metal8
+                77.4     153.2    0.990
+                                         Metal2:        0.8        1.5  1.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       49.2       97.0  0.986
+                                         Metal8:       25.7       51.3  1.000
+genblk1_7_i_mem_a/CTS_1:   preferred: Metal2 - Metal7
+               179.8     356.1    0.990
+                                         Metal5:        0.2        0.0  0.000
+                                         Metal6:        1.6        1.9  0.599
+                                         Metal7:      178.0      354.2  0.995
+CTS_70:   preferred: Metal7 - Metal8
+               174.3     345.2    0.990
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.8        2.4  0.435
+                                         Metal6:        1.9        3.6  0.945
+                                         Metal7:      169.4      338.8  1.000
+CTS_157:   preferred: Metal7 - Metal8
+               126.7     250.9    0.991
+                                         Metal2:        0.6        1.1  1.000
+                                         Metal3:        2.6        4.1  0.790
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal6:        1.7        3.2  0.942
+                                         Metal7:      121.2      241.3  0.995
+CTS_128:   preferred: Metal7 - Metal8
+                54.0     106.9    0.991
+                                         Metal2:        0.6        0.6  0.500
+                                         Metal3:        3.4        6.4  0.938
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal7:       11.6       23.2  1.000
+                                         Metal8:       37.8       75.6  1.000
+CTS_21:   preferred: Metal2 - Metal7
+               281.3     557.4    0.991
+                                         Metal4:       20.7       41.4  1.000
+                                         Metal5:      112.4      221.8  0.987
+                                         Metal6:      146.7      292.9  0.998
+                                         Metal7:        1.5        1.3  0.449
+CTS_164:   preferred: Metal7 - Metal8
+               154.9     307.1    0.991
+                                         Metal2:        1.6        2.2  0.687
+                                         Metal3:        1.6        2.9  0.895
+                                         Metal6:        2.1        3.0  0.717
+                                         Metal7:      139.4      278.5  0.999
+                                         Metal8:       10.3       20.5  1.000
+CTS_159:   preferred: Metal7 - Metal8
+               180.7     358.2    0.991
+                                         Metal2:        0.4        0.6  0.750
+                                         Metal3:        3.6        5.8  0.801
+                                         Metal4:       13.5       26.1  0.968
+                                         Metal5:        0.4        0.4  0.500
+                                         Metal7:      156.0      311.9  1.000
+                                         Metal8:        6.8       13.5  0.985
+CTS_34:   preferred: Metal7 - Metal8
+               131.6     260.9    0.991
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        2.0        3.2  0.797
+                                         Metal4:        0.4        0.4  0.500
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:        0.8        1.6  1.000
+                                         Metal8:      127.7      255.0  0.999
+CTS_154:   preferred: Metal2 - Metal7
+               282.7     560.5    0.991
+                                         Metal2:        0.3        0.2  0.328
+                                         Metal3:       15.0       27.6  0.921
+                                         Metal4:       60.4      119.5  0.988
+                                         Metal5:      207.0      413.2  0.998
+CTS_30:   preferred: Metal7 - Metal8
+                95.7     189.7    0.991
+                                         Metal2:        0.7        0.3  0.230
+                                         Metal3:        0.4        0.4  0.500
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal7:        3.4        6.8  1.000
+                                         Metal8:       91.0      182.0  1.000
+genblk1_8_i_mem_b/CTS_1:   preferred: Metal2 - Metal7
+                96.0     190.4    0.991
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        0.4        0.8  1.000
+                                         Metal5:       70.4      140.8  1.000
+                                         Metal6:       19.4       38.2  0.985
+                                         Metal7:        5.5       10.3  0.939
+CTS_163:   preferred: Metal7 - Metal8
+               176.8     350.6    0.992
+                                         Metal2:        0.4        0.6  0.750
+                                         Metal3:        4.0        6.9  0.858
+                                         Metal6:        0.2        0.0  0.000
+                                         Metal7:       54.6      108.1  0.990
+                                         Metal8:      117.6      235.0  0.999
+CTS_9:   preferred: Metal7 - Metal8
+               295.6     586.3    0.992
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        2.4        0.4  0.083
+                                         Metal7:      132.6      265.2  1.000
+                                         Metal8:      160.4      320.7  1.000
+CTS_191:   preferred: Metal7 - Metal8
+                90.2     179.0    0.992
+                                         Metal2:        0.6        0.8  0.667
+                                         Metal3:        2.4        4.0  0.840
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal7:       31.0       61.9  0.998
+                                         Metal8:       56.1      112.1  1.000
+CTS_24:   preferred: Metal7 - Metal8
+                45.9      91.1    0.992
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal6:        1.1        1.9  0.833
+                                         Metal7:       20.2       40.3  0.996
+                                         Metal8:       22.8       45.6  1.000
+CTS_169:   preferred: Metal7 - Metal8
+               263.9     523.7    0.992
+                                         Metal2:        0.6        1.0  0.833
+                                         Metal3:        2.8        3.9  0.689
+                                         Metal7:        0.8        1.4  0.872
+                                         Metal8:      259.8      517.5  0.996
+CTS_132:   preferred: Metal7 - Metal8
+               133.1     264.1    0.992
+                                         Metal2:        0.4        0.0  0.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal5:        1.6        2.2  0.690
+                                         Metal7:        1.0        2.0  1.000
+                                         Metal8:      128.1      256.1  1.000
+genblk1_15_i_mem_b/CTS_1:   preferred: Metal2 - Metal7
+               222.5     441.6    0.992
+                                         Metal6:       54.9      106.4  0.969
+                                         Metal7:      167.6      335.2  1.000
+genblk1_3_i_mem_b/CTS_1:   preferred: Metal2 - Metal7
+               196.2     389.7    0.993
+                                         Metal6:       35.8       71.1  0.992
+                                         Metal7:      160.4      318.7  0.993
+CTS_161:   preferred: Metal7 - Metal8
+                99.7     198.1    0.993
+                                         Metal2:        0.4        0.7  0.967
+                                         Metal3:        3.8        7.4  0.976
+                                         Metal4:        0.4        0.4  0.500
+                                         Metal6:        1.7        3.4  1.000
+                                         Metal7:       71.6      142.5  0.995
+                                         Metal8:       21.9       43.7  1.000
+CTS_89:   preferred: Metal7 - Metal8
+               109.1     216.8    0.993
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        4.6        9.1  0.985
+                                         Metal4:        8.6       16.3  0.953
+                                         Metal6:        1.0        1.4  0.750
+                                         Metal8:       94.8      189.6  1.000
+CTS_153:   preferred: Metal7 - Metal8
+               236.5     470.0    0.994
+                                         Metal2:        0.8        1.5  1.000
+                                         Metal3:        0.6        1.2  1.000
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal6:        0.6        0.4  0.390
+                                         Metal7:      234.0      465.7  0.995
+CTS_186:   preferred: Metal7 - Metal8
+               336.5     668.7    0.994
+                                         Metal2:        0.4        0.2  0.250
+                                         Metal3:        2.8        4.0  0.709
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:        5.0        9.7  0.970
+                                         Metal8:      328.1      654.7  0.998
+CTS_18:   preferred: Metal2 - Metal7
+               239.5     476.0    0.994
+                                         Metal2:        0.1        0.0  0.000
+                                         Metal3:        0.6        1.2  1.000
+                                         Metal4:       98.0      194.4  0.991
+                                         Metal5:      140.8      280.5  0.996
+CTS_8:   preferred: Metal7 - Metal8
+               304.1     604.4    0.994
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        2.0        2.0  0.500
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        0.2        0.0  0.000
+                                         Metal7:       48.8       96.6  0.990
+                                         Metal8:      252.7      505.4  1.000
+CTS_140:   preferred: Metal7 - Metal8
+               272.6     541.8    0.994
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.6        3.6  0.702
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      266.2      530.8  0.997
+                                         Metal8:        3.4        6.8  1.000
+CTS_12:   preferred: Metal7 - Metal8
+               119.3     237.2    0.994
+                                         Metal2:        0.6        0.8  0.662
+                                         Metal3:        1.0        1.8  0.882
+                                         Metal4:        0.4        0.4  0.500
+                                         Metal6:        1.3        2.2  0.825
+                                         Metal7:       36.8       73.6  1.000
+                                         Metal8:       79.2      158.5  1.000
+CTS_185:   preferred: Metal7 - Metal8
+               309.6     615.4    0.994
+                                         Metal2:        0.4        0.7  0.934
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal4:        0.4        0.6  0.836
+                                         Metal5:        0.2        0.2  0.500
+                                         Metal6:        1.3        1.0  0.359
+                                         Metal7:      253.4      505.2  0.997
+                                         Metal8:       51.9      103.7  1.000
+CTS_92:   preferred: Metal2 - Metal7
+               158.9     316.0    0.994
+                                         Metal2:        0.4        0.2  0.295
+                                         Metal3:        1.0        0.9  0.432
+                                         Metal4:      157.5      314.9  1.000
+CTS_184:   preferred: Metal7 - Metal8
+               380.8     757.4    0.994
+                                         Metal2:        0.3        0.3  0.500
+                                         Metal3:        0.4        0.3  0.331
+                                         Metal6:        0.8        0.9  0.571
+                                         Metal7:      139.8      276.8  0.990
+                                         Metal8:      239.6      479.2  1.000
+CTS_65:   preferred: Metal7 - Metal8
+               134.1     266.7    0.995
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        4.0        7.6  0.952
+                                         Metal4:        0.2        0.1  0.132
+                                         Metal6:        1.1        1.9  0.833
+                                         Metal7:      119.8      239.3  0.999
+                                         Metal8:        8.7       17.5  1.000
+CTS_137:   preferred: Metal7 - Metal8
+               270.4     538.0    0.995
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal4:        0.4        0.2  0.295
+                                         Metal6:        1.0        0.8  0.417
+                                         Metal7:      169.0      336.9  0.997
+                                         Metal8:       97.9      195.7  1.000
+CTS_72:   preferred: Metal7 - Metal8
+               200.0     397.9    0.995
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        1.8        3.2  0.889
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:       71.8      142.6  0.993
+                                         Metal8:      125.8      251.6  1.000
+CTS_193:   preferred: Metal7 - Metal8
+                59.9     119.1    0.995
+                                         Metal2:        0.4        0.8  1.000
+                                         Metal3:        0.8        1.4  0.875
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       29.8       59.6  1.000
+                                         Metal8:       28.5       57.0  1.000
+CTS_207:   preferred: Metal7 - Metal8
+                11.2      22.4    0.996
+                                         Metal2:        0.1        0.1  0.500
+                                         Metal6:        4.9        9.9  1.000
+                                         Metal7:        6.2       12.4  1.000
+CTS_187:   preferred: Metal7 - Metal8
+               279.5     556.6    0.996
+                                         Metal2:        0.4        0.0  0.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal4:        0.4        0.2  0.295
+                                         Metal6:        1.3        1.8  0.679
+                                         Metal7:      130.0      259.8  0.999
+                                         Metal8:      145.3      290.7  1.000
+CTS_167:   preferred: Metal7 - Metal8
+               257.5     512.8    0.996
+                                         Metal3:        0.6        0.4  0.329
+                                         Metal6:        0.8        1.0  0.678
+                                         Metal7:      193.4      386.0  0.998
+                                         Metal8:       62.7      125.4  1.000
+CTS_74:   preferred: Metal7 - Metal8
+               151.7     302.1    0.996
+                                         Metal3:        3.0        5.6  0.932
+                                         Metal7:        1.8        2.8  0.772
+                                         Metal8:      146.9      293.7  1.000
+CTS_31:   preferred: Metal2 - Metal7
+               358.7     714.5    0.996
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal6:        0.3        0.0  0.000
+                                         Metal7:        1.7        1.3  0.371
+                                         Metal8:      356.4      712.9  1.000
+CTS_103:   preferred: Metal7 - Metal8
+               107.7     214.6    0.996
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.6  0.895
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       13.0       26.0  1.000
+                                         Metal8:       92.2      184.3  1.000
+CTS_142:   preferred: Metal7 - Metal8
+               215.5     429.4    0.996
+                                         Metal3:        1.6        1.6  0.500
+                                         Metal7:       78.8      157.6  1.000
+                                         Metal8:      135.1      270.2  1.000
+CTS_145:   preferred: Metal7 - Metal8
+                51.4     102.5    0.996
+                                         Metal3:        3.4        6.8  1.000
+                                         Metal5:        7.6       15.2  1.000
+                                         Metal7:        2.8        5.6  1.000
+                                         Metal8:       37.6       74.9  0.995
+CTS_7:   preferred: Metal7 - Metal8
+               233.2     464.8    0.996
+                                         Metal3:        1.8        3.1  0.860
+                                         Metal4:        0.4        0.0  0.000
+                                         Metal6:        0.2        0.0  0.000
+                                         Metal7:       57.0      114.0  1.000
+                                         Metal8:      173.8      347.7  1.000
+CTS_170:   preferred: Metal7 - Metal8
+               260.2     518.6    0.996
+                                         Metal2:        0.8        1.5  1.000
+                                         Metal3:        5.6       10.3  0.916
+                                         Metal4:        2.9        5.2  0.916
+                                         Metal7:        0.8        1.3  0.784
+                                         Metal8:      250.2      500.4  1.000
+CTS_63:   preferred: Metal7 - Metal8
+               190.3     379.3    0.997
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        7.8       15.6  0.999
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:      123.8      247.3  0.999
+                                         Metal8:       58.0      115.9  1.000
+CTS_107:   preferred: Metal7 - Metal8
+               291.9     581.9    0.997
+                                         Metal2:        0.8        1.1  0.750
+                                         Metal3:        4.2        7.6  0.909
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal6:        0.2        0.0  0.000
+                                         Metal7:        5.0       10.0  1.000
+                                         Metal8:      281.6      563.2  1.000
+CTS_61:   preferred: Metal7 - Metal8
+                88.3     176.1    0.997
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal6:        1.1        2.1  0.917
+                                         Metal7:        1.0        2.0  1.000
+                                         Metal8:       84.0      167.6  0.998
+CTS_39:   preferred: Metal7 - Metal8
+               251.6     501.6    0.997
+                                         Metal3:        1.8        2.4  0.662
+                                         Metal5:        0.6        1.2  1.000
+                                         Metal7:        9.8       19.2  0.980
+                                         Metal8:      239.4      478.8  1.000
+CTS_190:   preferred: Metal7 - Metal8
+               304.1     606.2    0.997
+                                         Metal3:        2.6        4.4  0.845
+                                         Metal4:        0.4        0.2  0.244
+                                         Metal6:        0.4        0.2  0.295
+                                         Metal7:      287.6      575.2  1.000
+                                         Metal8:       13.1       26.2  1.000
+CTS_173:   preferred: Metal7 - Metal8
+                59.6     118.7    0.997
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.954
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal7:       30.0       60.0  1.000
+                                         Metal8:       27.2       54.3  1.000
+CTS_77:   preferred: Metal7 - Metal8
+               183.0     364.9    0.997
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        2.2        4.2  0.955
+                                         Metal6:        1.5        2.3  0.750
+                                         Metal7:      146.8      293.6  1.000
+                                         Metal8:       32.3       64.6  1.000
+CTS_36:   preferred: Metal7 - Metal8
+               171.4     341.7    0.997
+                                         Metal2:        1.1        2.3  1.000
+                                         Metal3:        3.2        5.7  0.885
+                                         Metal6:        0.4        0.8  1.000
+                                         Metal7:        4.0        7.7  0.963
+                                         Metal8:      162.6      325.3  1.000
+CTS_172:   preferred: Metal7 - Metal8
+               280.6     559.5    0.997
+                                         Metal3:        3.0        5.6  0.932
+                                         Metal4:        0.4        0.2  0.244
+                                         Metal6:        1.2        1.6  0.709
+                                         Metal7:      246.6      493.2  1.000
+                                         Metal8:       29.4       58.9  1.000
+CTS_141:   preferred: Metal7 - Metal8
+               134.1     267.5    0.997
+                                         Metal2:        0.6        1.1  1.000
+                                         Metal3:        2.2        3.8  0.864
+                                         Metal4:        0.6        1.1  1.000
+                                         Metal6:        1.3        2.5  0.929
+                                         Metal7:      126.8      253.6  1.000
+                                         Metal8:        2.7        5.3  1.000
+CTS_102:   preferred: Metal7 - Metal8
+               229.3     457.3    0.997
+                                         Metal2:        0.2        0.0  0.000
+                                         Metal3:        0.2        0.0  0.000
+                                         Metal7:       25.6       50.7  0.990
+                                         Metal8:      203.3      406.6  1.000
+CTS_205:   preferred: Metal7 - Metal8
+               145.5     290.3    0.997
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.4        4.2  0.874
+                                         Metal7:        1.4        2.6  0.927
+                                         Metal8:      141.6      283.1  1.000
+CTS_144:   preferred: Metal7 - Metal8
+               234.1     467.0    0.997
+                                         Metal2:        0.4        0.4  0.500
+                                         Metal3:        0.6        0.8  0.662
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:        0.6        1.1  0.887
+                                         Metal8:      232.2      464.4  1.000
+CTS_94:   preferred: Metal7 - Metal8
+               326.2     650.6    0.997
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.6        3.8  0.730
+                                         Metal6:        1.1        1.9  0.838
+                                         Metal7:      300.8      601.6  1.000
+                                         Metal8:       21.5       42.9  1.000
+CTS_165:   preferred: Metal7 - Metal8
+               290.1     578.7    0.997
+                                         Metal2:        0.6        0.0  0.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal4:        0.4        0.4  0.500
+                                         Metal7:       21.0       42.0  1.000
+                                         Metal8:      266.6      533.1  1.000
+genblk1_2_i_mem_b/CTS_1:   preferred: Metal2 - Metal7
+               175.0     349.1    0.997
+                                         Metal5:       83.6      167.2  1.000
+                                         Metal6:       91.4      181.9  0.995
+CTS_114:   preferred: Metal7 - Metal8
+               283.0     564.6    0.997
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        1.1        1.5  0.667
+                                         Metal7:        7.6       14.9  0.980
+                                         Metal8:      272.1      544.2  1.000
+i_clk_div_inv/CTS_4:   preferred: Metal7 - Metal8
+                 2.0       4.0    0.998
+                                         Metal2:        0.0        0.0  0.000
+                                         Metal7:        2.0        4.0  1.000
+CTS_69:   preferred: Metal7 - Metal8
+               249.8     498.4    0.998
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:      186.4      372.0  0.998
+                                         Metal8:       60.4      120.8  1.000
+CTS_91:   preferred: Metal7 - Metal8
+               309.8     618.2    0.998
+                                         Metal3:        2.6        5.2  0.999
+                                         Metal5:        0.2        0.2  0.500
+                                         Metal7:      235.4      469.9  0.998
+                                         Metal8:       71.6      142.9  0.998
+CTS_108:   preferred: Metal7 - Metal8
+               279.7     558.0    0.998
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      202.0      403.2  0.998
+                                         Metal8:       74.9      149.4  0.998
+i_clk_divider/CTS_1:   preferred: Metal7 - Metal8
+               238.3     475.5    0.998
+                                         Metal2:        0.6        0.8  0.667
+                                         Metal3:        0.2        0.0  0.000
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        0.4        0.6  0.816
+                                         Metal7:      107.4      214.8  1.000
+                                         Metal8:      129.6      259.2  1.000
+CTS_196:   preferred: Metal7 - Metal8
+               192.7     384.5    0.998
+                                         Metal2:        0.1        0.1  0.500
+                                         Metal3:        0.4        0.0  0.037
+                                         Metal7:       92.8      185.6  1.000
+                                         Metal8:       99.4      198.7  1.000
+CTS_203:   preferred: Metal7 - Metal8
+               266.8     532.3    0.998
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        0.6        0.2  0.167
+                                         Metal7:      138.4      276.8  1.000
+                                         Metal8:      125.6      251.2  1.000
+CTS_106:   preferred: Metal7 - Metal8
+               147.4     294.1    0.998
+                                         Metal3:        1.0        1.4  0.682
+                                         Metal6:        8.4       16.7  1.000
+                                         Metal7:      138.0      276.0  1.000
+genblk1_4_i_mem_a/CTS_1:   preferred: Metal2 - Metal7
+               220.0     439.1    0.998
+                                         Metal5:      216.8      433.6  1.000
+                                         Metal6:        3.2        5.5  0.856
+CTS_79:   preferred: Metal7 - Metal8
+               264.9     528.6    0.998
+                                         Metal3:        0.6        1.0  0.846
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal5:        1.2        2.0  0.840
+                                         Metal6:        0.4        0.8  1.000
+                                         Metal7:      252.6      504.9  0.999
+                                         Metal8:        9.9       19.8  1.000
+CTS_88:   preferred: Metal7 - Metal8
+               267.5     534.0    0.998
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal6:        0.8        0.8  0.500
+                                         Metal7:      165.4      330.5  0.999
+                                         Metal8:       99.2      198.4  1.000
+CTS_135:   preferred: Metal7 - Metal8
+               245.2     489.4    0.998
+                                         Metal2:        0.8        1.5  1.000
+                                         Metal3:        4.8        9.6  0.999
+                                         Metal4:        6.3       12.1  0.963
+                                         Metal7:      118.2      235.9  0.998
+                                         Metal8:      115.1      230.3  1.000
+CTS_40:   preferred: Metal7 - Metal8
+               241.6     482.2    0.998
+                                         Metal3:        2.6        4.3  0.819
+                                         Metal7:      109.2      218.4  1.000
+                                         Metal8:      129.8      259.5  1.000
+CTS_58:   preferred: Metal7 - Metal8
+               295.8     590.5    0.998
+                                         Metal2:        0.4        0.8  0.874
+                                         Metal3:        0.4        0.0  0.000
+                                         Metal5:        0.4        0.8  1.000
+                                         Metal6:        1.0        1.7  0.900
+                                         Metal7:      168.6      337.2  1.000
+                                         Metal8:      125.0      250.0  1.000
+CTS_86:   preferred: Metal7 - Metal8
+               252.9     504.9    0.998
+                                         Metal2:        0.2        0.2  0.500
+                                         Metal3:        3.2        6.4  0.999
+                                         Metal6:        0.4        0.4  0.566
+                                         Metal7:       30.8       61.6  1.000
+                                         Metal8:      218.3      436.3  0.999
+CTS_5:   preferred: Metal7 - Metal8
+                65.3     130.4    0.998
+                                         Metal3:        2.6        5.0  0.961
+                                         Metal6:        1.9        3.8  1.000
+                                         Metal7:       49.0       98.0  1.000
+                                         Metal8:       11.8       23.6  1.000
+CTS_67:   preferred: Metal7 - Metal8
+               277.4     554.0    0.998
+                                         Metal2:        0.6        1.0  0.833
+                                         Metal3:        2.2        3.9  0.893
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:        1.6        3.2  1.000
+                                         Metal8:      272.8      545.7  1.000
+CTS_198:   preferred: Metal7 - Metal8
+               291.8     582.7    0.999
+                                         Metal2:        0.6        1.1  1.000
+                                         Metal3:        0.6        1.1  0.883
+                                         Metal5:        0.6        1.2  1.000
+                                         Metal6:        0.4        0.4  0.566
+                                         Metal7:      278.6      556.8  0.999
+                                         Metal8:       11.0       22.0  1.000
+CTS_112:   preferred: Metal7 - Metal8
+               193.8     387.1    0.999
+                                         Metal3:        0.6        1.2  1.000
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       72.0      144.0  1.000
+                                         Metal8:      121.0      241.7  0.998
+CTS_48:   preferred: Metal7 - Metal8
+               207.6     414.7    0.999
+                                         Metal3:        1.4        2.8  1.000
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      203.2      406.4  1.000
+                                         Metal8:        2.9        5.3  0.933
+CTS_71:   preferred: Metal7 - Metal8
+               112.3     224.3    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        3.6        7.2  1.000
+                                         Metal4:        8.2       16.3  1.000
+                                         Metal6:        0.8        1.5  1.000
+                                         Metal7:       91.8      183.3  0.998
+                                         Metal8:        7.8       15.6  1.000
+CTS_87:   preferred: Metal7 - Metal8
+               307.2     613.5    0.999
+                                         Metal3:        2.6        5.2  0.999
+                                         Metal7:        7.2       14.2  0.986
+                                         Metal8:      297.4      594.1  0.999
+CTS_204:   preferred: Metal7 - Metal8
+               259.3     518.0    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:        1.0        1.8  0.897
+                                         Metal8:      255.9      511.9  1.000
+CTS_17:   preferred: Metal7 - Metal8
+               196.5     392.7    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      140.0      280.0  1.000
+                                         Metal8:       54.1      108.3  1.000
+CTS_49:   preferred: Metal7 - Metal8
+               351.4     702.2    0.999
+                                         Metal2:        0.4        0.8  1.000
+                                         Metal3:        2.2        4.0  0.908
+                                         Metal6:        0.4        0.5  0.691
+                                         Metal7:      308.2      616.4  1.000
+                                         Metal8:       40.3       80.6  1.000
+CTS_188:   preferred: Metal7 - Metal8
+               311.4     622.2    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.6  0.912
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      305.4      610.8  1.000
+                                         Metal8:        3.6        7.2  1.000
+CTS_162:   preferred: Metal7 - Metal8
+               237.0     473.6    0.999
+                                         Metal3:        1.4        2.8  1.000
+                                         Metal6:        1.0        1.7  0.900
+                                         Metal8:      234.7      469.1  1.000
+CTS_201:   preferred: Metal7 - Metal8
+               248.9     497.4    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:       93.2      186.4  1.000
+                                         Metal8:      153.3      306.7  1.000
+CTS_85:   preferred: Metal7 - Metal8
+               255.4     510.3    0.999
+                                         Metal2:        0.4        0.8  1.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal4:        0.2        0.0  0.000
+                                         Metal6:        0.6        1.1  1.000
+                                         Metal7:       89.0      178.0  1.000
+                                         Metal8:      163.2      326.4  1.000
+CTS_22:   preferred: Metal7 - Metal8
+               214.5     428.6    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        1.1        2.3  1.000
+                                         Metal7:        0.6        1.1  0.887
+                                         Metal8:      210.5      421.0  1.000
+CTS_60:   preferred: Metal7 - Metal8
+               211.4     422.5    0.999
+                                         Metal3:        2.2        4.2  0.953
+                                         Metal6:        2.3        4.5  0.979
+                                         Metal7:        7.6       15.2  1.000
+                                         Metal8:      199.3      398.6  1.000
+CTS_202:   preferred: Metal7 - Metal8
+               278.6     556.8    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:      140.0      280.0  1.000
+                                         Metal8:      136.2      272.5  1.000
+CTS_171:   preferred: Metal7 - Metal8
+               270.5     540.6    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal6:        1.5        2.7  0.875
+                                         Metal7:      266.2      532.4  1.000
+CTS_90:   preferred: Metal7 - Metal8
+               279.9     559.5    0.999
+                                         Metal2:        0.4        0.8  1.000
+                                         Metal3:        1.8        3.6  0.999
+                                         Metal5:        0.8        1.6  0.997
+                                         Metal6:        1.1        1.9  0.833
+                                         Metal7:      219.2      438.4  1.000
+                                         Metal8:       56.6      113.2  1.000
+CTS_120:   preferred: Metal7 - Metal8
+               258.3     516.3    0.999
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        1.6        3.0  0.950
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        2.1        4.2  1.000
+                                         Metal7:      251.2      502.4  1.000
+                                         Metal8:        3.0        6.1  1.000
+CTS_59:   preferred: Metal7 - Metal8
+               161.0     321.8    0.999
+                                         Metal3:        2.6        5.2  0.999
+                                         Metal6:        0.2        0.2  0.500
+                                         Metal7:        2.6        5.2  1.000
+                                         Metal8:      155.6      311.2  1.000
+CTS_64:   preferred: Metal7 - Metal8
+               183.7     367.2    0.999
+                                         Metal3:        2.6        5.2  0.999
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal6:        1.5        3.0  1.000
+                                         Metal7:      179.4      358.8  1.000
+CTS_45:   preferred: Metal7 - Metal8
+               221.2     442.3    1.000
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal5:        0.2        0.2  0.500
+                                         Metal6:        0.2        0.4  1.000
+                                         Metal7:        6.6       13.2  1.000
+                                         Metal8:      211.7      423.3  1.000
+CTS_62:   preferred: Metal7 - Metal8
+               428.5     856.6    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal6:        0.4        0.4  0.500
+                                         Metal7:        7.0       14.0  1.000
+                                         Metal8:      419.3      838.7  1.000
+CTS_116:   preferred: Metal7 - Metal8
+               231.3     462.5    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal7:        0.4        0.8  1.000
+                                         Metal8:      228.8      457.5  1.000
+CTS_83:   preferred: Metal7 - Metal8
+               250.7     501.2    1.000
+                                         Metal3:        0.6        1.0  0.829
+                                         Metal7:      118.6      237.2  1.000
+                                         Metal8:      131.5      263.0  1.000
+CTS_136:   preferred: Metal7 - Metal8
+               231.8     463.5    1.000
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal6:        0.4        0.6  0.816
+                                         Metal7:      104.6      209.2  1.000
+                                         Metal8:      124.3      248.5  1.000
+CTS_54:   preferred: Metal7 - Metal8
+               256.1     512.1    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal4:        0.2        0.2  0.500
+                                         Metal7:        2.8        5.6  1.000
+                                         Metal8:      251.4      502.7  1.000
+CTS_133:   preferred: Metal7 - Metal8
+               266.5     532.8    1.000
+                                         Metal3:        1.2        2.4  1.000
+                                         Metal6:        0.2        0.4  1.000
+                                         Metal7:       46.8       93.6  1.000
+                                         Metal8:      218.3      436.4  1.000
+CTS_35:   preferred: Metal7 - Metal8
+               309.6     619.0    1.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal5:        0.2        0.2  0.500
+                                         Metal7:        7.2       14.4  1.000
+                                         Metal8:      300.6      601.2  1.000
+CTS_200:   preferred: Metal7 - Metal8
+               319.1     637.9    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        2.0        3.8  0.949
+                                         Metal6:        6.5       12.9  1.000
+                                         Metal7:      310.4      620.8  1.000
+CTS_16:   preferred: Metal7 - Metal8
+               259.1     518.1    1.000
+                                         Metal2:        0.1        0.1  0.500
+                                         Metal6:       11.8       23.6  1.000
+                                         Metal7:      247.2      494.4  1.000
+CTS_6:   preferred: Metal7 - Metal8
+                16.1      32.3    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:       11.2       22.4  1.000
+                                         Metal4:        4.8        9.5  1.000
+CTS_82:   preferred: Metal7 - Metal8
+                30.9      61.9    1.000
+                                         Metal3:        2.0        4.0  1.000
+                                         Metal6:        1.5        3.0  1.000
+                                         Metal7:       24.2       48.4  1.000
+                                         Metal8:        3.2        6.5  1.000
+CTS_110:   preferred: Metal7 - Metal8
+               164.5     329.0    1.000
+                                         Metal7:       25.6       51.2  1.000
+                                         Metal8:      138.9      277.8  1.000
+i_clk_div_inv/CTS_1:   preferred: Metal2 - Metal7
+               180.0     360.0    1.000
+                                         Metal4:       80.2      160.4  1.000
+                                         Metal5:       99.8      199.6  1.000
+CTS_28:   preferred: Metal7 - Metal8
+               226.7     453.4    1.000
+                                         Metal7:      125.8      251.6  1.000
+                                         Metal8:      100.9      201.8  1.000
+CTS_75:   preferred: Metal7 - Metal8
+               245.2     490.4    1.000
+                                         Metal2:        0.2        0.4  1.000
+                                         Metal3:        1.8        3.6  1.000
+                                         Metal4:        0.2        0.4  1.000
+                                         Metal6:        0.2        0.4  1.000
+                                         Metal7:       68.4      136.8  1.000
+                                         Metal8:      174.4      348.8  1.000
+CTS_199:   preferred: Metal7 - Metal8
+               263.8     527.6    1.000
+                                         Metal3:        2.6        5.2  1.000
+                                         Metal7:      230.6      461.2  1.000
+                                         Metal8:       30.6       61.2  1.000
+CTS_113:   preferred: Metal7 - Metal8
+               271.6     543.2    1.000
+                                         Metal3:        1.6        3.2  1.000
+                                         Metal7:       31.0       62.0  1.000
+                                         Metal8:      239.0      478.0  1.000
+-------------------------------------------------------------------------------
+
+ Average ratio:                   0.970
+                                         Metal2:          3.3        5.0  0.769
+                                         Metal3:          6.7       12.2  0.904
+                                         Metal4:         13.8       25.7  0.929
+                                         Metal5:         11.2       21.9  0.980
+                                         Metal6:          6.5       11.2  0.864
+                                         Metal7:         65.9      129.7  0.984
+                                         Metal8:         62.8      124.6  0.992
+
+

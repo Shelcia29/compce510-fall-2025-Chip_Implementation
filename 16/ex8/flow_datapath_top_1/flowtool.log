@@ -1,0 +1,83 @@
+Flowtool
+Copyright 2025 Cadence Design Systems Inc.  All rights reserved worldwide
+
+Command:   -verbose -files /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl -enabled 'report_lec synth_spatial pnr_db_handoff add_scan opt_signoff'
+Directory: /home/student/16/ex8/flow_datapath_top_1
+Version:   23.16-s001_1, built 07/11/2025 08:51 PDT
+Date:      Fri Nov 14 15:22:18 2025
+
+**INFO (INTERRUPT): One more Ctrl-C to immediately kill flowtool ...
+## FLOWKIT: sourcing /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/flow_config.tcl
+Info: Sourcing scripts/design_setup.tcl
+Info: Sourcing /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/global_macro_setup.tcl
+Info: MACRO SETUP: v1.0
+ERROR: can't read "mmmc_vars(delay_corners)": no such variable
+    while executing
+"foreach dc $mmmc_vars(delay_corners) {
+
+    regexp {([^_]+)_([^_]+)_([^_]+)_([\w]+)} $dc -> corn volt temp rc
+
+    # PLL .lib
+    lappend mmmc_vars(${..."
+    (file "/home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/global_macro_setup.tcl" line 28)
+    invoked from within
+"source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/global_macro_setup.tcl"
+    invoked from within
+"flow_interp invokehidden -- source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/global_macro_setup.tcl"
+    ("eval" body line 1)
+    invoked from within
+"eval [list flow_interp invokehidden -- source {*}$args]"
+    (procedure "::flowtool::interp_source" line 62)
+    invoked from within
+"source [get_db flow_source_directory]/global_macro_setup.tcl"
+    invoked from within
+"if {[file exists [get_db flow_source_directory]/global_macro_setup.tcl]} {
+    puts "Info: Sourcing [get_db flow_source_directory]/global_macro_setup...."
+    (file "/home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/flow_config.tcl" line 71)
+    invoked from within
+"source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/flow_config.tcl"
+    invoked from within
+"flow_interp invokehidden -- source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/flow_config.tcl"
+    ("eval" body line 1)
+    invoked from within
+"eval [list flow_interp invokehidden -- source {*}$args]"
+    (procedure "::flowtool::interp_source" line 62)
+    invoked from within
+"source -quiet [file join [file dirname [info script]] flow_config.tcl]"
+    invoked from within
+"if {[file exists scripts/flow_config.tcl]} {
+    puts "## FLOWKIT: sourcing scripts/flow_config.tcl"
+    source -quiet scripts/flow_config.tcl
+} else ..."
+    (file "/home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl" line 425)
+    invoked from within
+"source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl"
+    invoked from within
+"flow_interp invokehidden -- source /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl"
+    ("eval" body line 1)
+    invoked from within
+"eval [list flow_interp invokehidden -- source {*}$args]"
+    (procedure "::flowtool::interp_source" line 62)
+    invoked from within
+"source -quiet /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl"
+    (in namespace eval "::" script line 1)
+    invoked from within
+"namespace eval :: {source -quiet /home/student/16/ex8/flow_datapath_top_1/cadence_flow_scripts/scripts/run_flow.tcl}"
+    invoked from within
+"::flowkit::eval_user_script $debug [list namespace eval :: [list source -quiet $file]] 2"
+    ("tcl" arm line 8)
+    invoked from within
+"switch -exact [dict get $obj type] {
+          tcl {
+            if {$inside_init_flow} {
+              ::flowkit::generic.log_command "#@ (init_flow)..."
+    (procedure "::flowkit::generic.read_flow" line 57)
+    invoked from within
+"::flowkit::generic.read_flow $debug $no_check $script_files"
+    (procedure "parse_argv" line 502)
+    invoked from within
+"parse_argv $argv"
+    (procedure "main" line 28)
+    invoked from within
+"main {*}$args"
+Flow failed

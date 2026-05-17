@@ -1,0 +1,6 @@
+MacroModel pin genblk1_0_i_mem_a/i_ram/CLK  133.50ps 133.50ps 133.50ps 133.50ps 0pf slow_0p9v_125c_cmax_func
+MacroModel pin genblk1_0_i_mem_a/i_ram/CLK  133.50ps 133.50ps 133.50ps 133.50ps 0pf slow_0p9v_125c_cmax_scan_capture
+MacroModel pin genblk1_0_i_mem_a/i_ram/CLK  133.50ps 133.50ps 133.50ps 133.50ps 0pf slow_0p9v_125c_cmax_scan_shift
+MacroModel pin genblk3_14_i_mul_wrapper_b/i_mul_a/clk_i  -18.00ps -18.00ps -18.00ps -18.00ps 0pf slow_0p9v_125c_cmax_func
+MacroModel pin genblk3_14_i_mul_wrapper_b/i_mul_a/clk_i  -18.00ps -18.00ps -18.00ps -18.00ps 0pf slow_0p9v_125c_cmax_scan_capture
+MacroModel pin genblk3_14_i_mul_wrapper_b/i_mul_a/clk_i  -18.00ps -18.00ps -18.00ps -18.00ps 0pf slow_0p9v_125c_cmax_scan_shift

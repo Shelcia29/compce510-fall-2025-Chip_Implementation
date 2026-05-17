@@ -1,0 +1,15 @@
+
+Cadence Innovus(TM) Implementation System.
+Copyright 2024 Cadence Design Systems, Inc. All rights reserved worldwide.
+
+Version:	v23.15-s106_1, built Wed Jul 16 17:15:29 PDT 2025
+Options:	
+Date:		Fri Nov 21 15:12:03 2025
+Host:		ASIC-vm (x86_64 w/Linux 4.18.0-553.69.1.el8_10.x86_64) (8cores*8cpus*12th Gen Intel(R) Core(TM) i7-12700 25600KB)
+OS:		Rocky Linux 8.10 (Green Obsidian)
+
+License:
+		[15:12:12.329057] Configured Lic search path (23.02-s006): 5280@licl01.it.tuni.fi
+
+		invs	Innovus Implementation System	23.1	checkout succeeded
+		8 CPU jobs allowed with the current license(s). Use setMultiCpuUsage to set your required CPU count.

@@ -1,0 +1,2 @@
+rm -rf flow* logs/ fv/ reports/ output* *~ atpg/ innovus.* pvsUI* qrc* collect* chkd* client_log ecoTimingDB dbs host* datapath_top* rc_model*
+
